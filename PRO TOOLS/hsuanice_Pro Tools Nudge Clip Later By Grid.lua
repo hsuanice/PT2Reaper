@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Later By Grid
--- @version 0.8.5 [260422.1820]
+-- @version 0.9.0 [260422.1820]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -20,6 +20,9 @@
 --
 --   Tags: Editing
 -- @changelog
+--   0.9.0 [260422.1820] - Source-bound clamp for Move (two-step PT behavior):
+--                        Cases 2/3/4/6/7 first clamp delta to source limit; razor follows actual movement
+--                        via min |actual_delta|; next attempt at the boundary shows the warning.
 --   0.8.5 [260422.1820] - All razors sync: any blocked track freezes all razors and time selection (not per-track)
 --   0.8.4 [260422.1820] - nudge_item returns false on guard block; main loop freezes razor+time-sel when all tracks blocked
 --   0.8.3 [260422.1820] - Case 2: unify Earlier fi_len guard — stops when fi_len exhausted (Zone A consumed) for all xf cases
@@ -161,6 +164,25 @@ local function nudge_item(item, sel_s, sel_e, delta)
     if delta > 0 and fo_len - delta < EPS then return false end               -- fo_len would be exhausted (Later)
     if delta < 0 and fi_len + delta < EPS then return false end               -- fi_len would be exhausted (Earlier) — Zone A consumed
     if not right_xf and not left_xf and delta < 0 and (fo_start - fi_end) + delta < EPS then return false end
+    -- Source-bound clamp: right_xf Earlier shrinks xf STARTOFFS
+    if right_xf and delta < 0 and NudgeEdge then
+      local xf_take = r.GetActiveTake(right_xf)
+      if xf_take then
+        local max_left = NudgeEdge.max_extend_left(xf_take)
+        if max_left < EPS then NudgeEdge.source_warning(); return false end
+        if -delta > max_left then delta = -max_left end
+      end
+    end
+    -- Source-bound clamp: left_xf Later grows la_len (Zone D atomic)
+    if left_xf and delta > 0 and NudgeEdge then
+      local la_take = r.GetActiveTake(left_xf)
+      if la_take then
+        local la_len_cur = r.GetMediaItemInfo_Value(left_xf, 'D_LENGTH')
+        local max_right = NudgeEdge.max_extend_right(left_xf, la_take, la_len_cur)
+        if max_right < EPS then NudgeEdge.source_warning(); return false end
+        if delta > max_right then delta = max_right end
+      end
+    end
     -- Left atomic (Zone D): item_e_A moves with fi_end_B
     if left_xf then
       local la_len = r.GetMediaItemInfo_Value(left_xf, 'D_LENGTH')
@@ -197,6 +219,12 @@ local function nudge_item(item, sel_s, sel_e, delta)
 
   elseif clip_covered and not fi_covered and fo_covered then
     -- Case 3: clip + fade_out -> fi grows, right end moves, contents move right
+    -- Source-bound clamp: Later shrinks STARTOFFS (offs - delta)
+    if delta > 0 and take and NudgeEdge then
+      local max_left = NudgeEdge.max_extend_left(take)
+      if max_left < EPS then NudgeEdge.source_warning(); return false end
+      if delta > max_left then delta = max_left end
+    end
     r.SetMediaItemInfo_Value(item, 'D_LENGTH', len + delta)
     set_fi_item(fi_len + delta)
     if take then
@@ -208,6 +236,12 @@ local function nudge_item(item, sel_s, sel_e, delta)
   elseif clip_covered and fi_covered and not fo_covered then
     -- Case 4: fade_in + clip -> left end moves, right edge fixed, contents move right
     -- Crossfade fo stays (right edge fixed = physical overlap unchanged)
+    -- Source-bound clamp: Later shrinks STARTOFFS (offs - delta)
+    if delta > 0 and take and NudgeEdge then
+      local max_left = NudgeEdge.max_extend_left(take)
+      if max_left < EPS then NudgeEdge.source_warning(); return false end
+      if delta > max_left then delta = max_left end
+    end
     r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta)
     r.SetMediaItemInfo_Value(item, 'D_LENGTH',   len - delta)
     if not right_xf then
@@ -228,11 +262,23 @@ local function nudge_item(item, sel_s, sel_e, delta)
       local xf_fi  = NudgeEdge and NudgeEdge.get_fi(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEINLEN')
       if xf_len - xf_fo - xf_fi - delta <= EPS then return false end
     end
+    -- Source-bound clamp: Later grows item length
+    if delta > 0 and take and NudgeEdge then
+      local max_right = NudgeEdge.max_extend_right(item, take, len)
+      if max_right < EPS then NudgeEdge.source_warning(); return false end
+      if delta > max_right then delta = max_right end
+    end
     r.SetMediaItemInfo_Value(item, 'D_LENGTH', len + delta)
     sync_right()
 
   elseif fi_covered and not clip_covered then
     -- Case 7: fade_in only -> left end moves
+    -- Source-bound clamp: Earlier shrinks STARTOFFS (offs + delta)
+    if delta < 0 and take and NudgeEdge then
+      local max_left = NudgeEdge.max_extend_left(take)
+      if max_left < EPS then NudgeEdge.source_warning(); return false end
+      if -delta > max_left then delta = -max_left end
+    end
     r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta)
     r.SetMediaItemInfo_Value(item, 'D_LENGTH',   len - delta)
     if take then
@@ -242,7 +288,7 @@ local function nudge_item(item, sel_s, sel_e, delta)
     sync_left()
 
   end
-  return true
+  return true, delta
 end
 
 -- Main
@@ -267,7 +313,15 @@ r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
 
 -- track_nudged: nil = no item processed, true = moved, false = all blocked
+-- min_actual: smallest |actual_delta| across all moved items (for razor sync when items clamp to source bound)
 local track_nudged = {}
+local min_actual = nil
+
+local function track_actual(d)
+  if min_actual == nil or math.abs(d) < math.abs(min_actual) then
+    min_actual = d
+  end
+end
 
 for i = 0, r.CountSelectedMediaItems(0) - 1 do
   local item  = r.GetSelectedMediaItem(0, i)
@@ -282,11 +336,12 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
     if sel_e > pos + EPS and sel_s < item_e - EPS then
       local clamped_s = math.max(sel_s, pos)
       local clamped_e = math.min(sel_e, item_e)
-      local moved = nudge_item(item, clamped_s, clamped_e, delta)
+      local moved, actual = nudge_item(item, clamped_s, clamped_e, delta)
       if moved == false then
         if track_nudged[track] == nil then track_nudged[track] = false end
       else
         track_nudged[track] = true  -- success (or no-match nil) overrides block
+        track_actual(actual or delta)
       end
     end
   else
@@ -294,6 +349,7 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
     if NudgeEdge then NudgeEdge.nudge_position(item, delta)
     else r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta) end
     track_nudged[track] = true
+    track_actual(delta)
   end
 end
 
@@ -303,6 +359,7 @@ for _, v in pairs(track_nudged) do
   if v == false then any_blocked = true; break end
 end
 local do_move = not any_blocked
+local effective_delta = min_actual or delta
 
 for ti = 0, r.CountTracks(0) - 1 do
   if do_move then
@@ -312,7 +369,7 @@ for ti = 0, r.CountTracks(0) - 1 do
       local new_s = s:gsub('(%S+)%s+(%S+)%s+""', function(a, b)
         local rs, re = tonumber(a), tonumber(b)
         if rs and re then
-          return string.format('%.14f %.14f ""', rs + delta, re + delta)
+          return string.format('%.14f %.14f ""', rs + effective_delta, re + effective_delta)
         end
         return a .. ' ' .. b .. ' ""'
       end)
@@ -323,7 +380,7 @@ end
 
 local ts, te = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
 if te > ts + EPS and do_move then
-  r.GetSet_LoopTimeRange(true, false, ts + delta, te + delta, false)
+  r.GetSet_LoopTimeRange(true, false, ts + effective_delta, te + effective_delta, false)
 end
 
 if Sync then Sync.cursor_follow() end
