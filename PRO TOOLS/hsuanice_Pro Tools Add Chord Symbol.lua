@@ -1,0 +1,32 @@
+-- @description hsuanice_Pro Tools Add Chord Symbol
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Stub script for the Pro Tools action:
+--   **Add Chord Symbol**
+--
+--   ## Status
+--   NOT YET IMPLEMENTED — placeholder only.
+--
+--   ## Details
+--   - Pro Tools equivalent : Add Chord Symbol
+--   - Module               : MIDI
+--   - Mac shortcut (PT)    : —
+--   - Tags                 : MIDI, Tempo/Meter
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Stub placeholder created
+
+-- TODO: not yet mapped to a Reaper action
+reaper.ShowMessageBox("Not yet implemented: Add Chord Symbol", "PT2Reaper", 0)

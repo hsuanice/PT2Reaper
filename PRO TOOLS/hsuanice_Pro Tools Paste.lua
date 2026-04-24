@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Paste
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Paste**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Paste
+--   - Reaper action        : Edit: Paste
+--   - Command ID           : 40058
+--   - Module               : Editing
+--   - Mac shortcut (PT)    : Command + V
+--   - Tags                 : Edit menu, Editing
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Paste" to Reaper command ID 40058
+
+reaper.Main_OnCommand(40058, 0)

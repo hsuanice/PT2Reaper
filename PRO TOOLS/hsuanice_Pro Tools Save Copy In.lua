@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Save Copy In
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Save Copy In**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Save Copy In
+--   - Reaper action        : File: Save new version of project (automatically increment project name)
+--   - Command ID           : 41895
+--   - Module               : Misc
+--   - Mac shortcut (PT)    : —
+--   - Tags                 : File menu
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Save Copy In" to Reaper command ID 41895
+
+reaper.Main_OnCommand(41895, 0)

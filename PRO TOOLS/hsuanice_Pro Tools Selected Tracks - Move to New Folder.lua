@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Selected Tracks: Move to New Folder
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Selected Tracks: Move to New Folder**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Selected Tracks: Move to New Folder
+--   - Reaper action        : Track: Move tracks to new folder
+--   - Command ID           : 42785
+--   - Module               : Tracks
+--   - Mac shortcut (PT)    : Command + Option + Shift + N
+--   - Tags                 : Track menu, Track/Playlist
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Selected Tracks: Move to New Folder" to Reaper command ID 42785
+
+reaper.Main_OnCommand(42785, 0)

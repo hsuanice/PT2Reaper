@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Fast Forward
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Fast Forward**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Fast Forward
+--   - Reaper action        : Transport: Fast forward
+--   - Command ID           : 1002
+--   - Module               : Transport
+--   - Mac shortcut (PT)    : Numpad 2
+--   - Tags                 : Transport
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Fast Forward" to Reaper command ID 1002
+
+reaper.Main_OnCommand(1002, 0)

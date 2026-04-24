@@ -1,0 +1,32 @@
+-- @description hsuanice_Pro Tools Clips List: Sort by Channel Name
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Stub script for the Pro Tools action:
+--   **Clips List: Sort by Channel Name**
+--
+--   ## Status
+--   NOT YET IMPLEMENTED — placeholder only.
+--
+--   ## Details
+--   - Pro Tools equivalent : Clips List: Sort by Channel Name
+--   - Module               : Clips
+--   - Mac shortcut (PT)    : —
+--   - Tags                 : Clips, Clips List
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Stub placeholder created
+
+-- TODO: not yet mapped to a Reaper action
+reaper.ShowMessageBox("Not yet implemented: Clips List: Sort by Channel Name", "PT2Reaper", 0)

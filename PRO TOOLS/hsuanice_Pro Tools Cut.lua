@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Cut
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Cut**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Cut
+--   - Reaper action        : Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
+--   - Command ID           : 40059
+--   - Module               : Automation
+--   - Mac shortcut (PT)    : Commands Focus + X
+--   - Tags                 : Automation, Edit menu, Editing
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Cut" to Reaper command ID 40059
+
+reaper.Main_OnCommand(40059, 0)

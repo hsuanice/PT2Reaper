@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Zoom Out Horizontal
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Zoom Out Horizontal**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Zoom Out Horizontal
+--   - Reaper action        : View: Zoom out horizontal
+--   - Command ID           : 1011
+--   - Module               : Zoom
+--   - Mac shortcut (PT)    : Command + [
+--   - Tags                 : Zoom
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Zoom Out Horizontal" to Reaper command ID 1011
+
+reaper.Main_OnCommand(1011, 0)

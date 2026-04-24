@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Loop Play Edit Selection (Numeric Keypad: Shuttle)
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Loop Play Edit Selection (Numeric Keypad: Shuttle)**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Loop Play Edit Selection (Numeric Keypad: Shuttle)
+--   - Reaper action        : Transport: Toggle repeat
+--   - Command ID           : 1068
+--   - Module               : Transport
+--   - Mac shortcut (PT)    : Numpad 0
+--   - Tags                 : Transport
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Loop Play Edit Selection (Numeric Keypad: Shuttle)" to Reaper command ID 1068
+
+reaper.Main_OnCommand(1068, 0)

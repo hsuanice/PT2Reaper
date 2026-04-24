@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Close Session
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Close Session**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Close Session
+--   - Reaper action        : Close current project tab
+--   - Command ID           : 40860
+--   - Module               : Misc
+--   - Mac shortcut (PT)    : —
+--   - Tags                 : —
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Close Session" to Reaper command ID 40860
+
+reaper.Main_OnCommand(40860, 0)

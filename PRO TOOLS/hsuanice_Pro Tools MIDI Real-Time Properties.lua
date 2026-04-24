@@ -1,0 +1,32 @@
+-- @description hsuanice_Pro Tools MIDI Real-Time Properties
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Stub script for the Pro Tools action:
+--   **MIDI Real-Time Properties**
+--
+--   ## Status
+--   NOT YET IMPLEMENTED — placeholder only.
+--
+--   ## Details
+--   - Pro Tools equivalent : MIDI Real-Time Properties
+--   - Module               : Misc
+--   - Mac shortcut (PT)    : Option + Numpad 4
+--   - Tags                 : Event menu, MIDI
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Stub placeholder created
+
+-- TODO: not yet mapped to a Reaper action
+reaper.ShowMessageBox("Not yet implemented: MIDI Real-Time Properties", "PT2Reaper", 0)

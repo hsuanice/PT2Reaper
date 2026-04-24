@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Zoom In Horizontal
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Zoom In Horizontal**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Zoom In Horizontal
+--   - Reaper action        : View: Zoom in horizontal
+--   - Command ID           : 1012
+--   - Module               : Zoom
+--   - Mac shortcut (PT)    : Control + T
+--   - Tags                 : Zoom
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Zoom In Horizontal" to Reaper command ID 1012
+
+reaper.Main_OnCommand(1012, 0)

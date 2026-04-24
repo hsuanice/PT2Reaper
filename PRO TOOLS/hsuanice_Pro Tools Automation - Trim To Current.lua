@@ -1,0 +1,32 @@
+-- @description hsuanice_Pro Tools Automation: Trim To Current
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Stub script for the Pro Tools action:
+--   **Automation: Trim To Current**
+--
+--   ## Status
+--   NOT YET IMPLEMENTED — placeholder only.
+--
+--   ## Details
+--   - Pro Tools equivalent : Automation: Trim To Current
+--   - Module               : Automation
+--   - Mac shortcut (PT)    : Command + Shift + Numpad /
+--   - Tags                 : Automation, Edit menu, Editing
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Stub placeholder created
+
+-- TODO: not yet mapped to a Reaper action
+reaper.ShowMessageBox("Not yet implemented: Automation: Trim To Current", "PT2Reaper", 0)

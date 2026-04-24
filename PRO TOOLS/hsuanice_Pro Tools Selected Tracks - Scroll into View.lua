@@ -1,0 +1,31 @@
+-- @description hsuanice_Pro Tools Selected Tracks: Scroll into View
+-- @version 0.1.0 [260413.1324]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   # hsuanice Pro Tools Keybindings for REAPER
+--
+--   Wrapper script replicating the Pro Tools action:
+--   **Selected Tracks: Scroll into View**
+--
+--   ## Mapping
+--   - Pro Tools equivalent : Selected Tracks: Scroll into View
+--   - Reaper action        : Track: Vertical scroll selected tracks into view
+--   - Command ID           : 40913
+--   - Module               : Tracks
+--   - Mac shortcut (PT)    : —
+--   - Tags                 : Track/Playlist
+--
+--   ## About This Project
+--   Part of the PT2Reaper project — a complete mapping of Pro Tools
+--   keyboard shortcuts and actions to native REAPER equivalents.
+--
+--   ## Development
+--   Developed with the assistance of Claude AI (Anthropic).
+--
+-- @changelog
+--   0.1.0 [260413.1324]
+--     - Initial release
+--     - Maps Pro Tools "Selected Tracks: Scroll into View" to Reaper command ID 40913
+
+reaper.Main_OnCommand(40913, 0)
