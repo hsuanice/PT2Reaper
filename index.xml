@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="ReaPack Repository Template" commit="5771427ef537a56686e96642cdb6b15f356a4750">
+<index version="1" name="PT2Reaper" commit="5771427ef537a56686e96642cdb6b15f356a4750">
   <category name="PRO TOOLS">
     <reapack name="hsuanice_Grid_Nudge_Panel_Reset_Position.lua" type="script" desc="hsuanice_Grid Nudge Panel - Reset Position">
       <metadata>
