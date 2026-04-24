@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Start Earlier By Grid
--- @version 0.7.1 [260422.1407]
+-- @version 0.9.1 [260422.1820]
 -- @author hsuanice
 -- @about
 --   Replicates Pro Tools: **Nudge Clip Start Earlier By Grid**
@@ -8,6 +8,16 @@
 --   Crossfade-aware via NudgeEdge module.
 --   Tags: Editing
 -- @changelog
+--   0.9.1 [260422.1820] - Handle "skipped" return value from nudge_start (3rd value `true`).
+--                         Skipped items don't influence min_actual sync, so pure razor + TS shift correctly
+--                         when crossfade pair has one item handling, the other skipping.
+--   0.9.0 [260422.1820] - Item-track is anchor: track min |delta_used| from nudge_start; pure razors
+--                         and time selection sync to that effective_delta. When item is blocked
+--                         (zone guard), all razors and TS freeze together.
+--   0.8.1 [260422.1820] - Pure-razor and time-selection width guard: keep razor/TS >= 1 nudge grid
+--                         (guard inactive when razor grows, i.e., Start Earlier).
+--   0.8.0 [260422.1820] - Sync razors on tracks WITHOUT items: pure-razor tracks now shift along
+--                         with item-driven nudge (matches Move script behavior).
 --   0.7.0 [260422.1407] - Use NudgeEdge module (crossfade-aware nudge_start); fix cursor fallback direction
 --   0.6.0 [260421.1048] - Add cursor_follow via SelectionSync when loop-link is active
 --   0.5.0 [260421.1048] - Item-only selection uses nudge_start (fade-aware) instead of ApplyNudge
@@ -100,7 +110,8 @@ end
 r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
 
-local new_sel_s_global = nil
+local processed_tracks = {}  -- tracks whose razor was processed via nudge_start (item-driven)
+local min_actual = nil       -- minimum |delta_used| across item-track operations (nil = no items processed)
 
 for i = 0, r.CountSelectedMediaItems(0) - 1 do
   local item  = r.GetSelectedMediaItem(0, i)
@@ -111,38 +122,51 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
 
   if sel_s and sel_e then
     if sel_e > pos + EPS and sel_s < item_e - EPS then
-      local new_s, new_e = nudge_start(item, sel_s, sel_e, delta)
-      if math.abs(new_s - sel_s) > 1e-10 or math.abs(new_e - sel_e) > 1e-10 then
-        new_sel_s_global = new_s
-        update_razor(track, new_s, new_e)
+      local new_s, new_e, skipped = nudge_start(item, sel_s, sel_e, delta)
+      if not skipped then
+        local delta_used = sel_s - new_s  -- amount nudge_start actually applied
+        if min_actual == nil or math.abs(delta_used) < math.abs(min_actual) then
+          min_actual = delta_used
+        end
+        if math.abs(delta_used) > 1e-10 or math.abs(new_e - sel_e) > 1e-10 then
+          update_razor(track, new_s, new_e)
+        end
       end
+      processed_tracks[track] = true
     end
   else
     local new_s, _ = nudge_start(item, pos, item_e, delta)
-    if math.abs(new_s - pos) > 1e-10 then
-      new_sel_s_global = new_s
+    local delta_used = pos - new_s
+    if min_actual == nil or math.abs(delta_used) < math.abs(min_actual) then
+      min_actual = delta_used
     end
   end
 end
 
-if not has_items then
-  if has_razor then
-    for ti = 0, r.CountTracks(0) - 1 do
-      local tr = r.GetTrack(0, ti)
-      local rs, re = get_track_razor(tr)
-      if rs then
-        new_sel_s_global = rs - delta
-        update_razor(tr, rs - delta, re)
+-- Effective delta: item track is anchor; pure razors and TS sync to it
+-- (no items → use full delta; any item blocked → effective_delta = 0 → all freeze)
+local effective_delta = min_actual ~= nil and min_actual or delta
+
+-- Sync razors on tracks NOT processed by item loop (pure-razor tracks)
+for ti = 0, r.CountTracks(0) - 1 do
+  local tr = r.GetTrack(0, ti)
+  if not processed_tracks[tr] then
+    local rs, re = get_track_razor(tr)
+    if rs and re and math.abs(effective_delta) > 1e-10 then
+      if (re - rs) >= -2*effective_delta - EPS then
+        update_razor(tr, rs - effective_delta, re)
       end
     end
-  elseif has_ts then
-    new_sel_s_global = ts_s - delta
   end
 end
 
+-- Time selection: shift start by -effective_delta (also blocks when item track blocks)
 local ts, te = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
-if te > ts + EPS and new_sel_s_global then
-  r.GetSet_LoopTimeRange(true, false, new_sel_s_global, te, false)
+if te > ts + EPS and math.abs(effective_delta) > 1e-10 then
+  local new_ts = ts - effective_delta
+  if (te - new_ts) >= math.abs(effective_delta) - EPS then
+    r.GetSet_LoopTimeRange(true, false, new_ts, te, false)
+  end
 end
 
 r.PreventUIRefresh(-1)
