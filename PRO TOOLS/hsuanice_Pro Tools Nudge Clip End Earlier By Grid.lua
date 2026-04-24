@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip End Earlier By Grid
--- @version 0.8.1 [260422.1820]
+-- @version 0.8.2 [260424.2227]
 -- @author hsuanice
 -- @about
 --   Replicates Pro Tools: **Nudge Clip End Earlier By Grid**
@@ -7,6 +7,10 @@
 --   Zone-aware stop guard prevents zone from disappearing.
 --   Tags: Editing
 -- @changelog
+--   0.8.2 [260424.2227] - No-razor branch: skip item when right xfade partner is also selected.
+--                         Treats full crossfade pair as one virtual item — only the trailing
+--                         O-end nudges (matches nudge_start behavior). Also closes a TS-sync hole
+--                         where in-library skip's delta_used=0 was dragging min_actual down.
 --   0.8.1 [260422.1820] - Handle "skipped" return value from nudge_end (3rd value `true`).
 --                         Skipped items don't influence min_actual sync, so pure razor + TS shift correctly
 --                         when crossfade pair has one item handling, the other skipping.
@@ -132,10 +136,15 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
       processed_tracks[track] = true
     end
   else
-    local _, new_e = nudge_end(item, pos, item_e, delta)
-    local shift = new_e - item_e
-    if min_actual == nil or math.abs(shift) < math.abs(min_actual) then
-      min_actual = shift
+    -- No razor on this track: treat full crossfade pair as one virtual item.
+    -- If right xfade partner is also selected, skip — partner is the "pair end" (O-end).
+    local rxf = NudgeEdge and NudgeEdge.find_right_xfade(track, item)
+    if not (rxf and r.IsMediaItemSelected(rxf)) then
+      local _, new_e = nudge_end(item, pos, item_e, delta)
+      local shift = new_e - item_e
+      if min_actual == nil or math.abs(shift) < math.abs(min_actual) then
+        min_actual = shift
+      end
     end
   end
 end

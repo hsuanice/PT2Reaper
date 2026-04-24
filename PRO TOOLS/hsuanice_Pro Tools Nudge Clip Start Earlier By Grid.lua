@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Start Earlier By Grid
--- @version 0.9.1 [260422.1820]
+-- @version 0.9.2 [260424.2227]
 -- @author hsuanice
 -- @about
 --   Replicates Pro Tools: **Nudge Clip Start Earlier By Grid**
@@ -8,6 +8,10 @@
 --   Crossfade-aware via NudgeEdge module.
 --   Tags: Editing
 -- @changelog
+--   0.9.2 [260424.2227] - No-razor branch: skip item when left xfade partner is also selected.
+--                         Treats full crossfade pair as one virtual item — only the leading
+--                         I-start nudges. Closes a TS-sync hole where in-library skip's
+--                         delta_used=0 was dragging min_actual to 0 in no-razor full-pair case.
 --   0.9.1 [260422.1820] - Handle "skipped" return value from nudge_start (3rd value `true`).
 --                         Skipped items don't influence min_actual sync, so pure razor + TS shift correctly
 --                         when crossfade pair has one item handling, the other skipping.
@@ -135,10 +139,15 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
       processed_tracks[track] = true
     end
   else
-    local new_s, _ = nudge_start(item, pos, item_e, delta)
-    local delta_used = pos - new_s
-    if min_actual == nil or math.abs(delta_used) < math.abs(min_actual) then
-      min_actual = delta_used
+    -- No razor on this track: treat full crossfade pair as one virtual item.
+    -- If left xfade partner is also selected, skip — partner is the "pair start" (I-start).
+    local lxf = NudgeEdge and NudgeEdge.find_left_xfade(track, item)
+    if not (lxf and r.IsMediaItemSelected(lxf)) then
+      local new_s, _ = nudge_start(item, pos, item_e, delta)
+      local delta_used = pos - new_s
+      if min_actual == nil or math.abs(delta_used) < math.abs(min_actual) then
+        min_actual = delta_used
+      end
     end
   end
 end
