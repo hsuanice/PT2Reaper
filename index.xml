@@ -1,32 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="ReaPack Repository Template" commit="58a3e39ba95bd0f35846aa1f39aa4cb2574295e1">
-  <category name="Example">
-    <reapack name="cfillion_Hello world.lua" type="script" desc="Hello world">
+<index version="1" name="ReaPack Repository Template" commit="5771427ef537a56686e96642cdb6b15f356a4750">
+  <category name="PRO TOOLS">
+    <reapack name="hsuanice_Grid_Nudge_Panel_Reset_Position.lua" type="script" desc="hsuanice_Grid Nudge Panel - Reset Position">
       <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 This is an example of a package file. It installs itself as a ReaScript that does nothing but show "Hello World!" in REAPER's scripting console.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Packages may also include additional files specified using the @provides tag.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 This text is the documentation shown when using ReaPack's "About this package" feature. {\field{\*\fldinst{HYPERLINK "https://commonmark.org/"}}{\fldrslt{\ul
-Markdown
-}}}
- {\i formatting} is supported.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Run this to reset the Grid Nudge Panel position back to default.\par}
 }
 ]]></description>
       </metadata>
-      <version name="1.0" author="cfillion" time="2021-01-04T23:30:32Z">
-        <source main="main">https://github.com/cfillion/reapack-repository-template/raw/58a3e39ba95bd0f35846aa1f39aa4cb2574295e1/Example/cfillion_Hello%20world.lua</source>
+      <version name="1.0" time="2026-04-24T02:31:56Z">
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Grid_Nudge_Panel_Reset_Position.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Display Timeline Selection End.lua" type="script" desc="Pro Tools - Display Timeline Selection End">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Mimics Pro Tools' "Display Timeline Selection End" behavior.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Priority: Razor Edit > Time Selection > Item Selection.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab View scrolls to the end of the active selection without changing zoom level or play/edit cursor.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Useful for navigating to timeline boundaries in a non-destructive way.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.\line hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Features:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Designed for fast, keyboard-light workflows.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Integrates with Razor Edit regions when available.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Uses SWS extension APIs where available.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 References:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER ReaScript API (Lua)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab SWS Extension API\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Note:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab This is a 0.1 beta release for internal testing.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <changelog><![CDATA[v0.1 - Beta release]]></changelog>
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Display%20Timeline%20Selection%20End.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Display Timeline Selection Start.lua" type="script" desc="Pro Tools - Display Timeline Selection Start">
+      <version name="0.2" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Display%20Timeline%20Selection%20Start.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Mute Unmute Clip.lua" type="script" desc="Pro Tools-style Item Mute/Unmute Toggle (uniformize mixed -&gt; unmute)">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Single item = normal toggle. Multiple items:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab mixed mute states -> unify to UNMUTE\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab uniform state -> toggle all\sa180\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1.0" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <changelog><![CDATA[0.1.0 - Initial release: mixed selection becomes unmute; uniform selection toggles.]]></changelog>
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Mute%20Unmute%20Clip.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Paste Special - Repeat to Fill Selection.lua" type="script" desc="hsuanice_Pro Tools Paste Special: Repeat to Fill Selection">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Pro Tools-style "Paste Special: Repeat to Fill Selection"\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Stage whole block at a far "staging area", then move once into Razor.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab No system Auto-Crossfade; ALL fades are applied manually.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JOIN crossfades between repeated tiles (after moving into target we verify/repair).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Boundary crossfades ONLY when edge-to-edge, and without moving any item:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Left boundary: extend LEFT neighbor's right edge (no move).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Right boundary: extend LAST-IN-AREA item's right edge (no move).\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Items only; envelopes not supported yet (Razor contains envelope -> abort).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Restores original item/track selection.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Known issues:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab CF_UNIT="grid" is still inaccurate/experimental; use seconds/frames for reliable results.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab When requested JOIN is much larger than the tile length, the script auto-adjusts JOIN to a fraction of the tile for stability. In certain source/material combinations this may still yield visually irregular overlaps. Workarounds: lower CF_VALUE or copy a longer source tile.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Note: This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Reference: MRX_PasteItemToFill_Items_and_EnvelopeLanes.lua\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.4.7 time/item selection fallback" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Paste%20Special%20-%20Repeat%20to%20Fill%20Selection.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Trim Clip To File Boundaries.lua" type="script" desc="Pro Tools - Trim Clip To File Boundaries">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Emulates Pro Tools' "Trim Clip to File Boundaries" behavior.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Extends both left and right edges of selected item(s) based on neighboring items.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Falls back to full file start/end if no neighbors exist.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Always respects file content bounds, avoiding empty/unrecorded areas.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u55357 ?\u56481 ? Ideal for reclaiming full usable media without overshooting source boundaries.\line Integrates well with hsuanice's Pro Tools-style editing workflow.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.\line hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Features:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Designed for fast, keyboard-light workflows.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 References:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER ReaScript API (Lua)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Note: This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1.1" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20To%20File%20Boundaries.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Trim Clips End To File End.lua" type="script" desc="Pro Tools - Trim Clips End To File End">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Emulates Pro Tools' "Trim Clip End to File End" behavior.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Extends the right edge of selected item(s) to the next item's start, or to the source media end.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Prevents extending into unrecorded/empty content area.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Automatically respects source limits and adjusts for playrate and offset.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u55357 ?\u56481 ? Ideal for reclaiming usable audio content without overshooting media length. Integrates well with hsuanice's Pro Tools-style timeline workflows.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Features:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Designed for fast, keyboard-light workflows.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 References:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER ReaScript API (Lua)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Note:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab This is a 0.1 beta release for internal testing.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <changelog><![CDATA[v0.1 - Beta release]]></changelog>
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clips%20End%20To%20File%20End.lua</source>
+      </version>
+    </reapack>
+    <reapack name="hsuanice_Pro Tools Trim Clips Start To File Start.lua" type="script" desc="Pro Tools - Trim Clips Start To File Start">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Emulates Pro Tools' "Trim Clip Start to File Start" behavior.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Extends the left edge of selected item(s) up to the previous item's end, or to the source media start.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Prevents revealing beyond recorded content.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Keeps normal left-edge reveal behavior when there is available headroom.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab If a left blank loop was created by "SWS/AW: Trim selected items to fill selection", the loop is collapsed in a content-preserving way (push start right by overshoot, shorten length, zero offset).\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice. hsuanice served as the workflow designer, tester, and integrator for this tool.\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1.1" author="hsuanice" time="2026-04-24T02:31:56Z">
+        <source main="main">https://github.com/hsuanice/PT2Reaper/raw/5771427ef537a56686e96642cdb6b15f356a4750/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clips%20Start%20To%20File%20Start.lua</source>
       </version>
     </reapack>
   </category>
   <metadata>
-    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs36 ReaPack Repository Template\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 ReaPack Repository Template\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 A template for GitHub-hosted ReaPack repositories with automated {\field{\*\fldinst{HYPERLINK "https://github.com/cfillion/reapack-index"}}{\fldrslt{\ul
 reapack-index
 }}}
