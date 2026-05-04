@@ -144,11 +144,57 @@ for i = 0, n - 1 do
   local fi_end   = pos + fi_eff
   local fo_start = item_e - fo_eff
 
+  -- Source / content info (for monitoring whether nudge altered audio content alignment)
+  local take = r.GetActiveTake(item)
+  local startoffs, playrate, src_name = 0, 1, ''
+  local src_start, src_end = 0, 0
+  local bwf_tc_str = nil
+  if take then
+    startoffs = r.GetMediaItemTakeInfo_Value(take, 'D_STARTOFFS')
+    playrate  = r.GetMediaItemTakeInfo_Value(take, 'D_PLAYRATE')
+    if playrate <= 0 then playrate = 1 end
+    src_start = startoffs
+    src_end   = startoffs + len * playrate
+    local source = r.GetMediaItemTake_Source(take)
+    if source then
+      local fn = r.GetMediaSourceFileName(source, '')
+      if fn and fn ~= '' then src_name = fn:match('([^/\\]+)$') or fn end
+      -- BWF TimeReference (samples since midnight) → seconds at source SR
+      local ok, tref = r.GetMediaFileMetadata(source, 'BWF:TimeReference')
+      if ok and tref and tref ~= '' then
+        local samples = tonumber(tref)
+        local sr_ok, sr_str = r.GetMediaFileMetadata(source, 'Generic:SampleRate')
+        local sr = sr_ok and sr_str and tonumber(sr_str) or nil
+        if not sr then
+          -- Fallback: try to infer from project sample rate
+          sr = r.GetSetProjectInfo(0, 'PROJECT_SRATE', 0, false)
+        end
+        if samples and sr and sr > 0 then
+          local tc_sec = samples / sr
+          bwf_tc_str = string.format('%s s (BWF=%d samples @ %dHz)', f(tc_sec), samples, sr)
+        end
+      end
+    end
+  end
+
   p(string.format('\n[Item %d] %s  (track %s)', i+1, item_label(item), track_label(track)))
   p(string.format('  pos=%s  end=%s  len=%s', f(pos), f(item_e), f(len)))
   p(string.format('  fade-in  : %s', fade_str(fi_eff, fi_man, fi_auto)))
   p(string.format('  fade-out : %s', fade_str(fo_eff, fo_man, fo_auto)))
   p(string.format('  fi_end=%s  fo_start=%s', f(fi_end), f(fo_start)))
+  -- Source / content lines
+  if take then
+    p(string.format('  source   : %s', src_name ~= '' and src_name or '(no source)'))
+    if playrate ~= 1 then
+      p(string.format('  STARTOFFS=%s  playrate=%.4f  src range: [%s, %s]', f(startoffs), playrate, f(src_start), f(src_end)))
+    else
+      p(string.format('  STARTOFFS=%s  src range: [%s, %s]', f(startoffs), f(src_start), f(src_end)))
+    end
+    if bwf_tc_str then
+      p(string.format('  source TC at item start: %s', bwf_tc_str))
+      -- Absolute source TC at item start = source_start_TC + STARTOFFS (in seconds)
+    end
+  end
 
   -- Zone boundaries using effective fades
   p(string.format('  Zone P1 (pos)      = %s', f(pos)))
@@ -224,6 +270,34 @@ for i = 0, n - 1 do
       p('      (need: other item starts in fo_start..item_e AND extends past item_e)')
     end
   end
+end
+
+-- ── razor edits across all tracks ────────────────────────────────────────────
+
+p('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+p('RAZOR EDITS (all tracks)')
+p('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+-- Track which tracks have at least one selected item
+local tracks_with_sel_items = {}
+for i = 0, n - 1 do
+  tracks_with_sel_items[r.GetMediaItemTrack(r.GetSelectedMediaItem(0, i))] = true
+end
+
+local razor_count = 0
+for ti = 0, r.CountTracks(0) - 1 do
+  local tr = r.GetTrack(0, ti)
+  local rz = razor_tracks[tr]
+  if rz then
+    razor_count = razor_count + 1
+    local kind = tracks_with_sel_items[tr] and '(item track)' or '(pure razor)'
+    p(string.format('\n  Track %d %s %s', ti+1, track_label(tr), kind))
+    p(string.format('    Razor: %s → %s  (len=%s)', f(rz.s), f(rz.e), f(rz.e - rz.s)))
+  end
+end
+
+if razor_count == 0 then
+  p('\n  No razor edits found.')
 end
 
 -- ── crossfade pair summary ────────────────────────────────────────────────────

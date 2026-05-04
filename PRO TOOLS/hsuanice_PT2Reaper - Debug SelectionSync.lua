@@ -35,7 +35,7 @@ local function get_delta()
     return value / sr
   end
   if unit == 18 then
-    local _, fps = r.TimeMap_curFrameRate(0)
+    local fps = r.TimeMap_curFrameRate(0)  -- returns (fps, isdrop) — fps FIRST
     fps = (fps and fps > 0) and fps or 24
     return value / fps
   end

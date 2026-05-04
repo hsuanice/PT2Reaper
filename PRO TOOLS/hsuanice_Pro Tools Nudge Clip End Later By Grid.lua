@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip End Later By Grid
--- @version 0.8.2 [260424.2227]
+-- @version 0.8.3 [260503.1934]
 -- @author hsuanice
 -- @about
 --   Replicates Pro Tools: **Nudge Clip End Later By Grid**
@@ -7,6 +7,9 @@
 --   Zone-aware stop guard prevents zone from disappearing.
 --   Tags: Editing
 -- @changelog
+--   0.8.3 [260503.1934] - Fix: TimeMap_curFrameRate return order — fps was being read as
+--                         the isdrop boolean, causing get_delta() at unit==18 to default to
+--                         24 on non-drop projects and crash on drop-frame projects.
 --   0.8.2 [260424.2227] - No-razor branch: skip item when right xfade partner is also selected.
 --                         Treats full crossfade pair as one virtual item — only the trailing
 --                         O-end nudges (matches nudge_start behavior). Also closes a TS-sync hole
@@ -52,7 +55,7 @@ local function get_delta()
     return value / sr
   end
   if unit == 18 then
-    local _, fps = r.TimeMap_curFrameRate(0)
+    local fps = r.TimeMap_curFrameRate(0)  -- returns (fps, isdrop) — fps FIRST
     fps = (fps and fps > 0) and fps or 24
     return value / fps
   end

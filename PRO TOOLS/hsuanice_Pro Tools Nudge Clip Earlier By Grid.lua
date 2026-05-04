@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Earlier By Grid
--- @version 0.9.11 [260422.1820]
+-- @version 0.9.12 [260503.1934]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -20,6 +20,10 @@
 --
 --   Tags: Editing
 -- @changelog
+--   0.9.12 [260503.1934] - Fix: TimeMap_curFrameRate return order — fps was being read as the
+--                          isdrop boolean, causing get_delta() at unit==18 to default to 24
+--                          (silent) on non-drop projects and crash ("compare number with boolean")
+--                          on drop-frame projects.
 --   0.9.11 [260422.1820] - Case 3 with left_xf: add Zone C atomic update (la extends/shrinks with item_e_A = fi_end_B).
 --                          Symmetric to Case 4 with right_xf (v0.9.9). Crossfade stays consistent.
 --                          Source-bound clamp added for la_take right bound on Later.
@@ -100,7 +104,7 @@ local function get_delta()
     return value / sr
   end
   if unit == 18 then
-    local _, fps = r.TimeMap_curFrameRate(0)
+    local fps = r.TimeMap_curFrameRate(0)  -- returns (fps, isdrop) — fps FIRST
     fps = (fps and fps > 0) and fps or 24
     return value / fps
   end

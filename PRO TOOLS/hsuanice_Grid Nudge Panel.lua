@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Grid Nudge Panel
-@version 0.2.3 [260419.1002]
+@version 0.4.9 [260503.1918]
 @author hsuanice
 @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 @about
@@ -10,7 +10,62 @@
 
   Inspired by Pro Tools transport display.
 
+  Grid logic now lives in hsuanice_PT_Grid.lua (parallel to PT_Nudge).
+
 @changelog
+  0.4.9 [260503.1918]
+    - Picks up hsuanice_PT_Grid 0.3.4: auto-resync on project fps/BPM
+      change so grid panel doesn't jump to a fallback when fps changes.
+  0.4.8 [260503.1909]
+    - Fix: format_nudge_value swapped TimeMap_curFrameRate return values.
+      Same bug as PT_Grid 0.3.3 — fps was being captured as isdrop, so
+      Nudge "Timecode" mode display was always computed at 24 fps and
+      crashed on drop-frame projects.
+    - Picks up hsuanice_PT_Grid 0.3.3.
+  0.4.7 [260503.1550]
+    - Picks up hsuanice_PT_Grid 0.3.2: deferred retry chain to keep
+      Frame grid OFF when REAPER state re-engages it after our toggle.
+  0.4.6 [260503.1528]
+    - Picks up hsuanice_PT_Grid 0.3.1: Metronome preset removed (couldn't
+      sync reliably and the implementation had a denominator/tempo bug).
+  0.4.5 [260503.1509]
+    - Picks up hsuanice_PT_Grid 0.3.0: adds "Metronome" preset to Measure
+      mode. Sets grid_div = 1/denom (4/4 → 1/4, 6/8 → 1/8, etc.).
+  0.4.4 [260503.1442]
+    - Picks up hsuanice_PT_Grid 0.2.3: log spam fix + Measure auto-sync.
+  0.4.3 [260503.1439]
+    - Right-click menu adds "Debug log" toggle and "Clear ReaScript console".
+      Output goes to View → Show ReaScript console output. Useful for
+      diagnosing intermittent grid-switch issues.
+  0.4.2 [260503.1428]
+    - Picks up hsuanice_PT_Grid 0.2.1: defensive grid_div writes around
+      command 40904 toggle. Fixes "first attempt fails, second works"
+      symptom when leaving Timecode "1 frame" (native_frame).
+  0.4.1 [260503.1409]
+    - Timecode "1 frame" and Feet+Frames "1 frame" now engage REAPER's
+      built-in Frame grid (cmd 40904) under the hood — exact, tempo-free.
+      Display still shows the TC string (e.g. "00:00:00:01.00").
+    - Mode switch picks DEFAULT_IDX per mode (Timecode / Feet+Frames land
+      on "1 frame" → no tempo prompt fires when you just switch modes).
+  0.4.0 [260503.1314]
+    - Restructure: Grid menu now mirrors Nudge — 5 modes
+      (Measure / Min:Secs / Timecode / Feet+Frames / Samples).
+      Top half = preset values, bottom half = mode list.
+    - Fix: simulated modes (non-Measure) at BPM != 120 used to silently
+      auto-revert to Native because of float-rounding mismatch. Tolerance
+      loosened (5e-3) and auto-revert removed.
+    - Add: when switching into a simulated mode at BPM != 120, prompt
+      Yes/No/Cancel — Yes sets BPM to 120, No proceeds (may drift).
+    - Refactor: shared logic moved to Library/PRO TOOLS/hsuanice_PT_Grid.lua,
+      which Increase/Decrease Grid Value scripts also consume.
+    - Note: Frame grid (40904) is still detected and displayed as "Frame",
+      but no longer a menu entry — pick a Measure / Timecode preset instead.
+  0.3.0 [260502.1928]
+    - Add: Grid "Timecode" mode (1 sec / 6 frames / 1 frame / 1/2 / 1/4 / 1 sub frame)
+      Simulated via tempo calculation; assumes constant tempo (post-production).
+    - Add: Tempo warning when switching Grid into Timecode mode if BPM != 120.
+    - Add: Auto-revert Grid mode to Native when grid_div changes externally.
+    - Sync: Increase/Decrease Grid Value scripts iterate TC presets in TC mode.
   0.2.0 [260418.2036]
     - Rewrite: GFX window instead of JS_Composite (more stable, dockable)
     - Fix: menu index was off-by-one (gfx.showmenu is 1-based)
@@ -29,6 +84,22 @@
 
 local r = reaper
 local EXT = 'hsuanice_GridNudgePanel'
+
+-- ============================================================
+-- LOAD GRID LIBRARY (parallel to hsuanice_PT_Nudge.lua)
+-- ============================================================
+local Grid
+do
+  local info = debug.getinfo(1, 'S')
+  local script_dir = info.source:match('^@(.*[/\\])') or ''
+  local ok, lib = pcall(dofile, script_dir .. 'hsuanice_PT_Grid.lua')
+  if not ok or type(lib) ~= 'table' then
+    r.MB('Failed to load hsuanice_PT_Grid.lua from:\n' .. script_dir,
+      'Grid Nudge Panel', 0)
+    return
+  end
+  Grid = lib
+end
 
 -- ============================================================
 -- NUDGE PRESET DEFINITIONS
@@ -81,7 +152,10 @@ local NUDGE_PRESETS = {
 -- ============================================================
 local function format_nudge_value(mode, preset)
   if not preset then return '?' end
-  local _, fps = r.TimeMap_curFrameRate(0)
+  -- NB: TimeMap_curFrameRate returns (fps, isdrop) — fps FIRST. Capturing
+  -- the second return as fps was a long-standing bug that defaulted to 24
+  -- everywhere and crashed on drop-frame projects.
+  local fps = r.TimeMap_curFrameRate(0)
   if not fps or fps <= 0 then fps = 24 end
 
   if mode == 'Timecode' then
@@ -151,16 +225,10 @@ local function load_nudge()
 end
 
 -- ============================================================
--- GRID HELPERS
+-- GRID HELPERS (delegated to hsuanice_PT_Grid.lua)
 -- ============================================================
 local function get_grid_text()
-  if r.GetToggleCommandState(40904) == 1 then return 'Frame' end
-  local _, grid_div, swing = r.GetSetProjectGrid(0, 0)
-  if grid_div ~= grid_div then grid_div = 1 end
-  if swing == 3 then return 'Measure' end
-  if grid_div >= 1 then return string.format('%d bar', math.floor(grid_div+0.5)) end
-  local denom = math.floor(1/grid_div + 0.5)
-  return '1/' .. denom
+  return Grid.get_text()
 end
 
 -- ============================================================
@@ -179,54 +247,55 @@ local function popup_menu(items)
 end
 
 local function show_grid_menu()
-  local _, grid_div, swing = r.GetSetProjectGrid(0, 0)
-  local is_frame   = r.GetToggleCommandState(40904) == 1
-  local is_measure = (swing == 3)
+  local cur_mode, cur_idx = Grid.get_state()
+  local presets = Grid.PRESETS[cur_mode] or {}
+  local entries = {}
 
-  local grids = {
-    {'Frame',    nil}, {'Measure', nil}, {''},
-    {'1/128', 1/128}, {'1/64', 1/64}, {'1/32T', 1/(32*1.5)}, {'1/32', 1/32},
-    {'1/16T', 1/(16*1.5)}, {'1/16', 1/16}, {'1/8T', 1/(8*1.5)}, {'1/8', 1/8},
-    {'1/4T',  1/(4*1.5)},  {'1/4',  1/4},  {'1/2',  1/2},
-    {'1',  1}, {'2', 2}, {'4', 4},
-  }
+  -- Top half: preset values for the current mode
+  for i, p in ipairs(presets) do
+    local target_idx = i
+    local target_preset = p
+    entries[#entries+1] = {
+      label = (i == cur_idx and '!' or '') .. p.label,
+      action = function()
+        if Grid.ensure_tempo(cur_mode, target_preset) then
+          Grid.apply(cur_mode, target_idx)
+        end
+      end,
+    }
+  end
+  entries[#entries+1] = {sep=true}
 
-  local items = {}
-  for _, g in ipairs(grids) do
-    if g[1] == '' then
-      items[#items+1] = ''  -- separator
-    else
-      local checked = false
-      if g[1] == 'Frame'   then checked = is_frame
-      elseif g[1] == 'Measure' then checked = is_measure and not is_frame
-      elseif g[2] then
-        checked = not is_frame and not is_measure and math.abs(grid_div - g[2]) < 1e-8
-      end
-      items[#items+1] = (checked and '!' or '') .. g[1]
-    end
+  -- Bottom half: mode list. Mode switch picks a sensible default preset
+  -- (DEFAULT_IDX prefers native_frame when available → no tempo prompt).
+  for _, m in ipairs(Grid.MODES) do
+    local target_mode = m
+    entries[#entries+1] = {
+      label = (m == cur_mode and '!' or '') .. m,
+      action = function()
+        if target_mode == cur_mode then return end
+        local def_idx = Grid.get_default_idx(target_mode)
+        local def_preset = Grid.get_preset(target_mode, def_idx)
+        if Grid.ensure_tempo(target_mode, def_preset) then
+          Grid.apply(target_mode, def_idx)
+        end
+      end,
+    }
   end
 
-  local ret = popup_menu(items)
+  -- Render to gfx menu and dispatch
+  local labels = {}
+  for _, e in ipairs(entries) do
+    labels[#labels+1] = e.sep and '' or e.label
+  end
+  local ret = popup_menu(labels)
   if ret == 0 then return end
 
-  -- Find the actual grid entry (skip separators)
   local count = 0
-  for _, g in ipairs(grids) do
-    if g[1] ~= '' then
+  for _, e in ipairs(entries) do
+    if not e.sep then
       count = count + 1
-      if count == ret then
-        if g[1] == 'Frame' then
-          r.Main_OnCommand(40904, 0)  -- toggle frame grid
-        elseif g[1] == 'Measure' then
-          if is_frame then r.Main_OnCommand(40904, 0) end
-          r.GetSetProjectGrid(0, 1, grid_div, 3)
-        else
-          if is_frame then r.Main_OnCommand(40904, 0) end
-          if is_measure then r.GetSetProjectGrid(0, 1, g[2], 0)
-          else r.GetSetProjectGrid(0, 1, g[2]) end
-        end
-        break
-      end
+      if count == ret then e.action(); return end
     end
   end
 end
@@ -361,7 +430,16 @@ local function frame()
   end
 
   if just_released_r then
-    local items = {'Size: Small (160x28)', 'Size: Medium (220x36)', 'Size: Large (280x46)', 'Size: Custom...'}
+    local dbg_on = Grid.is_debug()
+    local items = {
+      'Size: Small (160x28)',
+      'Size: Medium (220x36)',
+      'Size: Large (280x46)',
+      'Size: Custom...',
+      '',  -- separator
+      (dbg_on and '!' or '') .. 'Debug log (ReaScript console)',
+      'Clear ReaScript console',
+    }
     local ret = popup_menu(items)
     local nw, nh
     if     ret == 1 then nw, nh = 160, 28
@@ -376,6 +454,12 @@ local function frame()
         nw = p[1] and math.max(80, p[1])
         nh = p[2] and math.max(28, p[2])
       end
+    elseif ret == 5 then
+      Grid.set_debug(not dbg_on)
+      -- Grid.set_debug already appends a line to the console when turning ON,
+      -- which auto-opens the console window.
+    elseif ret == 6 then
+      if r.ClearConsole then r.ClearConsole() end
     end
     if nw and nh then
       gfx.quit()
