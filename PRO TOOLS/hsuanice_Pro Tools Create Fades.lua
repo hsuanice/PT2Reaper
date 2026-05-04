@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Create Fades
--- @version 0.3.8 [260418.1035]
+-- @version 0.3.10 [260504.1910]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -14,6 +14,16 @@
 --   Mac shortcut (PT): Command + F
 --
 -- @changelog
+--   0.3.10 [260504.1910]
+--     - GUI: pre-select radio buttons to match the existing fade shape on the
+--       selected items (was meant to work via existing_xxx_shape lookup, but now
+--       has a baseline read from items[1] so it always reflects current state
+--       even when the scenario-specific fadein/fadeout list is empty).
+--   0.3.9 [260504.1859]
+--     - GUI: rename SHAPE_NAMES to match REAPER 7.71's renamed fade shape actions:
+--       1=Linear, 2=Slight Convex (Equal Power), 3=Slight Concave,
+--       4=Sharp Convex, 5=Sharp Concave, 6=Slight S-Curve, 7=Sharp S-Curve.
+--       Action command IDs and shape index mapping unchanged — display only.
 --   0.3.8 [260418.1035]
 --     - Fix: xfade detection only pairs items on the same track
 --   0.3.7 [260418.1027]
@@ -110,7 +120,7 @@ local XFADE    = "crossfade"
 local EPS       = 1e-4   -- general floating point tolerance
 local XFADE_GAP = 0.005  -- items within 5ms are treated as touching (handles sample-level gaps)
 
-local SHAPE_NAMES    = {"Type 1 (Linear)","Type 2 (Equal Power)","Type 3","Type 4","Type 5","Type 6","Type 7"}
+local SHAPE_NAMES    = {"Linear","Slight Convex (Equal Power)","Slight Concave","Sharp Convex","Sharp Concave","Slight S-Curve","Sharp S-Curve"}
 local FADEIN_CMDS    = {41514,41515,41516,41517,41518,41519,41836}
 local FADEOUT_CMDS   = {41521,41522,41523,41524,41525,41526,41837}
 local XFADE_CMDS     = {41528,41529,41530,41531,41532,41533,41838}
@@ -134,11 +144,30 @@ local function clamp_shape(s)
   return math.max(1, math.min(7, s))
 end
 
+-- REAPER's GetMediaItemInfo_Value(C_FADEINSHAPE) returns garbage on 7.71+ (returns
+-- internal encoded values like 10/12 that don't match the 0-6 shape index). The
+-- authoritative source for fade shape is the item state chunk:
+--   FADEIN  <shape> <length> <dir> <autolen> <autoshape> <autodir>
+--   FADEOUT <shape> <length> <dir> <autolen> <autoshape> <autodir>
+-- where <shape> is 0..6 matching the action set order (linear=0, slight convex=1,
+-- slight concave=2, sharp convex=3, sharp concave=4, slight S=5, sharp S=6).
+local function shape_from_chunk(item, line_prefix)
+  local ok, chunk = r.GetItemStateChunk(item, "", false)
+  if not ok or not chunk then return 0 end
+  -- Find the shape (first integer after the line_prefix keyword)
+  local s = chunk:match(line_prefix .. "%s+(%-?%d+)")
+  return tonumber(s) or 0
+end
+
 local function existing_fadein_shape(item)
-  return clamp_shape(math.floor(r.GetMediaItemInfo_Value(item,"C_FADEINSHAPE"))+1)
+  local sh = shape_from_chunk(item, "FADEIN")
+  r.ShowConsoleMsg(string.format("[CreateFades] fade-in chunk shape=%s\n", tostring(sh)))
+  return clamp_shape(sh + 1)
 end
 local function existing_fadeout_shape(item)
-  return clamp_shape(math.floor(r.GetMediaItemInfo_Value(item,"C_FADEOUTSHAPE"))+1)
+  local sh = shape_from_chunk(item, "FADEOUT")
+  r.ShowConsoleMsg(string.format("[CreateFades] fade-out chunk shape=%s\n", tostring(sh)))
+  return clamp_shape(sh + 1)
 end
 
 local function get_razor_range()
@@ -336,7 +365,14 @@ local function detect()
   if #det.xfade_pairs   > 0 then det.types[#det.types+1] = XFADE   end
   if #det.fadeout_items > 0 then det.types[#det.types+1] = FADE_OUT end
 
-  -- Defaults from existing fades
+  -- Defaults from existing fades.
+  -- First, baseline from the very first selected item (covers edge cases where the
+  -- detected fadein_items/fadeout_items lists end up empty but the panel is still shown).
+  if items[1] then
+    det.def_fadein_shape  = existing_fadein_shape(items[1].item)
+    det.def_fadeout_shape = existing_fadeout_shape(items[1].item)
+  end
+  -- Then refine from the actual scenario's representative item, if available.
   if #det.fadein_items  > 0 then
     det.def_fadein_shape  = existing_fadein_shape(det.fadein_items[1].item.item)
   end
@@ -344,6 +380,7 @@ local function detect()
     det.def_fadeout_shape = existing_fadeout_shape(det.fadeout_items[1].item.item)
   end
   if #det.xfade_pairs   > 0 then
+    -- Crossfade shape lives on the right item's fade-in (and the left's fade-out matches).
     det.def_xfade_shape   = existing_fadein_shape(det.xfade_pairs[1].right.item)
   end
 
