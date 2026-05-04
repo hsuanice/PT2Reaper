@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Earlier By Grid
--- @version 0.9.12 [260503.1934]
+-- @version 0.10.4 [260504.1217]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -20,6 +20,35 @@
 --
 --   Tags: Editing
 -- @changelog
+--   0.10.4 [260504.1217] - Mirror of Later v0.10.4 — body-collapse + source-bound guards on
+--                          no-razor chain auto-include partners. Move Earlier here mostly hits
+--                          the left-partner body collapse (Case 6-like end-shift) and the
+--                          right-partner STARTOFFS source bound.
+--   0.10.3 [260504.1200] - Mirror of Later v0.10.3 — capture xfade partners BEFORE shifting.
+--                          (Fixes the Earlier-direction-equivalent edge case: pos shift moves
+--                          the search window past the partner.)
+--   0.10.2 [260504.1151] - Mirror of Later v0.10.2 — chain auto-include narrowed to 1-hop only.
+--                          Partner gets edge-shift (Case 6/7-like) instead of full shift to
+--                          preserve its other-side crossfade.
+--   0.10.1 [260504.1136] - Two follow-ups to v0.10.0 (mirror of Later v0.10.1):
+--                          * No-zone-match razor: now treated as "selection-only move" instead
+--                            of blocking the track. Razor / TS shift by delta, item unchanged.
+--                          * No-razor branch: chain auto-include — when only one item is clicked
+--                            and Moved Earlier, recursively pull crossfade neighbors so the
+--                            whole chain shifts together and crossfades stay aligned.
+--   0.10.0 [260504.1104] - Chain-aware Move (Option C, two-phase compute then apply):
+--                          * Added detect_case() and compute_intent() helpers — these classify
+--                            each selected item's case and predict its post-Move pos/end.
+--                          * New main-script intent pre-pass builds intent_pos / intent_end
+--                            tables for every selected item BEFORE any modification.
+--                          * sync_left / sync_right now look up partner intent first; falls back
+--                            to the partner's current pos/end only when the partner is not
+--                            being processed this Move.
+--                          * Case 3 Later body / xf_body, Case 6 Later xf_body, and Case 3
+--                            Earlier own-fo / la_fo guards now skip when the partner will shift
+--                            this Move (chain shift keeps overlap unchanged, body doesn't shrink).
+--                          Mirror of Later v0.10.0. Fixes 3-item chain Move Earlier where false
+--                          body / fo guards used to block.
 --   0.9.12 [260503.1934] - Fix: TimeMap_curFrameRate return order — fps was being read as the
 --                          isdrop boolean, causing get_delta() at unit==18 to default to 24
 --                          (silent) on non-drop projects and crash ("compare number with boolean")
@@ -133,6 +162,50 @@ local function get_track_razor(track)
   return nil
 end
 
+-- Detect which case (1-7) applies to an item given razor selection and pre-snapshot fades.
+-- Returns case number (1, 2, 3, 4, 6, 7) or nil if no case matches / razor doesn't intersect.
+local function detect_case(item, sel_s, sel_e, init_state)
+  local pos     = r.GetMediaItemInfo_Value(item, "D_POSITION")
+  local len     = r.GetMediaItemInfo_Value(item, "D_LENGTH")
+  local fi_len  = (init_state and init_state.fi_len)
+                  or (NudgeEdge and NudgeEdge.get_fi(item))
+                  or r.GetMediaItemInfo_Value(item, "D_FADEINLEN")
+  local fo_len  = (init_state and init_state.fo_len)
+                  or (NudgeEdge and NudgeEdge.get_fo(item))
+                  or r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN")
+  local item_e   = pos + len
+  local fi_end   = pos + fi_len
+  local fo_start = item_e - fo_len
+  if sel_e <= pos + EPS or sel_s >= item_e - EPS then return nil end
+  local cs = math.max(sel_s, pos)
+  local ce = math.min(sel_e, item_e)
+  local fi_covered   = fi_len > EPS and (cs <= pos      + EPS and ce >= fi_end    - EPS)
+  local fo_covered   = fo_len > EPS and (cs <= fo_start + EPS and ce >= item_e   - EPS)
+  local clip_covered = cs <= fi_end + EPS and ce >= fo_start - EPS
+  if fi_covered and clip_covered and fo_covered then return 1
+  elseif clip_covered and not fi_covered and not fo_covered then return 2
+  elseif clip_covered and not fi_covered and fo_covered then return 3
+  elseif clip_covered and fi_covered and not fo_covered then return 4
+  elseif fo_covered and not clip_covered then return 6
+  elseif fi_covered and not clip_covered then return 7
+  end
+  return nil
+end
+
+-- Compute intended (new_pos, new_end) for an item given its case and delta.
+-- This is what the item WILL become if its case is applied. Used by sync helpers
+-- so a chain partner can use future positions instead of current ones.
+local function compute_intent(case, pos, item_e, delta)
+  if     case == 1 then return pos + delta, item_e + delta  -- full shift
+  elseif case == 2 then return pos,         item_e          -- internal shift only
+  elseif case == 3 then return pos,         item_e + delta  -- right-edge extends
+  elseif case == 4 then return pos + delta, item_e          -- left-edge shifts
+  elseif case == 6 then return pos,         item_e + delta  -- fo only, end extends
+  elseif case == 7 then return pos + delta, item_e          -- fi only, pos shifts
+  end
+  return pos, item_e  -- no case / no change
+end
+
 -- Nudge one item based on razor selection overlap
 -- init_state (optional): {fi_len, fo_len} snapshot taken before main loop, used so that
 -- case detection sees pre-modification fades (sync_right/sync_left from earlier items
@@ -140,7 +213,10 @@ end
 -- dry_run (optional): when true, run case detection + guards + source clamp but do NOT apply
 -- modifications. Returns (true, clamped_delta) if would succeed, (false) if would block.
 -- Used by main loop to pre-check all items before applying any (prevents partial modification).
-local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
+-- intent_pos / intent_end (optional): tables mapping item → planned new pos / end after this Move.
+-- sync_left / sync_right look up partner here so chain Move uses future partner positions
+-- (avoids the "fo grows because partner pos hasn't shifted yet" body-collapse issue).
+local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run, intent_pos, intent_end)
   local track   = r.GetMediaItemTrack(item)
   local pos     = r.GetMediaItemInfo_Value(item, "D_POSITION")
   local len     = r.GetMediaItemInfo_Value(item, "D_LENGTH")
@@ -168,11 +244,19 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
   local left_xf  = NudgeEdge and NudgeEdge.find_left_xfade(track, item) or nil
   local right_xf = NudgeEdge and NudgeEdge.find_right_xfade(track, item) or nil
 
-  -- Adjust left xfade partner after this item's left edge moves to pos+delta
+  -- Adjust left xfade partner after this item's left edge moves to pos+delta.
+  -- Chain-aware: if left_xf is in intent_end (i.e., also being processed this Move),
+  -- use its planned future end instead of the current end. This keeps crossfade overlap
+  -- correct when both items shift uniformly.
   local function sync_left()
     if not left_xf then return end
-    local la_e   = r.GetMediaItemInfo_Value(left_xf, 'D_POSITION')
-                 + r.GetMediaItemInfo_Value(left_xf, 'D_LENGTH')
+    local la_e
+    if intent_end and intent_end[left_xf] then
+      la_e = intent_end[left_xf]
+    else
+      la_e = r.GetMediaItemInfo_Value(left_xf, 'D_POSITION')
+           + r.GetMediaItemInfo_Value(left_xf, 'D_LENGTH')
+    end
     local new_ov = math.max(0, la_e - (pos + delta))
     if NudgeEdge then
       NudgeEdge.set_fo(left_xf, new_ov)
@@ -183,10 +267,16 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
     end
   end
 
-  -- Adjust right xfade partner after this item's right edge moves to item_e+delta
+  -- Adjust right xfade partner after this item's right edge moves to item_e+delta.
+  -- Chain-aware: see sync_left.
   local function sync_right()
     if not right_xf then return end
-    local rc_pos = r.GetMediaItemInfo_Value(right_xf, 'D_POSITION')
+    local rc_pos
+    if intent_pos and intent_pos[right_xf] then
+      rc_pos = intent_pos[right_xf]
+    else
+      rc_pos = r.GetMediaItemInfo_Value(right_xf, 'D_POSITION')
+    end
     local new_ov = math.max(0, (item_e + delta) - rc_pos)
     if NudgeEdge then
       NudgeEdge.set_fi(right_xf, new_ov)
@@ -288,23 +378,47 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
       end
     end
     -- Zone-preservation guard (Later, with right_xf): body shrinks; right item's body also shrinks (xf grows)
+    -- Chain-aware: skip if partner will shift this Move (overlap stays, body doesn't shrink).
     if delta > 0 and right_xf then
-      local body = len - fi_len - fo_len
-      if body < 2*delta - EPS then return false end
-      local xf_len = r.GetMediaItemInfo_Value(right_xf, 'D_LENGTH')
-      local xf_fo  = NudgeEdge and NudgeEdge.get_fo(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEOUTLEN')
-      local xf_fi  = NudgeEdge and NudgeEdge.get_fi(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEINLEN')
-      local xf_body = xf_len - xf_fi - xf_fo
-      if xf_body < 2*delta - EPS then return false end
+      local partner_will_shift = false
+      if intent_pos and intent_pos[right_xf] then
+        local partner_cur = r.GetMediaItemInfo_Value(right_xf, 'D_POSITION')
+        if math.abs(intent_pos[right_xf] - partner_cur) > EPS then partner_will_shift = true end
+      end
+      if not partner_will_shift then
+        local body = len - fi_len - fo_len
+        if body < 2*delta - EPS then return false end
+        local xf_len = r.GetMediaItemInfo_Value(right_xf, 'D_LENGTH')
+        local xf_fo  = NudgeEdge and NudgeEdge.get_fo(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEOUTLEN')
+        local xf_fi  = NudgeEdge and NudgeEdge.get_fi(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEINLEN')
+        local xf_body = xf_len - xf_fi - xf_fo
+        if xf_body < 2*delta - EPS then return false end
+      end
     end
-    -- Zone-preservation guard (Earlier): adjacent fi must stay >= 1 nudge grid; with right_xf fo also shrinks
+    -- Zone-preservation guard (Earlier): adjacent fi must stay >= 1 nudge grid; with right_xf fo also shrinks.
+    -- Own fi guard fires unconditionally (Case 3 atomic shrinks own fi regardless of chain).
+    -- Own fo guard (right_xf) and la_fo guard (left_xf) are chain-aware (skip if partner shifts).
     if delta < 0 then
       if fi_len < -2*delta - EPS then return false end
-      if right_xf and fo_len < -2*delta - EPS then return false end
-      -- With left_xf: la_fo (= crossfade) shrinks atomically; keep >= 1 grid
+      if right_xf then
+        local right_will_shift = false
+        if intent_pos and intent_pos[right_xf] then
+          local pc = r.GetMediaItemInfo_Value(right_xf, 'D_POSITION')
+          if math.abs(intent_pos[right_xf] - pc) > EPS then right_will_shift = true end
+        end
+        if not right_will_shift and fo_len < -2*delta - EPS then return false end
+      end
       if left_xf then
-        local la_fo_chk = NudgeEdge and NudgeEdge.get_fo(left_xf) or r.GetMediaItemInfo_Value(left_xf, 'D_FADEOUTLEN')
-        if la_fo_chk < -2*delta - EPS then return false end
+        local left_will_shift = false
+        if intent_end and intent_end[left_xf] then
+          local lec = r.GetMediaItemInfo_Value(left_xf, 'D_POSITION')
+                    + r.GetMediaItemInfo_Value(left_xf, 'D_LENGTH')
+          if math.abs(intent_end[left_xf] - lec) > EPS then left_will_shift = true end
+        end
+        if not left_will_shift then
+          local la_fo_chk = NudgeEdge and NudgeEdge.get_fo(left_xf) or r.GetMediaItemInfo_Value(left_xf, 'D_FADEOUTLEN')
+          if la_fo_chk < -2*delta - EPS then return false end
+        end
       end
     end
     if dry_run then return true, delta end
@@ -379,12 +493,20 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
   elseif fo_covered and not clip_covered then
     -- Case 6: fade_out only -> right end moves
     -- Zone-preservation guard (Later, with right_xf): right item's body must stay >= 1 nudge grid
+    -- Chain-aware: skip if partner will shift this Move.
     if delta > 0 and right_xf then
-      local xf_len = r.GetMediaItemInfo_Value(right_xf, 'D_LENGTH')
-      local xf_fo  = NudgeEdge and NudgeEdge.get_fo(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEOUTLEN')
-      local xf_fi  = NudgeEdge and NudgeEdge.get_fi(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEINLEN')
-      local xf_body = xf_len - xf_fo - xf_fi
-      if xf_body < 2*delta - EPS then return false end
+      local partner_will_shift = false
+      if intent_pos and intent_pos[right_xf] then
+        local partner_cur = r.GetMediaItemInfo_Value(right_xf, 'D_POSITION')
+        if math.abs(intent_pos[right_xf] - partner_cur) > EPS then partner_will_shift = true end
+      end
+      if not partner_will_shift then
+        local xf_len = r.GetMediaItemInfo_Value(right_xf, 'D_LENGTH')
+        local xf_fo  = NudgeEdge and NudgeEdge.get_fo(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEOUTLEN')
+        local xf_fi  = NudgeEdge and NudgeEdge.get_fi(right_xf) or r.GetMediaItemInfo_Value(right_xf, 'D_FADEINLEN')
+        local xf_body = xf_len - xf_fo - xf_fi
+        if xf_body < 2*delta - EPS then return false end
+      end
     end
     -- Source-bound clamp: Later grows item length
     if delta > 0 and take and NudgeEdge then
@@ -426,8 +548,10 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run)
     sync_left()
 
   else
-    -- No case matched (razor doesn't fully cover any zone) — treat as blocked
-    return false
+    -- No case matched (razor doesn't fully cover any zone of THIS item).
+    -- Treat as "selection-only move" — don't modify item, but allow razor/TS to shift by delta.
+    -- Returning true (with delta) lets the caller sync razor & TS without freezing the track.
+    return true, delta
   end
   return true, delta
 end
@@ -455,8 +579,17 @@ r.PreventUIRefresh(1)
 
 -- track_nudged: nil = no item processed, true = moved, false = all blocked
 -- min_actual: smallest |actual_delta| across all moved items (for razor sync when items clamp to source bound)
+-- nudged_via_chain: items already moved via no-razor chain auto-include (prevents double-move
+-- when both a selected item and its xfade partner end up in the same chain).
+-- selected_set: lookup of user-selected items, so the chain auto-include knows whether to give
+-- a partner full-shift (selected → Case 1) or edge-shift (not selected → Case 6/7).
 local track_nudged = {}
 local min_actual = nil
+local nudged_via_chain = {}
+local selected_set = {}
+for i = 0, r.CountSelectedMediaItems(0) - 1 do
+  selected_set[r.GetSelectedMediaItem(0, i)] = true
+end
 
 local function track_actual(d)
   if min_actual == nil or math.abs(d) < math.abs(min_actual) then
@@ -476,6 +609,35 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
   }
 end
 
+-- Intent pre-pass (Option C two-phase compute): for each selected item, decide what its
+-- post-Move pos/end will be (based on its case). sync_left/sync_right and chain-aware
+-- guards inside nudge_item then look up partner intent here instead of using current pos.
+-- This is what makes 3+ item chain Move work without false body-collapse blocks.
+local intent_pos = {}
+local intent_end = {}
+for i = 0, r.CountSelectedMediaItems(0) - 1 do
+  local item   = r.GetSelectedMediaItem(0, i)
+  local track  = r.GetMediaItemTrack(item)
+  local pos    = r.GetMediaItemInfo_Value(item, 'D_POSITION')
+  local len    = r.GetMediaItemInfo_Value(item, 'D_LENGTH')
+  local item_e = pos + len
+  local sel_s, sel_e = get_track_razor(track)
+  if sel_s and sel_e then
+    if sel_e > pos + EPS and sel_s < item_e - EPS then
+      local cs = math.max(sel_s, pos)
+      local ce = math.min(sel_e, item_e)
+      local case = detect_case(item, cs, ce, item_state[item])
+      local new_pos, new_end = compute_intent(case, pos, item_e, delta)
+      intent_pos[item] = new_pos
+      intent_end[item] = new_end
+    end
+  else
+    -- No razor: full-item position move (matches nudge_position behavior below).
+    intent_pos[item] = pos + delta
+    intent_end[item] = item_e + delta
+  end
+end
+
 -- Pass 0 (dry-run): check if any item would block. If so, abort all modifications
 -- (prevents partial-modification when one item blocks but another's sync would still
 -- modify the blocked item indirectly via sync_left/sync_right).
@@ -490,7 +652,7 @@ for i = 0, r.CountSelectedMediaItems(0) - 1 do
   if sel_s and sel_e and sel_e > pos + EPS and sel_s < item_e - EPS then
     local clamped_s = math.max(sel_s, pos)
     local clamped_e = math.min(sel_e, item_e)
-    local moved = nudge_item(item, clamped_s, clamped_e, delta, item_state[item], true)  -- dry_run
+    local moved = nudge_item(item, clamped_s, clamped_e, delta, item_state[item], true, intent_pos, intent_end)  -- dry_run
     if moved == false then pre_block = true; break end
   end
 end
@@ -510,7 +672,7 @@ if not pre_block then
       if sel_e > pos + EPS and sel_s < item_e - EPS then
         local clamped_s = math.max(sel_s, pos)
         local clamped_e = math.min(sel_e, item_e)
-        local moved, actual = nudge_item(item, clamped_s, clamped_e, delta, item_state[item], false)
+        local moved, actual = nudge_item(item, clamped_s, clamped_e, delta, item_state[item], false, intent_pos, intent_end)
         if moved == false then
           track_nudged[track] = false
         elseif moved then
@@ -519,11 +681,80 @@ if not pre_block then
         end
       end
     else
-      -- No razor: item selection = entire item -> position move
-      if NudgeEdge then NudgeEdge.nudge_position(item, delta)
-      else r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta) end
-      track_nudged[track] = true
-      track_actual(delta)
+      -- No razor: full-shift this selected item, then 1-hop xfade partners that aren't
+      -- user-selected get an edge-shift (right partner: pos shifts / end stays = Case 7;
+      -- left partner: end shifts / pos stays = Case 6). This preserves crossfades on the
+      -- partner's OTHER side (analogous to razor's "razor only selects overlapping items"
+      -- semantic — we don't recurse beyond the immediate neighbor).
+      -- Capture partners BEFORE shifting — find_*_xfade reads item's current pos/end.
+      local rxf = NudgeEdge and NudgeEdge.find_right_xfade(track, item)
+      local lxf = NudgeEdge and NudgeEdge.find_left_xfade(track, item)
+      -- Pre-check guards on auto-included partners (body collapse + source bound).
+      local block, block_src_warn = false, false
+      if rxf and not selected_set[rxf] and not nudged_via_chain[rxf] then
+        local rxf_len_chk = r.GetMediaItemInfo_Value(rxf, 'D_LENGTH')
+        local rxf_fi_chk  = (NudgeEdge and NudgeEdge.get_fi(rxf)) or 0
+        local rxf_fo_chk  = (NudgeEdge and NudgeEdge.get_fo(rxf)) or 0
+        if delta > 0 then
+          if (rxf_len_chk - rxf_fi_chk - rxf_fo_chk) <= math.abs(delta) + EPS then block = true end
+        else
+          if NudgeEdge then
+            local rxf_take_chk = r.GetActiveTake(rxf)
+            if rxf_take_chk then
+              local max_left = NudgeEdge.max_extend_left(rxf_take_chk)
+              if max_left < math.abs(delta) - EPS then block, block_src_warn = true, true end
+            end
+          end
+        end
+      end
+      if not block and lxf and not selected_set[lxf] and not nudged_via_chain[lxf] then
+        local lxf_len_chk = r.GetMediaItemInfo_Value(lxf, 'D_LENGTH')
+        local lxf_fi_chk  = (NudgeEdge and NudgeEdge.get_fi(lxf)) or 0
+        local lxf_fo_chk  = (NudgeEdge and NudgeEdge.get_fo(lxf)) or 0
+        if delta < 0 then
+          if (lxf_len_chk - lxf_fi_chk - lxf_fo_chk) <= math.abs(delta) + EPS then block = true end
+        else
+          if NudgeEdge then
+            local lxf_take_chk = r.GetActiveTake(lxf)
+            if lxf_take_chk then
+              local max_right = NudgeEdge.max_extend_right(lxf, lxf_take_chk, lxf_len_chk)
+              if max_right < math.abs(delta) - EPS then block, block_src_warn = true, true end
+            end
+          end
+        end
+      end
+      if block then
+        if block_src_warn and NudgeEdge then NudgeEdge.source_warning() end
+        track_nudged[track] = false
+      else
+        if not nudged_via_chain[item] then
+          nudged_via_chain[item] = true
+          r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta)
+          track_nudged[track] = true
+          track_actual(delta)
+        end
+        -- Right xfade partner (not user-selected): Case 7-like edge shift
+        if rxf and not selected_set[rxf] and not nudged_via_chain[rxf] then
+          nudged_via_chain[rxf] = true
+          local rxf_pos = r.GetMediaItemInfo_Value(rxf, 'D_POSITION')
+          local rxf_len = r.GetMediaItemInfo_Value(rxf, 'D_LENGTH')
+          r.SetMediaItemInfo_Value(rxf, 'D_POSITION', rxf_pos + delta)
+          r.SetMediaItemInfo_Value(rxf, 'D_LENGTH',   rxf_len - delta)
+          local rxf_take = r.GetActiveTake(rxf)
+          if rxf_take then
+            local offs = r.GetMediaItemTakeInfo_Value(rxf_take, 'D_STARTOFFS')
+            r.SetMediaItemTakeInfo_Value(rxf_take, 'D_STARTOFFS', offs + delta)
+          end
+          track_nudged[r.GetMediaItemTrack(rxf)] = true
+        end
+        -- Left xfade partner (not user-selected): Case 6-like edge shift
+        if lxf and not selected_set[lxf] and not nudged_via_chain[lxf] then
+          nudged_via_chain[lxf] = true
+          local lxf_len = r.GetMediaItemInfo_Value(lxf, 'D_LENGTH')
+          r.SetMediaItemInfo_Value(lxf, 'D_LENGTH', lxf_len + delta)
+          track_nudged[r.GetMediaItemTrack(lxf)] = true
+        end
+      end
     end
   end
 else

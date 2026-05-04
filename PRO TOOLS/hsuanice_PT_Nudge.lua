@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_Nudge - Nudge Library
-@version 0.4.4 [260503.1918]
+@version 0.4.5 [260504.1230]
 @author hsuanice
 @about
   Library for all hsuanice nudge scripts.
@@ -12,6 +12,10 @@
     3 = right edge, 4 = contents, 6 = edit cursor
 
 @changelog
+  0.4.5 [260504.1230]
+    - Public M.calc_delta_sec(preset, reverse) — exposes the seconds conversion that
+      was internal to nudge_razor. Lets scripts do per-item processing (e.g. Contents
+      Later/Earlier with source-bound clamp) without duplicating the unit conversion.
   0.4.4 [260503.1918]
     - Fix: r.ApplyNudge with unit=18 (frames) doesn't track project fps
       reliably — at non-24 fps it appears to default to 24, so item
@@ -103,6 +107,45 @@ function M.get_preset(mode, idx)
   local presets = NUDGE_PRESETS[mode]
   if not presets then return nil end
   return presets[idx]
+end
+
+-- Public: convert a preset to a delta in seconds. Used by scripts that need to do their
+-- own per-item processing instead of going through r.ApplyNudge (e.g. Contents nudge with
+-- source-bound clamp). `reverse` flips sign.
+function M.calc_delta_sec(preset, reverse)
+  if not preset then return 0 end
+  local r = reaper
+  local unit, value = preset.unit, preset.value
+  local delta = 0
+  if unit == 0 then
+    delta = value / 1000.0
+  elseif unit == 1 then
+    delta = value
+  elseif unit == 17 then
+    local sr = r.GetSetProjectInfo(0, 'PROJECT_SRATE', 0, false)
+    delta = value / sr
+  elseif unit == 18 then
+    local fps = r.TimeMap_curFrameRate(0)
+    fps = (fps and fps > 0) and fps or 24
+    delta = value / fps
+  elseif unit == 16 then
+    local pos = r.GetCursorPosition()
+    local _, beats_per_measure, _ = r.TimeMap_GetTimeSigAtTime(0, pos)
+    local bpm, _ = r.GetProjectTimeSignature2(0)
+    local beat_sec = 60.0 / bpm
+    local measure_sec = beat_sec * beats_per_measure
+    local bars = math.floor(value)
+    local frac = value - bars
+    delta = bars * measure_sec + frac * beat_sec
+  elseif unit >= 3 and unit <= 15 then
+    local bpm, _ = r.GetProjectTimeSignature2(0)
+    local beat_sec = 60.0 / bpm
+    local note_map = {[3]=1/64,[4]=1/32,[5]=1/16,[6]=1/8,[7]=1/4,
+                      [8]=1/2,[9]=1,[10]=2,[11]=4,[12]=8,
+                      [13]=16,[14]=32,[15]=64}
+    delta = beat_sec * (note_map[unit] or 1) * value
+  end
+  return reverse and -delta or delta
 end
 
 -- Helper: calculate nudge delta in seconds from preset
