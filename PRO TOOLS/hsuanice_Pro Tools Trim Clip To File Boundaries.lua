@@ -1,44 +1,47 @@
---[[
-@description Pro Tools - Trim Clip To File Boundaries
-@version 0.1.1
-@author hsuanice
-@about
-  Emulates Pro Tools' "Trim Clip to File Boundaries" behavior.  
-    - Extends both left and right edges of selected item(s) based on neighboring items.  
-    - Falls back to full file start/end if no neighbors exist.  
-    - Always respects file content bounds, avoiding empty/unrecorded areas.
-  
-    💡 Ideal for reclaiming full usable media without overshooting source boundaries.  
-      Integrates well with hsuanice's Pro Tools-style editing workflow.
-  
-    This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.  
-    hsuanice served as the workflow designer, tester, and integrator for this tool.
-  
-  Features:
-  - Designed for fast, keyboard-light workflows.
-  
-  References:
-  - REAPER ReaScript API (Lua)
-  
-  Note:
-  This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.
-  hsuanice served as the workflow designer, tester, and integrator for this tool.
-  
-@changelog
-  v0.1.1 - Fix: items stretched beyond source by "SWS/AW: Trim selected items to fill selection"
-           could create a blank loop on the left (negative D_STARTOFFS). Now:
-           • Left side is clamped back to true file start (D_STARTOFFS → 0).
-           • Right side overrun/loop is unlooped and clamped to file end.
-           • normalize_loop_and_clamp() refactor to handle both sides robustly.
-           • Turn off B_LOOPSRC before clamping to honor pref 42218.
-           • Minor: take_offset/playrate/src_len declared local (avoid globals).
-           • Behavior preserved: never overlaps neighbors; fades untouched.
-  v0.1   - Beta release
---]]
+-- @description hsuanice_Pro Tools Trim Clip To File Boundaries
+-- @version 0.3.0 [260504.1620]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   Replicates Pro Tools: **Trim Clip to File Boundaries**
+--   Extends BOTH left and right edges of each selected item up to:
+--     • the next/previous neighbor on the same track, or
+--     • the source file start / end if no neighbor exists.
+--   Always respects source media bounds; auto-unloops and clamps an item that
+--   was previously stretched past source by SWS "Trim to fill selection".
+--   Fades are untouched.
+--   - Tags: Editing
+-- @changelog
+--   0.3.0 [260504.1620] - Selection follows extend: razor (per track) and time selection
+--                          now expand to encompass the items' new extents after trimming
+--                          to file boundaries. Tracks that didn't originally have razor
+--                          are untouched.
+--   0.2.0 [260504.1520] - Header standardized to PT2Reaper line-comment style;
+--                          logic unchanged from v0.1.1.
+--   0.1.1               - Fix: items stretched beyond source by "SWS/AW: Trim selected items
+--                          to fill selection" could create a blank loop on the left
+--                          (negative D_STARTOFFS). Now:
+--                            • Left side is clamped back to true file start (D_STARTOFFS → 0).
+--                            • Right side overrun/loop is unlooped and clamped to file end.
+--                            • normalize_loop_and_clamp() refactor to handle both sides robustly.
+--                            • Turn off B_LOOPSRC before clamping to honor pref 42218.
+--                            • Minor: take_offset/playrate/src_len declared local (avoid globals).
+--                            • Behavior preserved: never overlaps neighbors; fades untouched.
+--   0.1                 - Beta release
+
+-- Load PT_Trim library (for snapshot_selection / expand_selection_to_items)
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local _ok, Trim = pcall(dofile, _dir .. '../Library/hsuanice_PT_Trim.lua')
+if not _ok then Trim = nil end
+
 reaper.Undo_BeginBlock()
 
 local num_items = reaper.CountSelectedMediaItems(0)
 if num_items == 0 then return end
+
+-- Snapshot razor + TS BEFORE extending so we can expand them after.
+local _sel_snap = Trim and Trim.snapshot_selection() or nil
 
 -- Drop-in replacement for normalize_loop_and_clamp()
 local function normalize_loop_and_clamp(item, take)
@@ -150,6 +153,9 @@ for i = 0, num_items - 1 do
 
   ::continue::
 end
+
+-- Selection follow-extend: expand razor + TS to encompass items' new extents.
+if Trim and _sel_snap then Trim.expand_selection_to_items(_sel_snap) end
 
 reaper.UpdateArrange()
 reaper.Undo_EndBlock("Extend item both edges to item or full content", -1)

@@ -1,37 +1,34 @@
---[[
-@description Pro Tools - Trim Clips End To File End
-@version 0.1
-@author hsuanice
-@about
-  Emulates Pro Tools' "Trim Clip End to File End" behavior.
-    - Extends the right edge of selected item(s) to the next item's start, or to the source media end.
-    - Prevents extending into unrecorded/empty content area.
-    - Automatically respects source limits and adjusts for playrate and offset.
-  
-    💡 Ideal for reclaiming usable audio content without overshooting media length.
-      Integrates well with hsuanice's Pro Tools-style timeline workflows.
-  
-    This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.
-    hsuanice served as the workflow designer, tester, and integrator for this tool.
-  
-  Features:
-  - Designed for fast, keyboard-light workflows.
-  
-  References:
-  - REAPER ReaScript API (Lua)
-  
-  Note:
-  - This is a 0.1 beta release for internal testing.
-  
-  This script was generated using ChatGPT based on design concepts and iterative testing by hsuanice.
-  hsuanice served as the workflow designer, tester, and integrator for this tool.
-@changelog
-  v0.1 - Beta release
---]]
+-- @description hsuanice_Pro Tools Trim Clips End To File End
+-- @version 0.3.0 [260504.1620]
+-- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
+-- @about
+--   Replicates Pro Tools: **Trim Clip End to File End**
+--   Extends the RIGHT edge of each selected item up to:
+--     • the next neighbor's start on the same track, or
+--     • the source media end if no neighbor exists.
+--   Auto-unloops and clamps any item that was previously stretched past the
+--   source by SWS "Trim to fill selection". Respects playrate and STARTOFFS.
+--   - Tags: Editing
+-- @changelog
+--   0.3.0 [260504.1620] - Selection follows extend: razor (per track) and time selection
+--                          now expand to encompass the items' new extents (right edge only).
+--   0.2.0 [260504.1520] - Header standardized to PT2Reaper line-comment style;
+--                          logic unchanged from v0.1.
+--   0.1                 - Beta release
+
+-- Load PT_Trim library (for snapshot_selection / expand_selection_to_items)
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local _ok, Trim = pcall(dofile, _dir .. '../Library/hsuanice_PT_Trim.lua')
+if not _ok then Trim = nil end
+
 reaper.Undo_BeginBlock()
 
 local num_items = reaper.CountSelectedMediaItems(0)
 if num_items == 0 then return end
+
+local _sel_snap = Trim and Trim.snapshot_selection() or nil
 
 local function normalize_loop_and_clamp(item, take)
   local len = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
@@ -95,6 +92,8 @@ for i = 0, num_items - 1 do
 
   ::continue::
 end
+
+if Trim and _sel_snap then Trim.expand_selection_to_items(_sel_snap) end
 
 reaper.UpdateArrange()
 reaper.Undo_EndBlock("Trim Clips End To File End (auto-unloop & clamp first)", -1)
