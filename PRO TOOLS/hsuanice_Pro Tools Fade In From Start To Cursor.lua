@@ -1,32 +1,71 @@
 -- @description hsuanice_Pro Tools Fade In From Start To Cursor
--- @version 0.1.0 [260413.1324]
+-- @version 0.3.0 [260505.2045]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Stub script for the Pro Tools action:
---   **Fade In From Start To Cursor**
---
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
---
---   ## Details
---   - Pro Tools equivalent : Fade In From Start To Cursor
---   - Module               : Editing
---   - Mac shortcut (PT)    : Commands Focus + D
---   - Tags                 : Edit menu, Editing, Fades
---
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
---
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
+--   Replicates Pro Tools: **Fade In From Start To Cursor** (Ctrl+D)
+--   Thin wrapper over REAPER native action 40509 "Item: Fade items in to
+--   cursor" — for each selected item, sets the fade-in length to
+--   (cursor − item.pos). Items with the cursor outside their body are
+--   skipped automatically by the native action. REAPER's default fade
+--   shape is used.
+--   - Tags: Editing, Fades
 -- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--   0.3.0 [260505.2045] - Simplify to a thin wrapper around native
+--                          40509. Custom shape-from-ExtState logic
+--                          retained below as a NOTE block in case PT-style
+--                          shape recall is wanted later.
+--   0.2.0 [260505.2030] - First real implementation (custom iteration +
+--                          shape from Create Fades ExtState).
+--   0.1.0 [260413.1324] - Stub placeholder created.
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Fade In From Start To Cursor", "PT2Reaper", 0)
+reaper.Main_OnCommand(40509, 0)  -- Item: Fade items in to cursor
+
+--[[
+NOTE — previous v0.2.0 implementation (custom shape from Create Fades' ExtState)
+-------------------------------------------------------------------------------
+If we ever want PT-style shape recall (use the last fade-in shape set via
+Create Fades), revive this. Drops the native 40509 call and iterates manually
+so we can apply a specific shape per-item via FADEIN_CMDS:
+
+  local r = reaper
+  local _info = debug.getinfo(1, 'S')
+  local _dir  = _info.source:match('^@(.*[/\\])') or ''
+  local F = dofile(_dir .. '../Library/hsuanice_PT_Fades.lua')
+  if not F then return end
+
+  local EXT_SEC = "hsuanice_PT2Reaper_CreateFades"
+  local function read_shape(key, fallback)
+    local v = tonumber(r.GetExtState(EXT_SEC, key))
+    if v then return F.clamp_shape(math.floor(v)) end
+    return fallback
+  end
+
+  local fadein_shape = read_shape("fadein_shape", 1)
+  local cursor       = r.GetCursorPosition()
+  local n            = r.CountSelectedMediaItems(0)
+  if n == 0 then return end
+
+  local todo = {}
+  for i = 0, n-1 do
+    local it  = r.GetSelectedMediaItem(0, i)
+    local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
+    local fin = pos + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+    if cursor > pos + F.EPS and cursor < fin - F.EPS then
+      todo[#todo+1] = {item=it, len=cursor - pos}
+    end
+  end
+  if #todo == 0 then return end
+
+  r.Undo_BeginBlock()
+  r.PreventUIRefresh(1)
+  F.with_preserved_state(function()
+    for _, t in ipairs(todo) do
+      F.set_fadein_shape(t.item, fadein_shape)
+      r.SetMediaItemInfo_Value(t.item, "D_FADEINLEN", t.len)
+    end
+  end)
+  r.PreventUIRefresh(-1)
+  r.UpdateArrange()
+  r.Undo_EndBlock("Pro Tools: Fade In From Start To Cursor", -1)
+--]]
