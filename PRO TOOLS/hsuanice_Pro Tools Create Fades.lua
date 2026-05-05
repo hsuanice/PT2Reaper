@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Create Fades
--- @version 0.3.10 [260504.1910]
+-- @version 0.5.3 [260505.1313]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -14,6 +14,96 @@
 --   Mac shortcut (PT): Command + F
 --
 -- @changelog
+--   0.5.3 [260505.1313]
+--     - Fix Slight S-curve crossfade rendering as Linear: the flag field in
+--       FADEINNEW/FADEOUTNEW is a continuous S-curve INTENSITY, not a binary
+--       Slight/Sharp marker. REAPER renders type=12 with flag=0 as Linear.
+--       Confirmed via DUMP G (REAPER native 41533 Slight S-curve):
+--         FADEINNEW 10 0 0 12 0 0.5  (flag = 0.5 for Slight)
+--         FADEINNEW 10 0 0 12 0 1    (flag = 1   for Sharp, from earlier dump)
+--       Updated build_new_line FLAG map: shape 6 → 0.5, shape 7 → 1.
+--       Updated classify_new_shape detection threshold to 0.75 so flag values
+--       in the Slight range (0.5) classify as 6, and Sharp range (1) as 7.
+--   0.5.2 [260505.1236]
+--     - Fix: multi-pair selection across different tracks didn't detect any
+--       crossfade pairs. The xfade-pair check was iterating list-adjacent
+--       items (sorted by position globally), so two items on different tracks
+--       interleaved by position got skipped. Now groups items by track first,
+--       then checks position-adjacency within each track.
+--     - Fix: applying a crossfade to touching items (no prior overlap) only
+--       extended the items but produced no visible fade. REAPER does NOT
+--       auto-compute D_FADEIN/OUTLEN_AUTO from item overlap when geometry is
+--       set via API (only XFADE_CMDS do that). Now sets D_FADEOUTLEN_AUTO
+--       (left) and D_FADEINLEN_AUTO (right) directly to xlen so the visible
+--       auto-fade has the correct length.
+--     - Known minor issue: when an existing fade-in/out is set to Sharp
+--       S-curve (7) via REAPER's manual fade actions and the script is
+--       reopened, the GUI may pre-select Slight S-curve (6) instead of 7
+--       in some cases. The detection logic for the legacy 5.x fractional
+--       encoding works in most cases but may have edge cases with how
+--       different REAPER builds round/store the fractional value. Doesn't
+--       affect functionality — apply still produces the chosen shape.
+--   0.5.1 [260505.1225]
+--     - Fix Sharp S-curve (7) detection for fade-in / fade-out: REAPER 7.71+
+--       encodes Sharp S-curve in the legacy FADEIN/FADEOUT line as the
+--       fractional value 5.1 (not 6 as the simple 0..6 encoding would suggest);
+--       Slight S-curve stays at integer 5. classify_legacy_shape() now treats
+--       any 5.x with x>0 as shape 7. Crossfade detection (FADEINNEW/FADEOUTNEW)
+--       was already correct via the flag field — this fix only affects the
+--       legacy line read for non-crossfade fade-in / fade-out.
+--   0.5.0 [260504.2356]
+--     - Crossfade detect + apply rewritten to use FADEINNEW/FADEOUTNEW chunk
+--       lines (the "NEW" auto-fade format), discovered via full chunk dumps.
+--       Previous v0.4.x wrote the legacy FADEIN/FADEOUT lines, which REAPER
+--       ignores for the visible auto-fade shape — so picking a shape did
+--       nothing visually.
+--     - FADEINNEW/FADEOUTNEW format: <a> <b> <c> <type> <curv> <flag>
+--         type 10 = exponential, 11 = constant power (Slight Convex / Eq.P.),
+--         12 = s-curve. curv = -1..+1 (no sign flip between in/out, unlike
+--         legacy). flag = 1 only for Sharp S-curve (the missing distinction
+--         between shape 6 and 7 we couldn't find before).
+--     - Sharp S-curve (7) is now fully supported for crossfades — it writes
+--       type=12 curv=0 flag=1, which REAPER renders distinctly from Slight
+--       S-curve (type=12 curv=0 flag=0).
+--     - Detection precedence: shape_from_new_line() (NEW format) takes
+--       priority over the legacy FADEIN/FADEOUT line. Falls back to legacy
+--       only if the NEW line is missing or describes "no auto-fade".
+--   0.4.2 [260504.2328]
+--     - Confirmed via dump: REAPER normalizes type=12 (S-curve) chunks back
+--       to curv=0 even when we write a non-zero curvature, so the v0.4.1
+--       attempt to round-trip Sharp S-curve via curvature failed. Reverted:
+--       crossfade apply now writes curv=0 for both shape 6 and 7 (they are
+--       functionally identical for crossfades), and detect always returns
+--       shape 6 for type=12. Shape 7 remains in the GUI because fade-in /
+--       fade-out paths DO distinguish 6 vs 7 via FADEIN_CMDS / FADEOUT_CMDS
+--       (the simple field1=0..6 encoding preserves the distinction there).
+--   0.4.1 [260504.2255]
+--     - Sharp S-curve (7) experimental fix (later reverted in 0.4.2).
+--   0.4.0 [260504.2238]
+--     - Crossfade detect + apply rewritten based on actual chunk dump.
+--       REAPER's FADEIN/FADEOUT chunk line uses TWO different encodings:
+--         FADEIN_CMDS / FADEOUT_CMDS (manual): field1 = 0..6 (PT shape - 1)
+--         XFADE_CMDS (crossfade):              field1 = 10/11/12, field6 = curvature
+--       Field layout (7 tokens): <type> <manual_len> <auto_len> 0 <flag> <curv> <dir>
+--       type 10 = exponential (curvature -1..+1); type 11 = constant power
+--       (Slight Convex / Equal Power); type 12 = s-curve. Curvature sign flips
+--       between FADEIN (right side) and FADEOUT (left side) of a crossfade.
+--     - Detect: classify_chunk_shape() now handles both encodings and returns
+--       the correct GUI shape (1..7) for crossfades. Previous v0.3.11/12 only
+--       worked for simple fades.
+--     - Apply: stop using XFADE_CMDS (41528-41533, 41838) — those actions are
+--       unreliable and often only update the right item's fade-in. The script
+--       now writes the FADEOUT line on the left item and FADEIN line on the
+--       right item directly via SetItemStateChunk, which consistently sets
+--       both sides of the visible crossfade.
+--     - Note: XFADE actions don't distinguish Slight S-curve (6) from Sharp
+--       S-curve (7) — both produce type=12, curv=0 in the chunk. They render
+--       identically until REAPER provides separate native encoding.
+--   0.3.11 [260504.1957]
+--     - Fix shape auto-detect: REAPER's GetMediaItemInfo_Value(C_FADEINSHAPE) returns
+--       garbage on 7.71+ (encoded internal values like 10/12 instead of the 0-6 shape
+--       index). Switched to parsing the item state chunk's FADEIN/FADEOUT line, which
+--       reliably gives the correct shape index (0-6 mapped to GUI options 1-7).
 --   0.3.10 [260504.1910]
 --     - GUI: pre-select radio buttons to match the existing fade shape on the
 --       selected items (was meant to work via existing_xxx_shape lookup, but now
@@ -123,7 +213,9 @@ local XFADE_GAP = 0.005  -- items within 5ms are treated as touching (handles sa
 local SHAPE_NAMES    = {"Linear","Slight Convex (Equal Power)","Slight Concave","Sharp Convex","Sharp Concave","Slight S-Curve","Sharp S-Curve"}
 local FADEIN_CMDS    = {41514,41515,41516,41517,41518,41519,41836}
 local FADEOUT_CMDS   = {41521,41522,41523,41524,41525,41526,41837}
-local XFADE_CMDS     = {41528,41529,41530,41531,41532,41533,41838}
+-- XFADE shape actions (41528,41529,41530,41531,41532,41533,41838) are unreliable
+-- for setting both sides of a crossfade — often only the right item's fade-in
+-- updates. We write the FADEIN/FADEOUT chunk lines directly instead.
 
 -- ============================================================
 -- DETECTION
@@ -144,30 +236,125 @@ local function clamp_shape(s)
   return math.max(1, math.min(7, s))
 end
 
--- REAPER's GetMediaItemInfo_Value(C_FADEINSHAPE) returns garbage on 7.71+ (returns
--- internal encoded values like 10/12 that don't match the 0-6 shape index). The
--- authoritative source for fade shape is the item state chunk:
---   FADEIN  <shape> <length> <dir> <autolen> <autoshape> <autodir>
---   FADEOUT <shape> <length> <dir> <autolen> <autoshape> <autodir>
--- where <shape> is 0..6 matching the action set order (linear=0, slight convex=1,
--- slight concave=2, sharp convex=3, sharp concave=4, slight S=5, sharp S=6).
-local function shape_from_chunk(item, line_prefix)
-  local ok, chunk = r.GetItemStateChunk(item, "", false)
-  if not ok or not chunk then return 0 end
-  -- Find the shape (first integer after the line_prefix keyword)
-  local s = chunk:match(line_prefix .. "%s+(%-?%d+)")
-  return tonumber(s) or 0
+-- REAPER stores fade info in TWO chunk lines per side:
+--   FADEIN/FADEOUT       — legacy/manual fade definition (7 tokens)
+--   FADEINNEW/FADEOUTNEW — current auto-fade definition (6 tokens; this is
+--                          the source of truth for the visible crossfade shape)
+--
+-- FADEINNEW/FADEOUTNEW format: <a> <b> <c> <type> <curv> <flag>
+--   type = 10 (exponential), 11 (constant power = Slight Convex), 12 (s-curve)
+--   curv = -1..+1 (NO sign flip between in/out)
+--   flag = 0 normally; 1 only for Sharp S-curve (the only way to distinguish 6 vs 7)
+--
+-- FADEIN/FADEOUT (legacy) format: <type> <manual_len> <auto_len> 0 <active> <curv> <dir>
+--   type field1 = 0..6 (simple PT index, from FADEIN_CMDS) OR 10/11/12 (extended)
+--   curv field6 sign FLIPS between FADEIN and FADEOUT for the same visual shape
+
+-- Map (type, curv, flag) from the NEW format → GUI shape index (1..7).
+-- For S-curves (type=12), flag is a continuous intensity value:
+--   0.5 = Slight S-curve, 1 = Sharp S-curve.
+-- (REAPER renders type=12 with flag=0 as Linear — that intensity needs flag>0.)
+local function classify_new_shape(type_f, curv_f, flag_f)
+  if type_f == 11 then return 2 end  -- Slight Convex (Equal Power)
+  if type_f == 12 then
+    return ((flag_f or 0) >= 0.75) and 7 or 6  -- Sharp (~1) vs Slight (~0.5)
+  end
+  -- type 10: classify by curvature (no sign flip in NEW format)
+  if math.abs(curv_f) < 0.05 then return 1 end       -- Linear
+  if curv_f >=  0.75 then return 4 end               -- Sharp Convex (~+1)
+  if curv_f <= -0.75 then return 5 end               -- Sharp Concave (~-1)
+  if curv_f >  0     then return 2 end               -- Slight Convex (rare type 10 case)
+  return 3                                           -- Slight Concave (~-0.5)
 end
 
+-- Map (type, curv) from the legacy format → GUI shape index. is_fadein flips curv sign.
+local function classify_legacy_shape(field1, field6, is_fadein)
+  if field1 >= 0 and field1 <= 6 then
+    -- Simple 0..6 encoding from FADEIN/FADEOUT actions, with one quirk:
+    -- REAPER 7.71+ encodes Sharp S-curve as the fractional value 5.1 (not 6),
+    -- while Slight S-curve stays at integer 5. Treat any 5.x with x>0 as 7.
+    local int_part = math.floor(field1)
+    local has_frac = (field1 - int_part) > 0.05
+    if int_part == 5 and has_frac then return 7 end
+    return clamp_shape(int_part + 1)
+  end
+  if field1 == 11 then return 2 end
+  if field1 == 12 then return 6 end  -- legacy line can't distinguish 7
+  local c = is_fadein and -field6 or field6
+  if math.abs(c) < 0.05 then return 1 end
+  if c >=  0.75 then return 4 end
+  if c <= -0.75 then return 5 end
+  if c >  0     then return 4 end
+  return 3
+end
+
+-- Read the FADEINNEW or FADEOUTNEW line. Returns GUI shape (1..7), or nil if
+-- the line is missing or describes "no auto-fade" (type field < 10).
+local function shape_from_new_line(item, side)
+  local prefix = (side == "fadein") and "FADEINNEW" or "FADEOUTNEW"
+  local ok, chunk = r.GetItemStateChunk(item, "", false)
+  if not ok or not chunk then return nil end
+  local line = chunk:match("\n" .. prefix .. " ([^\n]+)")
+              or chunk:match("^" .. prefix .. " ([^\n]+)")
+  if not line then return nil end
+  local toks = {}
+  for tok in line:gmatch("%S+") do toks[#toks+1] = tok end
+  local type_f = tonumber(toks[4]) or 0
+  local curv_f = tonumber(toks[5]) or 0
+  local flag_f = tonumber(toks[6]) or 0
+  if type_f < 10 then return nil end
+  return classify_new_shape(type_f, curv_f, flag_f)
+end
+
+-- Read the legacy FADEIN/FADEOUT line.
+local function shape_from_legacy_line(item, line_prefix)
+  local ok, chunk = r.GetItemStateChunk(item, "", false)
+  if not ok or not chunk then return 1 end
+  local line = chunk:match("\n" .. line_prefix .. " ([^\n]+)")
+              or chunk:match("^" .. line_prefix .. " ([^\n]+)")
+  if not line then return 1 end
+  local toks = {}
+  for tok in line:gmatch("%S+") do toks[#toks+1] = tok end
+  local f1 = tonumber(toks[1]) or 0
+  local f6 = tonumber(toks[6]) or 0
+  return classify_legacy_shape(f1, f6, line_prefix == "FADEIN")
+end
+
+-- Effective shape = NEW line if present (controls visible auto-fade), else legacy.
 local function existing_fadein_shape(item)
-  local sh = shape_from_chunk(item, "FADEIN")
-  r.ShowConsoleMsg(string.format("[CreateFades] fade-in chunk shape=%s\n", tostring(sh)))
-  return clamp_shape(sh + 1)
+  return shape_from_new_line(item, "fadein") or shape_from_legacy_line(item, "FADEIN")
 end
 local function existing_fadeout_shape(item)
-  local sh = shape_from_chunk(item, "FADEOUT")
-  r.ShowConsoleMsg(string.format("[CreateFades] fade-out chunk shape=%s\n", tostring(sh)))
-  return clamp_shape(sh + 1)
+  return shape_from_new_line(item, "fadeout") or shape_from_legacy_line(item, "FADEOUT")
+end
+
+-- Build a FADEINNEW or FADEOUTNEW chunk line content for the chosen GUI shape.
+-- (No length in this line — REAPER computes auto-fade length from item overlap.)
+local function build_new_line(gui_shape)
+  local TYPE = {[1]=10, [2]=11, [3]=10, [4]=10, [5]=10, [6]=12, [7]=12}
+  local CURV = {[1]=0,  [2]=0.5, [3]=-0.5, [4]=1, [5]=-1, [6]=0, [7]=0}
+  -- flag is a continuous S-curve intensity: 0.5 = Slight, 1 = Sharp.
+  -- type=12 with flag=0 renders as Linear (no S-curve), so shape 6 must use 0.5.
+  local FLAG = {[1]=0,  [2]=0,   [3]=0,    [4]=0, [5]=0,  [6]=0.5, [7]=1}
+  return string.format("10 0 0 %d %.10g %.10g",
+    TYPE[gui_shape] or 10, CURV[gui_shape] or 0, FLAG[gui_shape] or 0)
+end
+
+-- Patch (or insert) the FADEINNEW/FADEOUTNEW line in an item's chunk.
+local function patch_xfade_new(item, side, gui_shape)
+  local new_prefix = (side == "fadein") and "FADEINNEW" or "FADEOUTNEW"
+  local old_prefix = (side == "fadein") and "FADEIN"    or "FADEOUT"
+  local ok, chunk = r.GetItemStateChunk(item, "", false)
+  if not ok or not chunk then return end
+  local new_data = build_new_line(gui_shape)
+  local pattern  = "(\n" .. new_prefix .. " )[^\n]+"
+  local replaced, n = chunk:gsub(pattern, "%1" .. new_data, 1)
+  if n == 0 then
+    -- Line missing — insert after the corresponding FADEIN/FADEOUT line.
+    local insert_pat = "(\n" .. old_prefix .. " [^\n]+)"
+    replaced = chunk:gsub(insert_pat, "%1\n" .. new_prefix .. " " .. new_data, 1)
+  end
+  r.SetItemStateChunk(item, replaced, false)
 end
 
 local function get_razor_range()
@@ -230,23 +417,31 @@ local function detect()
     sel_start, sel_end = ts, te
   end
 
-  -- Check xfade pairs (overlapping/touching adjacent items ON THE SAME TRACK)
-  for i = 1, #items-1 do
-    local a,b = items[i], items[i+1]
-    -- Only pair items on the same track
-    local track_a = r.GetMediaItemTrack(a.item)
-    local track_b = r.GetMediaItemTrack(b.item)
-    if track_a ~= track_b then goto continue_xfade end
-
-    local gap = b.pos - a.fin
-    if gap <= XFADE_GAP then
-      local overlap = math.max(0, a.fin - b.pos)
-      det.xfade_pairs[#det.xfade_pairs+1] = {
-        left=a, right=b, overlap=overlap,
-        touching=(gap >= -EPS)
-      }
+  -- Check xfade pairs per-track. Items are globally sorted by position, so
+  -- adjacent-in-list items on different tracks would be wrongly skipped if we
+  -- only paired list-adjacent items. Group by track first, then check
+  -- position-adjacency within each track.
+  do
+    local by_track = {}
+    for _, it in ipairs(items) do
+      local tr = r.GetMediaItemTrack(it.item)
+      by_track[tr] = by_track[tr] or {}
+      table.insert(by_track[tr], it)
     end
-    ::continue_xfade::
+    for _, group in pairs(by_track) do
+      table.sort(group, function(a,b) return a.pos < b.pos end)
+      for i = 1, #group-1 do
+        local a, b = group[i], group[i+1]
+        local gap = b.pos - a.fin
+        if gap <= XFADE_GAP then
+          local overlap = math.max(0, a.fin - b.pos)
+          det.xfade_pairs[#det.xfade_pairs+1] = {
+            left=a, right=b, overlap=overlap,
+            touching=(gap >= -EPS)
+          }
+        end
+      end
+    end
   end
 
   local has_xfade = #det.xfade_pairs > 0
@@ -481,22 +676,19 @@ local function apply(det, S)
       r.UpdateArrange()
     end
 
-    -- Apply crossfade shape action
-    -- Select both items, apply shape, then enforce lengths
-    r.Main_OnCommand(40289,0)
-    r.SetMediaItemSelected(left,  true)
-    r.SetMediaItemSelected(right, true)
+    -- Set the auto-fade lengths directly. REAPER does NOT auto-compute these
+    -- from item overlap when geometry is set via API (it does when XFADE_CMDS
+    -- run), so we have to write D_FADEIN/OUTLEN_AUTO ourselves — otherwise the
+    -- visible auto-fade has length 0 and looks invisible.
+    r.SetMediaItemInfo_Value(left,  "D_FADEOUTLEN_AUTO", xlen)
+    r.SetMediaItemInfo_Value(right, "D_FADEINLEN_AUTO",  xlen)
 
-    -- Set lengths BEFORE action so action doesn't reset them
-    r.SetMediaItemInfo_Value(left,  "D_FADEOUTLEN", xlen)
-    r.SetMediaItemInfo_Value(right, "D_FADEINLEN",  xlen)
-
-    -- Apply shape
-    r.Main_OnCommand(XFADE_CMDS[S.xfade_shape], 0)
-
-    -- Re-enforce lengths after action (action may have reset them)
-    r.SetMediaItemInfo_Value(left,  "D_FADEOUTLEN", xlen)
-    r.SetMediaItemInfo_Value(right, "D_FADEINLEN",  xlen)
+    -- Apply crossfade shape by patching both items' FADEINNEW/FADEOUTNEW lines.
+    -- The visible auto-fade shape is controlled by these "NEW" chunk lines, NOT
+    -- by FADEIN/FADEOUT (legacy) or by XFADE_CMDS actions (which only update the
+    -- right item's fade-in).
+    patch_xfade_new(left,  "fadeout", S.xfade_shape)
+    patch_xfade_new(right, "fadein",  S.xfade_shape)
   end
 
   -- Restore original selection
