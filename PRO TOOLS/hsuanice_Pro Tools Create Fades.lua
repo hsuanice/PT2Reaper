@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Create Fades
--- @version 0.7.1 [260505.1840]
+-- @version 0.7.2 [260505.1945]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -14,6 +14,15 @@
 --   Mac shortcut (PT): Command + F
 --
 -- @changelog
+--   0.7.2 [260505.1945]
+--     - Fix xfade position when razor/TS isn't centered on the items'
+--       touching point. Previous behavior centered the new overlap
+--       symmetrically around the OLD boundary using only the selection
+--       LENGTH, which offset the xfade by half the asymmetry (visible
+--       as ~half a frame off when razor isn't symmetrically placed).
+--       Now uses the selection BOUNDS (sel_start/sel_end from the
+--       library's detect_create_targets) to position the xfade exactly
+--       at the selection: left.fin = sel_end, right.pos = sel_start.
 --   0.7.1 [260505.1840]
 --     - Replace the single "Unit: ms/frame" toggle button with two
 --       mutually-exclusive checkboxes ("ms" and "frame") in the lower-left.
@@ -618,8 +627,30 @@ local function apply(det, S)
     local current_overlap = pair.overlap
     local needs_resize = math.abs(xlen - current_overlap) > EPS
 
-    if pair.touching then
-      -- No overlap yet: extend both items to create xfade
+    if (pair.touching or needs_resize) and det.sel_start and det.sel_end then
+      -- POSITION the xfade exactly at the selection (left.fin = sel_end,
+      -- right.pos = sel_start). Avoids the "off by half a frame" issue when
+      -- the user's razor isn't centered on the original touching point —
+      -- the symmetric center-around-old-boundary path below would offset
+      -- the xfade by half the asymmetry.
+      local rp   = r.GetMediaItemInfo_Value(right, "D_POSITION")
+      local lp   = r.GetMediaItemInfo_Value(left,  "D_POSITION")
+      local rt   = r.GetActiveTake(right)
+      local ro   = rt and r.GetMediaItemTakeInfo_Value(rt, "D_STARTOFFS") or 0
+      local pr   = rt and r.GetMediaItemTakeInfo_Value(rt, "D_PLAYRATE")  or 1.0
+      if pr <= 0 then pr = 1.0 end
+      local rfin = rp + r.GetMediaItemInfo_Value(right, "D_LENGTH")
+      r.SetMediaItemInfo_Value(left,  "D_LENGTH",   det.sel_end - lp)
+      r.SetMediaItemInfo_Value(right, "D_POSITION", det.sel_start)
+      r.SetMediaItemInfo_Value(right, "D_LENGTH",   rfin - det.sel_start)
+      if rt then
+        r.SetMediaItemTakeInfo_Value(rt, "D_STARTOFFS",
+          math.max(0, ro + (det.sel_start - rp) * pr))
+      end
+      r.UpdateArrange()
+
+    elseif pair.touching then
+      -- No overlap yet, no selection bounds: extend both items symmetrically.
       local half = xlen * 0.5
       local ll   = r.GetMediaItemInfo_Value(left,  "D_LENGTH")
       local rp   = r.GetMediaItemInfo_Value(right, "D_POSITION")
@@ -633,16 +664,14 @@ local function apply(det, S)
       r.UpdateArrange()
 
     elseif needs_resize then
-      -- Already has overlap but want different length: adjust boundary
-      -- Move right item's left edge to achieve target overlap
-      local diff   = xlen - current_overlap  -- positive = extend more, negative = shrink
-      local rp     = r.GetMediaItemInfo_Value(right, "D_POSITION")
-      local rl     = r.GetMediaItemInfo_Value(right, "D_LENGTH")
-      local rt     = r.GetActiveTake(right)
-      local ro     = rt and r.GetMediaItemTakeInfo_Value(rt,"D_STARTOFFS") or 0
-      -- Move right item left by diff/2, and left item right by diff/2
+      -- Already overlapping, no selection bounds: resize symmetrically.
+      local diff = xlen - current_overlap
       local half = diff * 0.5
-      local ll   = r.GetMediaItemInfo_Value(left, "D_LENGTH")
+      local ll   = r.GetMediaItemInfo_Value(left,  "D_LENGTH")
+      local rp   = r.GetMediaItemInfo_Value(right, "D_POSITION")
+      local rl   = r.GetMediaItemInfo_Value(right, "D_LENGTH")
+      local rt   = r.GetActiveTake(right)
+      local ro   = rt and r.GetMediaItemTakeInfo_Value(rt,"D_STARTOFFS") or 0
       r.SetMediaItemInfo_Value(left,  "D_LENGTH",   ll + half)
       r.SetMediaItemInfo_Value(right, "D_POSITION", rp - half)
       r.SetMediaItemInfo_Value(right, "D_LENGTH",   rl + half)
