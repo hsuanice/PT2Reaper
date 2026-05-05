@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Create Fades
--- @version 0.5.3 [260505.1313]
+-- @version 0.7.1 [260505.1840]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -14,6 +14,57 @@
 --   Mac shortcut (PT): Command + F
 --
 -- @changelog
+--   0.7.1 [260505.1840]
+--     - Replace the single "Unit: ms/frame" toggle button with two
+--       mutually-exclusive checkboxes ("ms" and "frame") in the lower-left.
+--       Click a checkbox to switch unit; the other unchecks. Same conversion
+--       behavior — values are recomputed so the physical length is preserved.
+--   0.7.0 [260505.1815]
+--     - Add length-unit toggle (ms / frame). Click the "Unit:" button
+--       (left of Cancel/OK) to swap. Field labels update to "(ms)" or
+--       "(frame)". Toggling converts displayed values so the physical
+--       length is preserved (uses project frame rate from
+--       TimeMap_curFrameRate). Useful for sub-frame-accurate fades —
+--       e.g. type "1" in frame mode for a single-frame fade. Unit
+--       choice and per-field values are persisted in ExtState alongside
+--       the existing shape/ms keys, so "Execute Crossfade Last Setting"
+--       sees them too.
+--     - Tab now cycles between length input fields (commits current,
+--       jumps to next, wraps to the first). Enter still commits and
+--       exits editing mode.
+--   0.6.4 [260505.1745]
+--     - Generalize the single-category shape-only rule across batch detection.
+--       When the detected set is all fade-in OR all fade-out OR all crossfade
+--       (only one of the three types non-empty), GUI drops the ms field and
+--       lengths come from the selection — same UX as the single-item path.
+--       Per-item lengths: fade-in = sel_end - item.pos; fade-out = item.fin -
+--       sel_start; crossfade = sel_end - sel_start. Mixed-type batch (e.g.
+--       fade-in + fade-out) keeps the batch UI with ms fields.
+--   0.6.3 [260505.1730]
+--     - Crossfade-only mode: when a razor or time selection is present, the
+--       crossfade length is now adjusted to match the selection length
+--       (mirrors fade-in/fade-out shape-only behavior). Items are
+--       extended/shrunk symmetrically by the existing apply geometry path
+--       to reach the target overlap. Falls back to the existing overlap if
+--       there's no selection (items-only mode).
+--   0.6.2 [260505.1715]
+--     - Preserve razor edits across apply (some fade actions clear razor as
+--       a side effect). Snapshot via F.snapshot_razors() at start, restore
+--       via F.restore_razors() at end. Time selection was already preserved.
+--   0.6.1 [260505.1700]
+--     - Crossfade-only mode now hides the length (ms) input field and just
+--       uses the existing overlap as the crossfade length. The shape radio
+--       is the only control. Mirrors the existing Fade-In-only / Fade-Out-
+--       only shape-only behavior. (Triggers when xfade_pairs > 0 and there
+--       are no separate fade-in/fade-out items in the detected set.)
+--   0.6.0 [260505.1608]
+--     - Refactor: chunk parsing / shape detection / shape writing now live
+--       in Library/hsuanice_PT_Fades.lua (shared with Apply Next/Previous,
+--       Execute Crossfade Last Setting, Delete Fades). No behavior change in
+--       this script — all helpers delegate to the library.
+--     - Save fadein_shape / xfade_shape / fadeout_shape to ExtState alongside
+--       the existing ms fields, so "Execute Crossfade Last Setting" can
+--       re-apply the same shape without showing the GUI.
 --   0.5.3 [260505.1313]
 --     - Fix Slight S-curve crossfade rendering as Linear: the flag field in
 --       FADEINNEW/FADEOUTNEW is a continuous S-curve INTENSITY, not a binary
@@ -204,158 +255,35 @@
 
 local r = reaper
 
+-- Load PT_Fades library (shared with Apply Next/Previous Fade Shape, Execute
+-- Crossfade Last Setting, Delete Fades, etc.)
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local F = dofile(_dir .. '../Library/hsuanice_PT_Fades.lua')
+if not F then
+  reaper.ShowMessageBox("Could not load Library/hsuanice_PT_Fades.lua", "Create Fades", 0)
+  return
+end
+
 local FADE_IN  = "fade_in"
 local FADE_OUT = "fade_out"
 local XFADE    = "crossfade"
-local EPS       = 1e-4   -- general floating point tolerance
-local XFADE_GAP = 0.005  -- items within 5ms are treated as touching (handles sample-level gaps)
+local EPS       = F.EPS
+local XFADE_GAP = F.XFADE_GAP
 
-local SHAPE_NAMES    = {"Linear","Slight Convex (Equal Power)","Slight Concave","Sharp Convex","Sharp Concave","Slight S-Curve","Sharp S-Curve"}
-local FADEIN_CMDS    = {41514,41515,41516,41517,41518,41519,41836}
-local FADEOUT_CMDS   = {41521,41522,41523,41524,41525,41526,41837}
--- XFADE shape actions (41528,41529,41530,41531,41532,41533,41838) are unreliable
--- for setting both sides of a crossfade — often only the right item's fade-in
--- updates. We write the FADEIN/FADEOUT chunk lines directly instead.
+local SHAPE_NAMES  = F.SHAPE_NAMES
+local FADEIN_CMDS  = F.FADEIN_CMDS
+local FADEOUT_CMDS = F.FADEOUT_CMDS
+
+-- Aliases for shape detection / writing (delegated to library).
+local existing_fadein_shape  = F.existing_fadein_shape
+local existing_fadeout_shape = F.existing_fadeout_shape
+local patch_xfade_new        = F.patch_xfade_new
 
 -- ============================================================
 -- DETECTION
 -- ============================================================
-local function get_sel_items()
-  local items = {}
-  for i = 0, r.CountSelectedMediaItems(0)-1 do
-    local it  = r.GetSelectedMediaItem(0,i)
-    local pos = r.GetMediaItemInfo_Value(it,"D_POSITION")
-    local len = r.GetMediaItemInfo_Value(it,"D_LENGTH")
-    items[#items+1] = {item=it, pos=pos, len=len, fin=pos+len}
-  end
-  table.sort(items, function(a,b) return a.pos < b.pos end)
-  return items
-end
-
-local function clamp_shape(s)
-  return math.max(1, math.min(7, s))
-end
-
--- REAPER stores fade info in TWO chunk lines per side:
---   FADEIN/FADEOUT       — legacy/manual fade definition (7 tokens)
---   FADEINNEW/FADEOUTNEW — current auto-fade definition (6 tokens; this is
---                          the source of truth for the visible crossfade shape)
---
--- FADEINNEW/FADEOUTNEW format: <a> <b> <c> <type> <curv> <flag>
---   type = 10 (exponential), 11 (constant power = Slight Convex), 12 (s-curve)
---   curv = -1..+1 (NO sign flip between in/out)
---   flag = 0 normally; 1 only for Sharp S-curve (the only way to distinguish 6 vs 7)
---
--- FADEIN/FADEOUT (legacy) format: <type> <manual_len> <auto_len> 0 <active> <curv> <dir>
---   type field1 = 0..6 (simple PT index, from FADEIN_CMDS) OR 10/11/12 (extended)
---   curv field6 sign FLIPS between FADEIN and FADEOUT for the same visual shape
-
--- Map (type, curv, flag) from the NEW format → GUI shape index (1..7).
--- For S-curves (type=12), flag is a continuous intensity value:
---   0.5 = Slight S-curve, 1 = Sharp S-curve.
--- (REAPER renders type=12 with flag=0 as Linear — that intensity needs flag>0.)
-local function classify_new_shape(type_f, curv_f, flag_f)
-  if type_f == 11 then return 2 end  -- Slight Convex (Equal Power)
-  if type_f == 12 then
-    return ((flag_f or 0) >= 0.75) and 7 or 6  -- Sharp (~1) vs Slight (~0.5)
-  end
-  -- type 10: classify by curvature (no sign flip in NEW format)
-  if math.abs(curv_f) < 0.05 then return 1 end       -- Linear
-  if curv_f >=  0.75 then return 4 end               -- Sharp Convex (~+1)
-  if curv_f <= -0.75 then return 5 end               -- Sharp Concave (~-1)
-  if curv_f >  0     then return 2 end               -- Slight Convex (rare type 10 case)
-  return 3                                           -- Slight Concave (~-0.5)
-end
-
--- Map (type, curv) from the legacy format → GUI shape index. is_fadein flips curv sign.
-local function classify_legacy_shape(field1, field6, is_fadein)
-  if field1 >= 0 and field1 <= 6 then
-    -- Simple 0..6 encoding from FADEIN/FADEOUT actions, with one quirk:
-    -- REAPER 7.71+ encodes Sharp S-curve as the fractional value 5.1 (not 6),
-    -- while Slight S-curve stays at integer 5. Treat any 5.x with x>0 as 7.
-    local int_part = math.floor(field1)
-    local has_frac = (field1 - int_part) > 0.05
-    if int_part == 5 and has_frac then return 7 end
-    return clamp_shape(int_part + 1)
-  end
-  if field1 == 11 then return 2 end
-  if field1 == 12 then return 6 end  -- legacy line can't distinguish 7
-  local c = is_fadein and -field6 or field6
-  if math.abs(c) < 0.05 then return 1 end
-  if c >=  0.75 then return 4 end
-  if c <= -0.75 then return 5 end
-  if c >  0     then return 4 end
-  return 3
-end
-
--- Read the FADEINNEW or FADEOUTNEW line. Returns GUI shape (1..7), or nil if
--- the line is missing or describes "no auto-fade" (type field < 10).
-local function shape_from_new_line(item, side)
-  local prefix = (side == "fadein") and "FADEINNEW" or "FADEOUTNEW"
-  local ok, chunk = r.GetItemStateChunk(item, "", false)
-  if not ok or not chunk then return nil end
-  local line = chunk:match("\n" .. prefix .. " ([^\n]+)")
-              or chunk:match("^" .. prefix .. " ([^\n]+)")
-  if not line then return nil end
-  local toks = {}
-  for tok in line:gmatch("%S+") do toks[#toks+1] = tok end
-  local type_f = tonumber(toks[4]) or 0
-  local curv_f = tonumber(toks[5]) or 0
-  local flag_f = tonumber(toks[6]) or 0
-  if type_f < 10 then return nil end
-  return classify_new_shape(type_f, curv_f, flag_f)
-end
-
--- Read the legacy FADEIN/FADEOUT line.
-local function shape_from_legacy_line(item, line_prefix)
-  local ok, chunk = r.GetItemStateChunk(item, "", false)
-  if not ok or not chunk then return 1 end
-  local line = chunk:match("\n" .. line_prefix .. " ([^\n]+)")
-              or chunk:match("^" .. line_prefix .. " ([^\n]+)")
-  if not line then return 1 end
-  local toks = {}
-  for tok in line:gmatch("%S+") do toks[#toks+1] = tok end
-  local f1 = tonumber(toks[1]) or 0
-  local f6 = tonumber(toks[6]) or 0
-  return classify_legacy_shape(f1, f6, line_prefix == "FADEIN")
-end
-
--- Effective shape = NEW line if present (controls visible auto-fade), else legacy.
-local function existing_fadein_shape(item)
-  return shape_from_new_line(item, "fadein") or shape_from_legacy_line(item, "FADEIN")
-end
-local function existing_fadeout_shape(item)
-  return shape_from_new_line(item, "fadeout") or shape_from_legacy_line(item, "FADEOUT")
-end
-
--- Build a FADEINNEW or FADEOUTNEW chunk line content for the chosen GUI shape.
--- (No length in this line — REAPER computes auto-fade length from item overlap.)
-local function build_new_line(gui_shape)
-  local TYPE = {[1]=10, [2]=11, [3]=10, [4]=10, [5]=10, [6]=12, [7]=12}
-  local CURV = {[1]=0,  [2]=0.5, [3]=-0.5, [4]=1, [5]=-1, [6]=0, [7]=0}
-  -- flag is a continuous S-curve intensity: 0.5 = Slight, 1 = Sharp.
-  -- type=12 with flag=0 renders as Linear (no S-curve), so shape 6 must use 0.5.
-  local FLAG = {[1]=0,  [2]=0,   [3]=0,    [4]=0, [5]=0,  [6]=0.5, [7]=1}
-  return string.format("10 0 0 %d %.10g %.10g",
-    TYPE[gui_shape] or 10, CURV[gui_shape] or 0, FLAG[gui_shape] or 0)
-end
-
--- Patch (or insert) the FADEINNEW/FADEOUTNEW line in an item's chunk.
-local function patch_xfade_new(item, side, gui_shape)
-  local new_prefix = (side == "fadein") and "FADEINNEW" or "FADEOUTNEW"
-  local old_prefix = (side == "fadein") and "FADEIN"    or "FADEOUT"
-  local ok, chunk = r.GetItemStateChunk(item, "", false)
-  if not ok or not chunk then return end
-  local new_data = build_new_line(gui_shape)
-  local pattern  = "(\n" .. new_prefix .. " )[^\n]+"
-  local replaced, n = chunk:gsub(pattern, "%1" .. new_data, 1)
-  if n == 0 then
-    -- Line missing — insert after the corresponding FADEIN/FADEOUT line.
-    local insert_pat = "(\n" .. old_prefix .. " [^\n]+)"
-    replaced = chunk:gsub(insert_pat, "%1\n" .. new_prefix .. " " .. new_data, 1)
-  end
-  r.SetItemStateChunk(item, replaced, false)
-end
+local get_sel_items = F.get_sel_items
 
 local function get_razor_range()
   -- Get the union of all track-level razor areas (guid="")
@@ -555,6 +483,30 @@ local function detect()
     end
   end
 
+  -- Single-category batch: when the detected set is all fade-in, all fade-out,
+  -- OR all crossfade (only one of the three types is non-empty), drop the
+  -- ms input field and derive lengths from the selection — same UX as the
+  -- single-item shape-only path. Mixed-type batch (e.g. fade-in + fade-out)
+  -- keeps the batch UI with ms fields so the user can set each independently.
+  local n_in   = #det.fadein_items
+  local n_out  = #det.fadeout_items
+  local n_x    = #det.xfade_pairs
+  local n_cats = (n_in > 0 and 1 or 0) + (n_out > 0 and 1 or 0) + (n_x > 0 and 1 or 0)
+  if n_cats == 1 and sel_start and sel_end and (sel_end - sel_start) > EPS then
+    det.show_length = false
+    for _, fi in ipairs(det.fadein_items) do
+      fi.len = sel_end - fi.item.pos
+      fi.use_ms = false
+    end
+    for _, fo in ipairs(det.fadeout_items) do
+      fo.len = fo.item.fin - sel_start
+      fo.use_ms = false
+    end
+    if n_x > 0 then
+      det.sel_xlen = sel_end - sel_start
+    end
+  end
+
   -- Build types list
   if #det.fadein_items  > 0 then det.types[#det.types+1] = FADE_IN  end
   if #det.xfade_pairs   > 0 then det.types[#det.types+1] = XFADE   end
@@ -589,9 +541,25 @@ local function apply(det, S)
   r.Undo_BeginBlock()
   r.PreventUIRefresh(1)
 
+  -- Snapshot razor edits up-front; some fade actions clear them as a side
+  -- effect. Time selection is left alone (REAPER doesn't clear it). Item
+  -- selection is restored explicitly below.
+  local razor_snap = F.snapshot_razors()
+
   local function sel_only(item)
     r.Main_OnCommand(40289,0)
     r.SetMediaItemSelected(item,true)
+  end
+
+  -- Convert a typed length value (S.*_ms) to seconds based on S.length_unit.
+  local function to_seconds(v)
+    if not v then return nil end
+    if S.length_unit == "frame" then
+      local fr = r.TimeMap_curFrameRate(0) or 24
+      if fr <= 0 then fr = 24 end
+      return v / fr
+    end
+    return v / 1000.0
   end
 
   local is_batch = det.show_length  -- show_length = has ms fields in UI
@@ -600,7 +568,7 @@ local function apply(det, S)
     local item = fi.item.item
     local len
     if fi.use_ms then
-      len = S.fadein_ms and (S.fadein_ms/1000.0) or fi.len
+      len = to_seconds(S.fadein_ms) or fi.len
     else
       len = fi.len  -- use detected length directly
     end
@@ -615,7 +583,7 @@ local function apply(det, S)
     local item = fo.item.item
     local len
     if fo.use_ms then
-      len = S.fadeout_ms and (S.fadeout_ms/1000.0) or fo.len
+      len = to_seconds(S.fadeout_ms) or fo.len
     else
       len = fo.len
     end
@@ -630,12 +598,18 @@ local function apply(det, S)
     local left  = pair.left.item
     local right = pair.right.item
 
-    -- Determine target xfade length
+    -- Determine target xfade length:
+    --   batch mode (ms field shown)  → typed ms
+    --   crossfade-only with razor/TS → selection length
+    --   crossfade-only items mode    → existing overlap
+    --   no overlap and no fallback   → existing fade-out length, or 10ms
     local xlen
     if det.show_length and S.xfade_ms then
-      xlen = S.xfade_ms / 1000.0
+      xlen = to_seconds(S.xfade_ms)
+    elseif det.sel_xlen and det.sel_xlen > EPS then
+      xlen = det.sel_xlen
     elseif pair.overlap > EPS then
-      xlen = pair.overlap  -- keep existing overlap length (shape-only mode)
+      xlen = pair.overlap
     else
       local existing = r.GetMediaItemInfo_Value(left, "D_FADEOUTLEN")
       xlen = existing > EPS and existing or 0.010
@@ -691,11 +665,12 @@ local function apply(det, S)
     patch_xfade_new(right, "fadein",  S.xfade_shape)
   end
 
-  -- Restore original selection
+  -- Restore original selection + razor edits
   r.Main_OnCommand(40289,0)
   for _, it in ipairs(det.items) do
     r.SetMediaItemSelected(it.item,true)
   end
+  F.restore_razors(razor_snap)
 
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
@@ -781,6 +756,31 @@ local function draw_btn(x,y,w,h,lbl,hc,nc)
   return hover and mb==1
 end
 
+-- Small checkbox + label. Returns true on click. Click hit area covers box+label.
+local function draw_check(x, y, label, checked)
+  local mx, my, mb = gfx.mouse_x, gfx.mouse_y, gfx.mouse_cap & 1
+  local cs = 14
+  gfx.setfont(1,"Arial",12)
+  local label_w = gfx.measurestr(label)
+  local total_w = cs + 6 + label_w
+  local hover = mx >= x and mx <= x + total_w and my >= y and my <= y + cs
+  -- box
+  if checked then sc(70,120,210) else sc(28,28,28) end
+  gfx.rect(x, y, cs, cs, 1)
+  sc(120,120,120); gfx.rect(x, y, cs, cs, 0)
+  -- check tick
+  if checked then
+    sc(255,255,255)
+    gfx.line(x+3, y+cs/2,   x+cs/2, y+cs-3)
+    gfx.line(x+cs/2, y+cs-3, x+cs-3, y+3)
+  end
+  -- label
+  sc(210,210,210)
+  gfx.x = x + cs + 6; gfx.y = y + 1
+  gfx.drawstr(label)
+  return hover and mb == 1
+end
+
 -- ============================================================
 -- UI (defer loop)
 -- ============================================================
@@ -812,6 +812,10 @@ local function run_ui(det)
     local v = tonumber(r.GetExtState(EXT_SEC, key))
     return (v and v > 0) and math.floor(v) or fallback
   end
+  local function get_remembered_unit()
+    local u = r.GetExtState(EXT_SEC, "length_unit")
+    return (u == "frame") and "frame" or "ms"
+  end
 
   local S = {
     fadein_shape  = det.def_fadein_shape,
@@ -820,6 +824,7 @@ local function run_ui(det)
     fadein_ms  = get_remembered_ms("fadein_ms",  det.def_batch_ms),
     xfade_ms   = get_remembered_ms("xfade_ms",   det.def_batch_ms),
     fadeout_ms = get_remembered_ms("fadeout_ms",  det.def_batch_ms),
+    length_unit = get_remembered_unit(),  -- "ms" or "frame"; values above are in this unit
   }
   -- Only expose ms fields if show_length
   if not show_len then
@@ -828,11 +833,35 @@ local function run_ui(det)
     S.fadeout_ms = nil
   end
 
-  -- Save ms values to ExtState
+  -- Save ms values + shapes + unit to ExtState (read by "Execute Crossfade
+  -- Last Setting"). Values stored AS TYPED in the chosen unit.
   local function save_ms()
     if S.fadein_ms  then r.SetExtState(EXT_SEC, "fadein_ms",  tostring(S.fadein_ms),  true) end
     if S.xfade_ms   then r.SetExtState(EXT_SEC, "xfade_ms",   tostring(S.xfade_ms),   true) end
     if S.fadeout_ms then r.SetExtState(EXT_SEC, "fadeout_ms", tostring(S.fadeout_ms), true) end
+    r.SetExtState(EXT_SEC, "fadein_shape",  tostring(S.fadein_shape),  true)
+    r.SetExtState(EXT_SEC, "xfade_shape",   tostring(S.xfade_shape),   true)
+    r.SetExtState(EXT_SEC, "fadeout_shape", tostring(S.fadeout_shape), true)
+    r.SetExtState(EXT_SEC, "length_unit",   S.length_unit,             true)
+  end
+
+  -- Toggle ms <-> frame, converting all field values so the physical length
+  -- is preserved across the toggle (ms 100 at 24fps becomes 2 frames, etc).
+  local function toggle_unit()
+    local fr = r.TimeMap_curFrameRate(0) or 24
+    if fr <= 0 then fr = 24 end
+    local function conv(v)
+      if not v then return nil end
+      if S.length_unit == "ms" then
+        return math.max(1, math.floor(v / 1000 * fr + 0.5))   -- ms → frame
+      else
+        return math.max(1, math.floor(v / fr * 1000 + 0.5))   -- frame → ms
+      end
+    end
+    S.fadein_ms  = conv(S.fadein_ms)
+    S.xfade_ms   = conv(S.xfade_ms)
+    S.fadeout_ms = conv(S.fadeout_ms)
+    S.length_unit = (S.length_unit == "ms") and "frame" or "ms"
   end
 
   -- Which length field is being edited (nil=none)
@@ -912,7 +941,7 @@ local function run_ui(det)
 
       for _, fd in ipairs(field_defs) do
         sc(145,145,145)
-        gfx.x=fd.x; gfx.y=ly+6; gfx.drawstr(fd.label.." (ms):")
+        gfx.x=fd.x; gfx.y=ly+6; gfx.drawstr(fd.label.." ("..S.length_unit.."):")
         local bx=fd.x+86; local bw=54; local bh=20
         local is_ed = (editing_field==fd.key)
         if is_ed then sc(35,45,65) else sc(28,28,28) end
@@ -932,14 +961,26 @@ local function run_ui(det)
         end
       end
 
-      -- Keyboard: digits, backspace, enter/tab to commit
+      -- Keyboard: digits, backspace, enter to commit, tab to cycle to next field.
       if editing_field and char>0 then
         if char>=48 and char<=57 then
           editing_str=editing_str..string.char(char)
         elseif char==8 and #editing_str>0 then
           editing_str=editing_str:sub(1,-2)
-        elseif char==13 or char==9 then
+        elseif char==13 then
           commit_field()
+        elseif char==9 then
+          -- Tab: commit current field, jump to next (cycle through field_defs).
+          local cur_key = editing_field
+          commit_field()
+          for i, fd in ipairs(field_defs) do
+            if fd.key == cur_key then
+              local next_idx = (i % #field_defs) + 1
+              editing_field = field_defs[next_idx].key
+              editing_str   = ""
+              break
+            end
+          end
         elseif char==27 then
           editing_field=nil; editing_str=""; char=0
         end
@@ -961,6 +1002,17 @@ local function run_ui(det)
     end
     if draw_btn(WIN_W-PAD-84-92, btn_y, 84, 30, "Cancel", {100,50,50},{50,50,50}) then
       done=true; ok_result=false
+    end
+    -- Unit selection: two mutually-exclusive checkboxes (radio behavior).
+    -- Only meaningful when length fields are shown.
+    if show_len then
+      local cy = btn_y + 8
+      if draw_check(PAD,      cy, "ms",    S.length_unit == "ms") then
+        if S.length_unit ~= "ms"    then commit_field(); toggle_unit() end
+      end
+      if draw_check(PAD + 60, cy, "frame", S.length_unit == "frame") then
+        if S.length_unit ~= "frame" then commit_field(); toggle_unit() end
+      end
     end
 
     prev_mb = cur_mb
