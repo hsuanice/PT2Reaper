@@ -1,32 +1,15 @@
 -- @description hsuanice_Pro Tools Identify Sync Point
--- @version 0.1.0 [260413.1324]
+-- @version 0.2.0 [260506.1750]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Stub script for the Pro Tools action:
---   **Identify Sync Point**
---
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
---
---   ## Details
---   - Pro Tools equivalent : Identify Sync Point
---   - Module               : Clips
---   - Mac shortcut (PT)    : Command + Comma
---   - Tags                 : Clip menu, Clips, Editing
---
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
---
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
+--   Replicates Pro Tools: **Identify Sync Point** (Cmd+Comma)
+--   Thin wrapper over REAPER native action 40541 "Item: Set snap offset to
+--   cursor" — sets the sync point (D_SNAPOFFSET) of each selected item to
+--   the position under the edit cursor.
+--   - Tags: Clips, Editing
 -- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--   0.2.0 [260506.1750] - Map to native 40541.
+--   0.1.0 [260413.1324] - Stub placeholder created.
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Identify Sync Point", "PT2Reaper", 0)
+reaper.Main_OnCommand(40541, 0)  -- Item: Set snap offset to cursor
