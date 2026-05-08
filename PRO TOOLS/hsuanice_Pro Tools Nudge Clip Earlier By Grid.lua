@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Nudge Clip Earlier By Grid
--- @version 0.10.4 [260504.1217]
+-- @version 0.11.0 [260509.0041]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -20,6 +20,15 @@
 --
 --   Tags: Editing
 -- @changelog
+--   0.11.0 [260509.0041] - Fix: razor that fully encloses an item now
+--                          always triggers Case 1 (full position move),
+--                          regardless of fade presence. Previously a
+--                          razor wider than the item with fi_len=0 or
+--                          fo_len=0 was misclassified as Case 2/3/4
+--                          and got blocked by the fade-len guard
+--                          ("must equal item width to move"). Same
+--                          fix applied in detect_case and nudge_item.
+--                          Mirrors Later v0.11.0.
 --   0.10.4 [260504.1217] - Mirror of Later v0.10.4 — body-collapse + source-bound guards on
 --                          no-razor chain auto-include partners. Move Earlier here mostly hits
 --                          the left-partner body collapse (Case 6-like end-shift) and the
@@ -179,6 +188,9 @@ local function detect_case(item, sel_s, sel_e, init_state)
   if sel_e <= pos + EPS or sel_s >= item_e - EPS then return nil end
   local cs = math.max(sel_s, pos)
   local ce = math.min(sel_e, item_e)
+  -- Razor fully encloses the item → always Case 1 (full position move),
+  -- regardless of whether the item has fades on either side.
+  if cs <= pos + EPS and ce >= item_e - EPS then return 1 end
   local fi_covered   = fi_len > EPS and (cs <= pos      + EPS and ce >= fi_end    - EPS)
   local fo_covered   = fo_len > EPS and (cs <= fo_start + EPS and ce >= item_e   - EPS)
   local clip_covered = cs <= fi_end + EPS and ce >= fo_start - EPS
@@ -235,6 +247,9 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run, intent
   local fi_covered   = fi_len > EPS and (sel_s <= pos      + EPS and sel_e >= fi_end    - EPS)
   local fo_covered   = fo_len > EPS and (sel_s <= fo_start + EPS and sel_e >= item_e   - EPS)
   local clip_covered = sel_s <= fi_end   + EPS and sel_e >= fo_start - EPS
+  -- Razor fully encloses the item → always Case 1 (full position move),
+  -- regardless of fade presence. Forces Case 1 below to win the if-chain.
+  local fully_covered = sel_s <= pos + EPS and sel_e >= item_e - EPS
 
   if sel_e <= pos + EPS or sel_s >= item_e - EPS then return end
 
@@ -290,8 +305,10 @@ local function nudge_item(item, sel_s, sel_e, delta, init_state, dry_run, intent
   local function set_fi_item(v) if NudgeEdge then NudgeEdge.set_fi(item, v) else r.SetMediaItemInfo_Value(item, 'D_FADEINLEN',  v) end end
   local function set_fo_item(v) if NudgeEdge then NudgeEdge.set_fo(item, v) else r.SetMediaItemInfo_Value(item, 'D_FADEOUTLEN', v) end end
 
-  if fi_covered and clip_covered and fo_covered then
-    -- Case 1: entire item -> position move (both ends shift by delta)
+  if fully_covered or (fi_covered and clip_covered and fo_covered) then
+    -- Case 1: entire item -> position move (both ends shift by delta).
+    -- Triggered either by fi+clip+fo full coverage OR by razor fully
+    -- enclosing the item (works for items without fades too).
     if dry_run then return true, delta end
     r.SetMediaItemInfo_Value(item, 'D_POSITION', pos + delta)
     sync_left(); sync_right()

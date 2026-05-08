@@ -1,32 +1,164 @@
 -- @description hsuanice_Pro Tools Snap To Next
--- @version 0.1.0 [260413.1324]
+-- @version 0.3.0 [260509.0031]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   # hsuanice Pro Tools Keybindings for REAPER
+--   Replicates Pro Tools: **Snap To Next** (Opt+Ctrl+Period)
 --
---   Stub script for the Pro Tools action:
---   **Snap To Next**
+--   Group-moves the entire moving body (selected items + time
+--   selection + razor edit zones) to the right so it abuts the next
+--   non-selected item.
 --
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
+--   ## Algorithm
+--   The "moving body" on each track contains:
+--   - the selected items on that track
+--   - the time selection (a global, treated as if present on every
+--     constrained track)
+--   - the razor edit zones on that track
 --
---   ## Details
---   - Pro Tools equivalent : Snap To Next
---   - Module               : Clips
---   - Mac shortcut (PT)    : Option + Control + Period
---   - Tags                 : Clips, Edit menu, Editing
+--   1. Collect constrained tracks: every track that has selected
+--      items OR razor zones.
+--   2. Per constrained track, compute the rightmost extent of the
+--      moving body — `right_end = max(item.fin, TS_end, razor.end)`.
+--   3. Find the first non-selected item on the same track whose
+--      start position is >= `right_end`.
+--   4. delta = next_item.pos - right_end (only kept if > 0).
+--   5. Across all constrained tracks, take min(delta) so no track's
+--      moving body overlaps its next neighbour.
+--   6. Shift all selected items, the time selection, and every
+--      track's razor zones by `delta`.
 --
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
+--   Pure REAPER native — only `D_POSITION` and `P_RAZOREDITS` /
+--   loop time range are written; length, fades, snap offset, and
+--   take properties are all preserved.
 --
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
+--   - Tags: Editing, Clips
 -- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--   0.3.0 [260509.0031] - Treat TS_end and per-track razor zones as
+--                          part of the moving body when computing
+--                          the right extent. Razor zones now shift
+--                          along with items + TS.
+--   0.2.0 [260509.0021] - First implementation. Per-track group-move
+--                          using minimum-positive-delta to keep the
+--                          move safe across all tracks; time
+--                          selection follows the items.
+--   0.1.0 [260413.1324] - Stub placeholder created.
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Snap To Next", "PT2Reaper", 0)
+local r   = reaper
+local EPS = 1e-9
+
+local n_sel = r.CountSelectedMediaItems(0)
+if n_sel == 0 then return end
+
+-- 1. Collect selected items + per-track buckets
+local sel_items = {}
+local sel_set   = {}
+local tracks    = {}  -- track -> { sel = {items} }
+
+for i = 0, n_sel - 1 do
+  local it = r.GetSelectedMediaItem(0, i)
+  sel_items[#sel_items+1] = it
+  sel_set[it] = true
+  local tr = r.GetMediaItem_Track(it)
+  tracks[tr] = tracks[tr] or { sel = {} }
+  table.insert(tracks[tr].sel, it)
+end
+
+-- 2. Time selection bounds
+local ts_s, ts_e = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
+local has_ts = ts_e > ts_s + EPS
+
+-- 3. Razor zones per track
+local razor_per_track = {}
+local n_tracks = r.CountTracks(0)
+for ti = 0, n_tracks - 1 do
+  local tr = r.GetTrack(0, ti)
+  local _, str = r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", false)
+  if str and str ~= "" then
+    local zones = {}
+    for s_str, e_str, guid in str:gmatch("(%S+)%s+(%S+)%s+(%S+)") do
+      local s = tonumber(s_str)
+      local e = tonumber(e_str)
+      if s and e then zones[#zones+1] = {s = s, e = e, guid = guid} end
+    end
+    if #zones > 0 then razor_per_track[tr] = zones end
+  end
+end
+
+-- 4. Compute the smallest safe positive delta across constrained tracks
+local constrained = {}
+for tr in pairs(tracks)         do constrained[tr] = true end
+for tr in pairs(razor_per_track) do constrained[tr] = true end
+
+local best_delta
+for tr in pairs(constrained) do
+  local info = tracks[tr] or { sel = {} }
+
+  local right_end = -math.huge
+  for _, it in ipairs(info.sel) do
+    local fin = r.GetMediaItemInfo_Value(it, "D_POSITION")
+              + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+    if fin > right_end then right_end = fin end
+  end
+  if has_ts and ts_e > right_end then right_end = ts_e end
+  if razor_per_track[tr] then
+    for _, z in ipairs(razor_per_track[tr]) do
+      if z.e > right_end then right_end = z.e end
+    end
+  end
+
+  if right_end > -math.huge then
+    local nearest_pos
+    local n = r.CountTrackMediaItems(tr)
+    for k = 0, n - 1 do
+      local it = r.GetTrackMediaItem(tr, k)
+      if not sel_set[it] then
+        local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
+        if pos >= right_end - EPS then
+          if not nearest_pos or pos < nearest_pos then
+            nearest_pos = pos
+          end
+        end
+      end
+    end
+    if nearest_pos then
+      local delta = nearest_pos - right_end
+      if delta > EPS then
+        if not best_delta or delta < best_delta then
+          best_delta = delta
+        end
+      end
+    end
+  end
+end
+
+if not best_delta then return end
+
+-- 5. Apply: move items, TS, razor zones
+r.Undo_BeginBlock()
+r.PreventUIRefresh(1)
+
+for _, it in ipairs(sel_items) do
+  if r.ValidatePtr(it, "MediaItem*") then
+    local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
+    r.SetMediaItemInfo_Value(it, "D_POSITION", pos + best_delta)
+  end
+end
+
+if has_ts then
+  r.GetSet_LoopTimeRange(true, false, ts_s + best_delta, ts_e + best_delta, false)
+end
+
+for tr, zones in pairs(razor_per_track) do
+  local parts = {}
+  for _, z in ipairs(zones) do
+    parts[#parts+1] = string.format("%.14f %.14f %s",
+      z.s + best_delta, z.e + best_delta, z.guid)
+  end
+  r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS",
+    table.concat(parts, " "), true)
+end
+
+r.PreventUIRefresh(-1)
+r.UpdateArrange()
+r.Undo_EndBlock("Pro Tools: Snap To Next", -1)
