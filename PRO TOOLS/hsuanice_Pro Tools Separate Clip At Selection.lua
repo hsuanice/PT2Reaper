@@ -1,36 +1,61 @@
 -- @description hsuanice_Pro Tools Separate Clip At Selection
--- @version 0.5.0 [260507.1230]
+-- @version 0.8.1 [260508.1259]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
 --   Replicates Pro Tools: **Separate Clip At Selection** (Cmd+E)
 --
---   ## Behavior
---   - **Time selection exists** → split each selected item at TS_start AND
---     TS_end. After: TS / razor preserved; item selection keeps ONLY the
---     pieces inside the TS range.
---   - **No time selection**     → split each selected item at the edit
---     cursor. After: razor / TS / item selection all cleared.
---   - **Crossfade-aware**       → if a split point lands inside the overlap
---     region of two items on the same track (i.e., a crossfade), both items
---     are TRIMMED to the split point instead of being split:
---       * left crossfading item   → length cropped to split, fade-out set
---         to the portion of the auto/manual fade that fell before split.
---       * right crossfading item  → position pushed to split, fade-in set
---         to the remainder past split, D_STARTOFFS adjusted to keep audio
---         aligned.
---     The two items now TOUCH at the split point with regular fades — the
---     crossfade is broken, replaced by a fade-out + fade-in pair.
---   - **Plain split fade rule**  → outside crossfade regions, asymmetric:
---       * split inside fade-in   → left.fade-in cleared, right gets remainder.
---       * split inside fade-out  → right.fade-out cleared, left gets portion.
+--   ## Modes
+--   - **Time selection exists** → split selected items at TS_s and TS_e.
+--     After: TS / razor preserved; item selection keeps inside-TS pieces
+--     plus crossfade-resolved survivors.
+--   - **No time selection**     → split selected items at the edit cursor.
+--     After: razor / TS / item selection cleared.
+--
+--   ## Boundary suppression (no-separate cases)
+--   - TS_s OR TS_e at a fade boundary (fade-in out point or fade-out in
+--     point) on a selected item → that split point is skipped on that item.
+--   - TS_s = cf_start AND TS_e = cf_end (TS exactly equals crossfade) →
+--     entire pair untouched.
+--
+--   ## Crossfade-in-TS rules (TS overlaps a crossfade pair)
+--   - TS_s = cf_start, TS_e < cf_end → trim BOTH Left.fin and Right.pos to
+--     TS_e (fully breaks the crossfade); select Left only (the side whose
+--     range overlaps the TS).
+--   - TS_s > cf_start, TS_e = cf_end → trim BOTH Left.fin and Right.pos to
+--     TS_s (fully breaks the crossfade); select Right only.
+--   - TS strictly inside crossfade   → fall through to plain split + crossfade
+--     trim at TS_s; select inside-TS pieces only.
+--
+--   ## Crossfade-at-cursor rule
+--   Cursor inside an overlap region trims BOTH items to cursor.
+--
+--   ## Plain split fade rule
+--   - split inside fade-in  → left.fade-in cleared, right gets remainder.
+--   - split inside fade-out → right.fade-out cleared, left gets portion.
 --   - Tags: Editing, Clips
 -- @changelog
---   0.5.0 [260507.1230] - Crossfade-aware: split points inside item-overlap
---                          regions now trim both items to the split point,
---                          converting the crossfade into a fade-out / fade-in
---                          pair (matches PT). Outside crossfades, the
---                          asymmetric fade rule from 0.4.0 still applies.
+--   0.8.1 [260508.1259] - Boundary cases: select only the surviving item that
+--                          overlaps the TS (Left for s_at_start, Right for
+--                          e_at_end). The other survivor is left untouched
+--                          but unselected.
+--   0.8.0 [260507.1500] - TS-in-crossfade boundary cases now trim BOTH items
+--                          to fully break the crossfade. TS_s = cf_start:
+--                          trim Left.fin AND Right.pos to ts_e. TS_e = cf_end:
+--                          trim Left.fin AND Right.pos to ts_s. Both
+--                          survivors selected. (Previously only one side was
+--                          trimmed, leaving an unintended residual overlap.)
+--   0.7.0 [260507.1430] - Don't delete items in TS-in-crossfade cases (fixes
+--                          regression from 0.6.0 where outer pieces were
+--                          erased entirely). TS_s = cf_start case: trim Left
+--                          to ts_e and leave Right alone (manual selection
+--                          mark). TS_e = cf_end case: mirror. TS strictly
+--                          inside: v0.5.0 logic + selection filter.
+--                          Boundary-suppression: split point at fade-in/out
+--                          boundaries no-ops on that item.
+--   0.6.0 [260507.1330] - TS-in-crossfade resolves to ONE surviving item with
+--                          deletion of the other (USER REJECTED this).
+--   0.5.0 [260507.1230] - Crossfade-aware (cursor + TS).
 --   0.4.0 [260507.1130] - Asymmetric fade rule + per-mode selection handling.
 --   0.3.0 [260507.1100] - First custom version.
 --   0.2.0 [260506.2030] - Map to native 40196.
@@ -76,49 +101,47 @@ local function split_with_fades(item, pos)
   return right
 end
 
--- ---- Crossfade-aware trim helpers ----------------------------------------
+-- Boundary-suppression check: should we skip splitting `item` at `pos`
+-- because pos is exactly at a fade-in/fade-out boundary?
+local function pos_at_fade_boundary(item, pos)
+  local item_pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
+  local item_fin = item_pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
+  local fi = math.max(
+    r.GetMediaItemInfo_Value(item, "D_FADEINLEN")      or 0,
+    r.GetMediaItemInfo_Value(item, "D_FADEINLEN_AUTO") or 0)
+  local fo = math.max(
+    r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN")      or 0,
+    r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN_AUTO") or 0)
+  if fi > 0 and math.abs(pos - (item_pos + fi)) < EPS then return true end
+  if fo > 0 and math.abs(pos - (item_fin - fo)) < EPS then return true end
+  return false
+end
 
--- Trim the LEFT item of a crossfade pair to end at `pos`. The fade-out is
--- set to the portion of the (auto-or-manual) fade-out that fell before
--- `pos`. Auto-fade is cleared because the items no longer overlap after.
-local function trim_left_crossfade(item, pos)
+-- ---- Auto-fade-aware trim helpers ----------------------------------------
+local function trim_left_to(item, pos)
   local item_pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
   local item_fin = item_pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
   if pos <= item_pos + EPS or pos >= item_fin - EPS then return end
-
-  local fo_man  = r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN")      or 0
-  local fo_auto = r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN_AUTO") or 0
-  local fo_eff  = math.max(fo_man, fo_auto)
+  local fo_eff = math.max(
+    r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN")      or 0,
+    r.GetMediaItemInfo_Value(item, "D_FADEOUTLEN_AUTO") or 0)
   local fo_start_abs = item_fin - fo_eff
-
   r.SetMediaItemInfo_Value(item, "D_LENGTH", pos - item_pos)
-
-  local new_fo
-  if pos > fo_start_abs + EPS then
-    new_fo = pos - fo_start_abs
-  else
-    new_fo = fo_eff
-  end
+  local new_fo = (pos > fo_start_abs + EPS) and (pos - fo_start_abs) or fo_eff
   new_fo = math.min(new_fo, pos - item_pos)
   r.SetMediaItemInfo_Value(item, "D_FADEOUTLEN",      new_fo)
   r.SetMediaItemInfo_Value(item, "D_FADEOUTLEN_AUTO", 0)
 end
 
--- Trim the RIGHT item of a crossfade pair to start at `pos`. Position is
--- pushed to `pos`, length shortened, take STARTOFFS shifted to keep audio
--- in sync. Fade-in is set to the (auto-or-manual) fade-in's remainder past
--- `pos`. Auto-fade cleared.
-local function trim_right_crossfade(item, pos)
+local function trim_right_to(item, pos)
   local item_pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
   local item_len = r.GetMediaItemInfo_Value(item, "D_LENGTH")
   local item_fin = item_pos + item_len
   if pos <= item_pos + EPS or pos >= item_fin - EPS then return end
-
-  local fi_man  = r.GetMediaItemInfo_Value(item, "D_FADEINLEN")      or 0
-  local fi_auto = r.GetMediaItemInfo_Value(item, "D_FADEINLEN_AUTO") or 0
-  local fi_eff  = math.max(fi_man, fi_auto)
+  local fi_eff = math.max(
+    r.GetMediaItemInfo_Value(item, "D_FADEINLEN")      or 0,
+    r.GetMediaItemInfo_Value(item, "D_FADEINLEN_AUTO") or 0)
   local fi_end_abs = item_pos + fi_eff
-
   local delta = pos - item_pos
   r.SetMediaItemInfo_Value(item, "D_POSITION", pos)
   r.SetMediaItemInfo_Value(item, "D_LENGTH",   item_len - delta)
@@ -131,81 +154,123 @@ local function trim_right_crossfade(item, pos)
       r.SetMediaItemTakeInfo_Value(t, "D_STARTOFFS", o + delta * pr)
     end
   end
-
-  local new_fi
-  if pos < fi_end_abs - EPS then
-    new_fi = fi_end_abs - pos
-  else
-    new_fi = 0
-  end
+  local new_fi = (pos < fi_end_abs - EPS) and (fi_end_abs - pos) or 0
   new_fi = math.min(new_fi, item_len - delta)
   r.SetMediaItemInfo_Value(item, "D_FADEINLEN",      new_fi)
   r.SetMediaItemInfo_Value(item, "D_FADEINLEN_AUTO", 0)
 end
 
--- Find a crossfade pair (two items on the same track that both strictly
--- contain `pos` in their interior) within `pool`. Returns left, right items
--- (sorted by position) or nil, nil.
-local function find_crossfade_pair(pool, pos, handled)
-  for i = 1, #pool do
-    local a = pool[i]
-    if not handled[a] then
+-- ---- Crossfade pair detection (overlap-based, robust to boundary cases) --
+local function find_crossfade_pairs(items)
+  local pairs_out, seen = {}, {}
+  for i = 1, #items do
+    local a = items[i]
+    if not seen[a] then
       local a_pos = r.GetMediaItemInfo_Value(a, "D_POSITION")
       local a_fin = a_pos + r.GetMediaItemInfo_Value(a, "D_LENGTH")
-      if pos > a_pos + EPS and pos < a_fin - EPS then
-        local a_track = r.GetMediaItemTrack(a)
-        for j = i+1, #pool do
-          local b = pool[j]
-          if not handled[b] and r.GetMediaItemTrack(b) == a_track then
-            local b_pos = r.GetMediaItemInfo_Value(b, "D_POSITION")
-            local b_fin = b_pos + r.GetMediaItemInfo_Value(b, "D_LENGTH")
-            if pos > b_pos + EPS and pos < b_fin - EPS then
-              if a_pos < b_pos then return a, b else return b, a end
-            end
+      local a_track = r.GetMediaItemTrack(a)
+      for j = i+1, #items do
+        local b = items[j]
+        if not seen[b] and r.GetMediaItemTrack(b) == a_track then
+          local b_pos = r.GetMediaItemInfo_Value(b, "D_POSITION")
+          local b_fin = b_pos + r.GetMediaItemInfo_Value(b, "D_LENGTH")
+          local ov_s = math.max(a_pos, b_pos)
+          local ov_e = math.min(a_fin, b_fin)
+          if ov_e > ov_s + EPS then
+            local L, R
+            if a_pos < b_pos then L, R = a, b else L, R = b, a end
+            pairs_out[#pairs_out+1] = { left=L, right=R, cf_start=ov_s, cf_end=ov_e }
+            seen[a] = true; seen[b] = true
+            break
           end
         end
       end
     end
   end
-  return nil, nil
+  return pairs_out
 end
 
--- ---- Determine mode + split positions ------------------------------------
+-- ---- Mode + setup --------------------------------------------------------
 
 local ts_s, ts_e = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
 local has_ts     = ts_e > ts_s + EPS
 local cursor     = r.GetCursorPosition()
+local positions  = has_ts and {ts_s, ts_e} or {cursor}
 
-local positions = has_ts and {ts_s, ts_e} or {cursor}
-
-local pool = {}
+local sel_items = {}
 for i = 0, r.CountSelectedMediaItems(0)-1 do
-  pool[#pool+1] = r.GetSelectedMediaItem(0, i)
+  sel_items[#sel_items+1] = r.GetSelectedMediaItem(0, i)
 end
-if #pool == 0 then return end
+if #sel_items == 0 then return end
 
 r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
 
+-- ---- Crossfade pair handling ---------------------------------------------
+
+local handled_items   = {}  -- items removed from the plain-split pool
+local manual_select   = {}  -- items that should be selected at the end
+                            -- regardless of inside-TS filter
+
+local pairs_in_sel = find_crossfade_pairs(sel_items)
+
+for _, p in ipairs(pairs_in_sel) do
+  local cf_s, cf_e = p.cf_start, p.cf_end
+
+  if has_ts and ts_s < cf_e - EPS and ts_e > cf_s + EPS then
+    local s_at_start = math.abs(ts_s - cf_s) < EPS
+    local e_at_end   = math.abs(ts_e - cf_e) < EPS
+
+    if s_at_start and e_at_end then
+      handled_items[p.left]  = true
+      handled_items[p.right] = true
+      manual_select[p.left]  = true
+      manual_select[p.right] = true
+    elseif s_at_start then
+      trim_left_to(p.left,   ts_e)
+      trim_right_to(p.right, ts_e)
+      handled_items[p.left]  = true
+      handled_items[p.right] = true
+      manual_select[p.left]  = true
+    elseif e_at_end then
+      trim_left_to(p.left,   ts_s)
+      trim_right_to(p.right, ts_s)
+      handled_items[p.left]  = true
+      handled_items[p.right] = true
+      manual_select[p.right] = true
+    else
+      -- TS strictly inside crossfade → fall through to v0.5.0 logic at ts_s
+      trim_left_to(p.left,  ts_s)
+      trim_right_to(p.right, ts_s)
+      -- right still in pool; further plain split at ts_e will produce the
+      -- inside-TS piece that gets selected via the inside-TS filter below.
+    end
+  elseif (not has_ts) and cursor > cf_s + EPS and cursor < cf_e - EPS then
+    handled_items[p.left]  = true
+    handled_items[p.right] = true
+    trim_left_to(p.left,  cursor)
+    trim_right_to(p.right, cursor)
+  end
+end
+
+-- ---- Plain split on remaining items --------------------------------------
+
+local pool = {}
+for _, it in ipairs(sel_items) do
+  if not handled_items[it] then pool[#pool+1] = it end
+end
+
+local all_pieces = {}
+for _, it in ipairs(pool) do all_pieces[#all_pieces+1] = it end
+
 for _, sp in ipairs(positions) do
-  local handled = {}
-  -- Crossfade pairs first (greedy — keep finding pairs until none remain).
-  while true do
-    local left, right = find_crossfade_pair(pool, sp, handled)
-    if not left or not right then break end
-    trim_left_crossfade(left, sp)
-    trim_right_crossfade(right, sp)
-    handled[left]  = true
-    handled[right] = true
-  end
-  -- Plain split on remaining unhandled items.
   local snapshot = {}
-  for _, it in ipairs(pool) do
-    if not handled[it] then snapshot[#snapshot+1] = it end
-  end
+  for _, it in ipairs(all_pieces) do snapshot[#snapshot+1] = it end
   for _, it in ipairs(snapshot) do
-    local new_right = split_with_fades(it, sp)
-    if new_right then pool[#pool+1] = new_right end
+    if not pos_at_fade_boundary(it, sp) then
+      local new_right = split_with_fades(it, sp)
+      if new_right then all_pieces[#all_pieces+1] = new_right end
+    end
   end
 end
 
@@ -214,10 +279,17 @@ end
 r.Main_OnCommand(40289, 0)  -- unselect all
 
 if has_ts then
-  for _, it in ipairs(pool) do
+  -- Inside-TS pieces from plain-split pool
+  for _, it in ipairs(all_pieces) do
     local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
     local fin = pos + r.GetMediaItemInfo_Value(it, "D_LENGTH")
     if pos >= ts_s - EPS and fin <= ts_e + EPS then
+      r.SetMediaItemSelected(it, true)
+    end
+  end
+  -- Manually-marked items (crossfade-pair survivors) — select regardless
+  for it in pairs(manual_select) do
+    if r.ValidatePtr(it, "MediaItem*") then
       r.SetMediaItemSelected(it, true)
     end
   end
