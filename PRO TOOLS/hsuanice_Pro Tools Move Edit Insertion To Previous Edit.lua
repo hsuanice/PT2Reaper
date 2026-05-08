@@ -1,27 +1,43 @@
 -- @description hsuanice_Pro Tools Move Edit Insertion To Previous Edit
--- @version 0.1.0 [260418.1120]
+-- @version 0.2.0 [260508.1648]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
 --   Replicates Pro Tools: **Move Edit Insertion To Previous Edit** (Shift+Tab)
 --
 --   ## Behaviour
 --   Reads the "Tab to Transient" toggle state:
---   - ON  → moves cursor to previous transient (item edges + internal peaks)
---   - OFF → moves cursor to previous item edge
+--   - ON  → moves cursor to previous transient (filtered by shared
+--     min-gap setting, see `Library/hsuanice_PT_Transient.lua` /
+--     `hsuanice_PT_Transient/min_ms`). Transients within `min_ms` of
+--     the starting cursor are skipped; if none far enough is found,
+--     cursor stays put.
+--   - OFF → moves cursor to previous item edge.
 --
 --   Saves and restores item selection so the user sees no change.
---   Selects all items on current track temporarily to enable navigation.
+--
+--   ## Dependency
+--   - `Library/hsuanice_PT_Transient.lua`
 --
 --   - Tags : Editing, Navigation
 --
 -- @changelog
+--   0.2.0 [260508.1648]
+--     - Tab-to-Transient mode now applies the shared min-gap filter
+--       from Library/hsuanice_PT_Transient.lua. Library is a hard dep.
 --   0.1.0 [260418.1120]
---     - Initial release
+--     - Initial release.
 
 local r = reaper
+
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local Tran  = dofile(_dir .. '../Library/hsuanice_PT_Transient.lua')
+if not Tran then
+  r.ShowMessageBox("Could not load Library/hsuanice_PT_Transient.lua",
+    "Move Edit Insertion To Previous Edit", 0)
+  return
+end
 
 local function get_tab_toggle_state()
   local section = r.SectionFromUniqueID(0)
@@ -46,7 +62,7 @@ r.Main_OnCommand(40421, 0)  -- Item: Select all items in track
 
 -- Move cursor
 if get_tab_toggle_state() then
-  r.Main_OnCommand(40376, 0)  -- Item navigation: Move cursor to previous transient in items
+  Tran.cursor_to_prev_transient(Tran.get_min_sec())
 else
   r.Main_OnCommand(40318, 0)  -- Item navigation: Move cursor left to edge of item
 end

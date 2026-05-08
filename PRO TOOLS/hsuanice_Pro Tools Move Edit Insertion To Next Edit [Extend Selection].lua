@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Move Edit Insertion To Next Edit [Extend Selection]
--- @version 0.1.1 [260418.1151]
+-- @version 0.2.0 [260508.1648]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -12,17 +12,34 @@
 --   - Extends selection rightward; cursor stays at left
 --   - Selection only grows, never shrinks
 --
---   Works with "Tab to Transient" toggle (ON=transients, OFF=item edges)
+--   Works with "Tab to Transient" toggle (ON=transients, OFF=item edges).
+--   Transient mode applies the shared min-gap filter from
+--   `Library/hsuanice_PT_Transient.lua` (`hsuanice_PT_Transient/min_ms`).
+--
+--   ## Dependency
+--   - `Library/hsuanice_PT_Transient.lua`
 --
 --   - Tags : Editing, Navigation, Selection
 --
 -- @changelog
+--   0.2.0 [260508.1648]
+--     - Transient walk now uses Library/hsuanice_PT_Transient.lua so the
+--       shared min-gap setting is honoured.
 --   0.1.1 [260418.1151]
 --     - Fix: cursor always at left edge; selection extends rightward from te
 --   0.1.0 [260418.1138]
---     - Initial release
+--     - Initial release.
 
 local r = reaper
+
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local Tran  = dofile(_dir .. '../Library/hsuanice_PT_Transient.lua')
+if not Tran then
+  r.ShowMessageBox("Could not load Library/hsuanice_PT_Transient.lua",
+    "Move Edit Insertion To Next Edit [Extend Selection]", 0)
+  return
+end
 
 local function get_tab_toggle_state()
   local section = r.SectionFromUniqueID(0)
@@ -67,7 +84,7 @@ r.Main_OnCommand(41229, 0)  -- Save selection set
 r.Main_OnCommand(40421, 0)  -- Select all items in track
 
 if get_tab_toggle_state() then
-  r.Main_OnCommand(40375, 0)  -- Next transient
+  Tran.cursor_to_next_transient(Tran.get_min_sec())
 else
   r.Main_OnCommand(40319, 0)  -- Next item edge
 end

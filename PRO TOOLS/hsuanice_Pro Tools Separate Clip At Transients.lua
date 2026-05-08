@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Separate Clip At Transients
--- @version 0.4.1 [260508.1622]
+-- @version 0.5.0 [260508.1643]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -10,25 +10,33 @@
 --
 --   ## Behavior
 --   - Prompts for two values (single dialog):
---     - "Pre-separate amount (ms)" : 0-99
---     - "Minimum clip length (ms)" : 0-999  (transient-to-transient
+--     - "Pre-separate amount (ms)" : 0-99 (per-script, remembered)
+--     - "Minimum clip length (ms)" : 0-999 (transient-to-transient
 --       minimum spacing; transients closer than this to the previous
 --       kept transient are dropped before splitting)
---     Both values are remembered between runs (ExtState).
+--   - The min-length value is the SHARED Pro Tools transient setting
+--     (namespace `hsuanice_PT_Transient`, key `min_ms`). Changing it
+--     here also affects Tab-to-Transient navigation and any other
+--     consumers of the shared library.
 --   - **pre_ms = 0** → split exactly at each (kept) transient.
 --   - **pre_ms > 0** → split at `transient - pre_ms` (pre-roll before
 --     each transient, matching Pro Tools).
 --   - Transient detection sensitivity follows REAPER's global settings
---     (Options → Media → Transient detection). Adjust there to tune
---     overall sensitivity; PT does not expose sensitivity so REAPER
---     defaults will usually differ. The Min-clip-length filter is the
---     primary tool for cleaning up over-detection.
---   - Implementation is pure REAPER native (no SWS dependency): uses
---     action 40375 "Item navigation: Move cursor to next transient in
---     items" to enumerate transients, then `SplitMediaItem` for the cuts.
+--     (Options → Media → Transient detection). The Min-clip-length
+--     filter is the primary tool for cleaning up over-detection.
+--
+--   ## Dependency
+--   - `Library/hsuanice_PT_Transient.lua`
 --
 --   - Tags: Editing, Clips
 -- @changelog
+--   0.5.0 [260508.1643] - Refactor onto Library/hsuanice_PT_Transient.lua.
+--                          min_ms now reads/writes the shared namespace
+--                          `hsuanice_PT_Transient/min_ms` so Tab navigation
+--                          + any future consumers share one tuning value.
+--                          pre_ms stays in `hsuanice_PT_SeparateClipAtTransients`
+--                          (per-script). Transient enumeration + min-gap
+--                          filter delegated to the library.
 --   0.4.1 [260508.1622] - Set DEBUG = false (verified working). No
 --                          behavior change.
 --   0.4.0 [260508.1611] - Add Min-clip-length filter (0-999 ms,
@@ -71,18 +79,22 @@
 
 local r   = reaper
 local EPS = 1e-9
-local DEBUG = false  -- set to true to print diagnostic to ReaScript console
 
-local function dbg(s)
-  if DEBUG then r.ShowConsoleMsg(tostring(s) .. "\n") end
+-- Load Library/hsuanice_PT_Transient.lua
+local _info = debug.getinfo(1, 'S')
+local _dir  = _info.source:match('^@(.*[/\\])') or ''
+local Tran  = dofile(_dir .. '../Library/hsuanice_PT_Transient.lua')
+if not Tran then
+  r.ShowMessageBox("Could not load Library/hsuanice_PT_Transient.lua",
+    "Separate Clip At Transients", 0)
+  return
 end
 
--- 1. Two-field dialog (remembers both values)
-local EXT_NS = "hsuanice_PT_SeparateClipAtTransients"
-local prev_pre = r.GetExtState(EXT_NS, "pre_ms")
-local prev_min = r.GetExtState(EXT_NS, "min_ms")
+-- 1. Two-field dialog
+local PRE_NS = "hsuanice_PT_SeparateClipAtTransients"
+local prev_pre = r.GetExtState(PRE_NS, "pre_ms")
 if prev_pre == "" then prev_pre = "0" end
-if prev_min == "" then prev_min = "0" end
+local prev_min = tostring(Tran.get_min_ms())  -- shared value
 
 local rv, csv = r.GetUserInputs("Separate Clip At Transients", 2,
   "Pre-separate amount (ms):,Minimum clip length (ms):,extrawidth=80",
@@ -90,17 +102,17 @@ local rv, csv = r.GetUserInputs("Separate Clip At Transients", 2,
 if not rv then return end
 
 local pre_str, min_str = csv:match("([^,]*),([^,]*)")
-local pre_ms = tonumber(pre_str)
-local min_ms = tonumber(min_str)
-if not pre_ms or pre_ms < 0 then pre_ms = 0 end
-if pre_ms > 99 then pre_ms = 99 end
-if not min_ms or min_ms < 0 then min_ms = 0 end
+local pre_ms = tonumber(pre_str) or 0
+local min_ms = tonumber(min_str) or 0
+if pre_ms < 0   then pre_ms = 0   end
+if pre_ms > 99  then pre_ms = 99  end
+if min_ms < 0   then min_ms = 0   end
 if min_ms > 999 then min_ms = 999 end
 local pre_sec = pre_ms / 1000
 local min_sec = min_ms / 1000
 
-r.SetExtState(EXT_NS, "pre_ms", tostring(pre_ms), true)
-r.SetExtState(EXT_NS, "min_ms", tostring(min_ms), true)
+r.SetExtState(PRE_NS, "pre_ms", tostring(math.floor(pre_ms + 0.5)), true)
+Tran.set_min_ms(min_ms)  -- writes shared namespace
 
 -- 2. Snapshot current selection + cursor
 local sel_items = {}
@@ -111,74 +123,24 @@ if #sel_items == 0 then return end
 
 local orig_cursor = r.GetCursorPosition()
 
-if DEBUG then r.ShowConsoleMsg("=== Separate Clip At Transients (debug) ===\n") end
-dbg(string.format("pre_ms=%d  min_ms=%d  selected_items=%d",
-  pre_ms, min_ms, #sel_items))
-
 r.Undo_BeginBlock()
 
 local new_pieces = {}
 
-for idx, item in ipairs(sel_items) do
+for _, item in ipairs(sel_items) do
   if r.ValidatePtr(item, "MediaItem*") then
     local pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
     local fin = pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
 
-    dbg(string.format("\n[item %d] pos=%.4f fin=%.4f len=%.4f",
-      idx, pos, fin, fin - pos))
-
-    -- Solo-select this item so 40376 only enumerates its transients
-    r.SelectAllMediaItems(0, false)
-    r.SetMediaItemSelected(item, true)
-
-    -- Set cursor to item start, then walk forward via 40376
-    r.SetEditCurPos(pos, false, false)
-    dbg(string.format("  cursor set to %.4f, sel count=%d",
-      r.GetCursorPosition(), r.CountSelectedMediaItems(0)))
-
-    local transients = {}
-    local guard = 0
-    while true do
-      guard = guard + 1
-      if guard > 10000 then dbg("  GUARD HIT — aborting walk"); break end
-      local before = r.GetCursorPosition()
-      r.Main_OnCommand(40375, 0)  -- Move cursor to next transient in items
-      local after  = r.GetCursorPosition()
-      dbg(string.format("  step %d: before=%.4f after=%.4f", guard, before, after))
-      if after <= before + EPS then break end
-      if after >= fin - EPS      then break end
-      if after >  pos + EPS then transients[#transients+1] = after end
-    end
-
-    dbg(string.format("  transients found (raw): %d", #transients))
-
-    -- Min-clip-length filter: drop transients within `min_sec` of the
-    -- previous KEPT transient. transients[] is already ascending from
-    -- the forward 40375 walk.
-    local kept = {}
-    if min_sec > 0 then
-      local last_kept
-      for _, T in ipairs(transients) do
-        if not last_kept or (T - last_kept) >= min_sec - EPS then
-          kept[#kept+1] = T
-          last_kept = T
-        end
-      end
-      dbg(string.format("  transients kept after min-length filter (%d ms): %d",
-        min_ms, #kept))
-    else
-      kept = transients
-    end
-
-    for i, T in ipairs(kept) do
-      dbg(string.format("    T[%d]=%.4f -> split at %.4f", i, T, T - pre_sec))
-    end
+    -- Library: enumerate raw transients (saves/restores cursor + sel)
+    local raw  = Tran.enumerate_transients(item)
+    -- Library: filter by min-gap (transients[] ascending)
+    local kept = Tran.filter_min_gap(raw, min_sec)
 
     -- Sort descending so we can keep splitting the LEFT piece
     table.sort(kept, function(a, b) return a > b end)
-    transients = kept
 
-    for _, T in ipairs(transients) do
+    for _, T in ipairs(kept) do
       local split_pos = T - pre_sec
       if split_pos > pos + EPS and split_pos < fin - EPS then
         local left_pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
@@ -206,8 +168,6 @@ for _, it in ipairs(new_pieces) do
 end
 
 r.SetEditCurPos(orig_cursor, false, false)
-
-dbg(string.format("\n=== done. new_pieces created: %d ===", #new_pieces))
 
 r.UpdateArrange()
 r.Undo_EndBlock("Pro Tools: Separate Clip At Transients", -1)
