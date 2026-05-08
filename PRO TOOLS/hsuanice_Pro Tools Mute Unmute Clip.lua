@@ -1,13 +1,26 @@
--- @description Pro Tools-style Item Mute/Unmute Toggle (uniformize mixed -> unmute)
--- @version 0.1.0
+-- @description hsuanice_Pro Tools Mute Unmute Clip
+-- @version 0.2.0 [260508.2250]
 -- @author hsuanice
+-- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   Single item = normal toggle.
---   Multiple items:
---     - mixed mute states -> unify to UNMUTE
---     - uniform state     -> toggle all
+--   Replicates Pro Tools: **Mute Unmute Clip** (Cmd+M)
+--
+--   Toggles the mute state of selected items, uniformising mixed
+--   selections (PT behavior).
+--
+--   ## Behavior
+--   - Single item: normal toggle.
+--   - Multiple items:
+--     - Mixed mute states → unify to UNMUTE.
+--     - Uniform state     → toggle all.
+--
+--   - Tags: Editing, Clips
 -- @changelog
---   0.1.0 - Initial release: mixed selection becomes unmute; uniform selection toggles.
+--   0.2.0 [260508.2250] - Standardize ReaPack header (add @link, PT
+--                          shortcut, tags, and YYMMDD.HHMM timestamp).
+--                          Logic unchanged from 0.1.0.
+--   0.1.0 - Initial release: mixed selection becomes unmute; uniform
+--           selection toggles.
 
 local r = reaper
 
