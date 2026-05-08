@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Rename Clips
--- @version 0.4.0 [260509.0008]
+-- @version 0.4.2 [260509.0014]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -18,10 +18,19 @@
 --   the chain (already-renamed items stay renamed).
 --
 --   ## Dependency
---   - `Library/hsuanice_GFXInputField.lua`
+--   - `PRO TOOLS/hsuanice_PT_GFXInputField.lua`
 --
 --   - Tags: Editing, Clips
 -- @changelog
+--   0.4.2 [260509.0014] - Picks up hsuanice_PT_GFXInputField 0.2.0:
+--                          Cmd+Left/Right (line edge), Option+Left/Right
+--                          (word jump), all with Shift extension. Cmd+A
+--                          select-all also accepts char 1 (Ctrl+A) so
+--                          it works on the macOS REAPER builds that
+--                          emit it that way.
+--   0.4.1 [260509.0010] - Library renamed to hsuanice_PT_GFXInputField
+--                          and moved from Library/ to PRO TOOLS/.
+--                          Updated dofile path. No behaviour change.
 --   0.4.0 [260509.0008] - Refactor onto Library/hsuanice_GFXInputField
 --                          (extracted shared input-field behavior).
 --                          Adds Cmd/Ctrl+A select all (free in the
@@ -54,9 +63,9 @@ local r = reaper
 
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local IF = dofile(_dir .. '../Library/hsuanice_GFXInputField.lua')
+local IF = dofile(_dir .. 'hsuanice_PT_GFXInputField.lua')
 if not IF then
-  r.ShowMessageBox("Could not load Library/hsuanice_GFXInputField.lua",
+  r.ShowMessageBox("Could not load PRO TOOLS/hsuanice_PT_GFXInputField.lua",
     "Rename Clips", 0)
   return
 end
