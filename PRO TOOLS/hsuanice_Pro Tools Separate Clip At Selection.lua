@@ -1,5 +1,5 @@
 -- @description hsuanice_Pro Tools Separate Clip At Selection
--- @version 0.8.1 [260508.1259]
+-- @version 0.8.2 [260508.1313]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
@@ -7,8 +7,11 @@
 --
 --   ## Modes
 --   - **Time selection exists** → split selected items at TS_s and TS_e.
---     After: TS / razor preserved; item selection keeps inside-TS pieces
---     plus crossfade-resolved survivors.
+--     After: TS / razor preserved; item selection keeps the boundary-aware
+--     inside-TS piece per item plus crossfade-resolved survivors. When a TS
+--     edge split is suppressed by fade-boundary alignment, the surviving
+--     piece that extends past TS to the item's edge stays selected (so the
+--     "inside-TS portion" never silently goes unselected).
 --   - **No time selection**     → split selected items at the edit cursor.
 --     After: razor / TS / item selection cleared.
 --
@@ -35,6 +38,13 @@
 --   - split inside fade-out → right.fade-out cleared, left gets portion.
 --   - Tags: Editing, Clips
 -- @changelog
+--   0.8.2 [260508.1313] - Boundary-aware inside-TS selection. When a TS edge
+--                          split is suppressed because TS_s/TS_e land on a
+--                          fade-in out point or fade-out in point, the
+--                          extended Left/Right piece (or the original item,
+--                          if both edges were suppressed) stays selected
+--                          instead of being filtered out by the strict
+--                          "pos >= ts_s AND fin <= ts_e" rule.
 --   0.8.1 [260508.1259] - Boundary cases: select only the surviving item that
 --                          overlaps the TS (Left for s_at_start, Right for
 --                          e_at_end). The other survivor is left untouched
@@ -260,6 +270,24 @@ for _, it in ipairs(sel_items) do
   if not handled_items[it] then pool[#pool+1] = it end
 end
 
+-- Boundary-aware expected inside-TS ranges, computed BEFORE splits modify
+-- positions. When a TS edge split is suppressed by fade-boundary alignment,
+-- the resulting "inside-TS piece" extends to the item's edge instead of TS.
+local expected_ranges = {}
+if has_ts then
+  for _, it in ipairs(pool) do
+    local item_pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
+    local item_fin = item_pos + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+    if item_pos < ts_e - EPS and item_fin > ts_s + EPS then
+      local sup_s = pos_at_fade_boundary(it, ts_s)
+      local sup_e = pos_at_fade_boundary(it, ts_e)
+      local exp_s = sup_s and item_pos or math.max(ts_s, item_pos)
+      local exp_e = sup_e and item_fin or math.min(ts_e, item_fin)
+      expected_ranges[#expected_ranges+1] = {s = exp_s, e = exp_e}
+    end
+  end
+end
+
 local all_pieces = {}
 for _, it in ipairs(pool) do all_pieces[#all_pieces+1] = it end
 
@@ -279,12 +307,15 @@ end
 r.Main_OnCommand(40289, 0)  -- unselect all
 
 if has_ts then
-  -- Inside-TS pieces from plain-split pool
+  -- Boundary-aware inside-TS piece selection
   for _, it in ipairs(all_pieces) do
     local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
     local fin = pos + r.GetMediaItemInfo_Value(it, "D_LENGTH")
-    if pos >= ts_s - EPS and fin <= ts_e + EPS then
-      r.SetMediaItemSelected(it, true)
+    for _, rng in ipairs(expected_ranges) do
+      if math.abs(pos - rng.s) < EPS and math.abs(fin - rng.e) < EPS then
+        r.SetMediaItemSelected(it, true)
+        break
+      end
     end
   end
   -- Manually-marked items (crossfade-pair survivors) — select regardless
