@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_GFXInputField — Native-feeling text input for gfx
-@version 0.2.0 [260509.0014]
+@version 0.3.0 [260509.0129]
 @author hsuanice
 @about
   Reusable text input field for REAPER's stock `gfx` library, designed
@@ -64,6 +64,9 @@
     IF.filter_digits, IF.filter_ascii_print
 
 @changelog
+  0.3.0 [260509.0129] - Add `filter_time` (digits + `:` + `.` + `-`)
+                         for time-format inputs like timecode and
+                         minutes:seconds.
   0.2.0 [260509.0014] - Add Cmd+Left/Right (jump to line start/end)
                          and Option+Left/Right (jump by word
                          boundary). Both honour Shift for selection
@@ -95,6 +98,9 @@ M.KEY_DEL   = 6579564
 
 M.filter_digits          = function(c) return c >= 48 and c <= 57 end
 M.filter_ascii_print     = function(c) return c >= 32 and c <= 126 end
+M.filter_time            = function(c)
+  return (c >= 48 and c <= 57) or c == 58 or c == 46 or c == 45
+end
 
 -- ---- Default colours -----------------------------------------------------
 
