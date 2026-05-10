@@ -1,32 +1,30 @@
 -- @description hsuanice_Pro Tools Restore Last Selection
--- @version 0.1.0 [260413.1324]
+-- @version 0.2.0 [260509.1245]
 -- @author hsuanice
 -- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
 -- @about
---   # hsuanice Pro Tools Keybindings for REAPER
+--   Replicates Pro Tools: **Restore Last Selection** (Cmd+Opt+Z)
 --
---   Stub script for the Pro Tools action:
---   **Restore Last Selection**
+--   Loads REAPER's "Selection set #01" (item selection + time
+--   selection). Pair this script with a "Save Selection Set #01"
+--   keystroke (native action 41229) so you can snapshot a selection
+--   and recall it later.
 --
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
+--   ## Caveat (vs. PT)
+--   PT auto-tracks the previous selection — pressing Cmd+Opt+Z
+--   restores the selection that existed BEFORE the most recent
+--   change. REAPER doesn't expose this natively. A future iteration
+--   may add a defer-based selection-history watcher to fully match
+--   PT; for now this script just calls native action 41239
+--   (Selection set: Load set #01), so you must have saved one with
+--   action 41229 first.
 --
---   ## Details
---   - Pro Tools equivalent : Restore Last Selection
---   - Module               : Editing
---   - Mac shortcut (PT)    : Command + Option + Z
---   - Tags                 : Edit menu, Editing, Selection
---
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
---
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
+--   - Tags : Editing, Selection
 -- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--   0.2.0 [260509.1245] - Initial implementation as wrapper for
+--                          native action 41239 (Load Selection Set
+--                          #01). Full PT-style auto-history TBD.
+--   0.1.0 [260413.1324] - Stub placeholder created.
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Restore Last Selection", "PT2Reaper", 0)
+local r = reaper
+r.Main_OnCommand(41239, 0)  -- Selection set: Load set #01
