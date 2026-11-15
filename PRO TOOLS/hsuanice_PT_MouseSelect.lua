@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_MouseSelect - Pro Tools mouse clicks on the Edit Selection (PT2Reaper library)
-@version 26.1115.1920pre1
+@version 26.1115.1930pre1
 @author hsuanice
 @noindex
 @changelog
-  - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
+  - Shift-click (Pro Tools): a track outside the selection is only added (the range stays); inside the selection, the nearer edge trims to the click.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper mouse modifier actions. Loaded with dofile().
@@ -136,12 +136,19 @@ function M.apply(t0, t1, sel)
   if M.SYNC_TIME_SELECTION then r.GetSet_LoopTimeRange(true, false, t0, t1, false) end
 end
 
--- Extend the current Edit Selection to cover [c0, c1] and add track tr.
--- trim_t (optional, Pro Tools Shift-click): when [c0, c1] lies inside the selection, the
--- nearer edge moves to trim_t instead (the selection shrinks).
+-- Extend the current Edit Selection to cover [c0, c1] and add track tr (only grows).
+-- trim_t given = Pro Tools Shift-click:
+--   * tr already in the selection: [c0, c1] outside the range extends it; inside the range,
+--     the nearer edge moves to trim_t (the selection shrinks).
+--   * tr not in the selection: only the track is added, the range stays as it is.
+--   * no range yet (only an insertion point): extends from it to the click.
 function M.extend(c0, c1, tr, trim_t)
   local t0, t1, sel, has = M.current()
-  if trim_t and c0 > t0 + EPS and c1 < t1 - EPS and trim_t > t0 + EPS and trim_t < t1 - EPS then
+  local idx = tr and track_index(tr) or -1
+  local range_only = trim_t and t1 - t0 > EPS and idx >= 0 and not sel[idx]
+  if range_only then
+    -- keep t0, t1
+  elseif trim_t and c0 > t0 + EPS and c1 < t1 - EPS and trim_t > t0 + EPS and trim_t < t1 - EPS then
     if trim_t - t0 < t1 - trim_t then t0 = trim_t else t1 = trim_t end
   else
     t0, t1 = math.min(t0, c0), math.max(t1, c1)

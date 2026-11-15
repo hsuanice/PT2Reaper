@@ -1,19 +1,20 @@
 --[[
 @description hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection
-@version 26.1115.1920pre1
+@version 26.1115.1930pre1
 @author hsuanice
 @noindex
 @changelog
-  - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
+  - Pro Tools: Shift-click on a track outside the selection only adds the track (the range stays); inside the selection, the nearer edge trims to the click.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Shift-click extends the Edit Selection** (mouse)
 
   Extends the Edit Selection to the mouse position. Only grows: clicking before the range
   extends its start, after it extends its end. Clicking inside it trims the nearer edge
-  (start or end) to the click. The clicked track is added; every track of the selection
-  gets the same range. Clicking a clip outside the range extends to cover the whole clip;
-  the click position follows snap / grid.
+  (start or end) to the click. Clicking a clip outside the range extends to cover the whole
+  clip; the click position follows snap / grid.
+  Clicking a track that is not in the selection only adds that track (the range stays);
+  every track of the selection gets the same range.
   The edit cursor does not move.
 
   Setup: Preferences > Mouse Modifiers > Track (left click), Media item bottom half (left click)

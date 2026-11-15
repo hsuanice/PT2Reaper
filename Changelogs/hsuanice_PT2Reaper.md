@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1930pre1
+
+- Pro Tools: Shift-click on a track outside the selection only adds the track (the range stays).
+
 ## 26.1115.1920pre1
 
 - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
