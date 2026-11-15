@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1407
+@version 26.1115.1428pre1
 @author hsuanice
 @metapackage
 @provides
@@ -9,6 +9,7 @@
   [main] hsuanice_PT_Transient Settings.lua
   [main] hsuanice_Pro Tools Apply Next Fade Shape.lua
   [main] hsuanice_Pro Tools Apply Previous Fade Shape.lua
+  [main] hsuanice_Pro Tools Clear All Soloed Tracks.lua
   [main] hsuanice_Pro Tools Clear.lua
   [main] hsuanice_Pro Tools Consolidate Selection.lua
   [main] hsuanice_Pro Tools Copy and Move Clip End To Current TC.lua
@@ -35,6 +36,7 @@
   [main] hsuanice_Pro Tools Identify Sync Point.lua
   [main] hsuanice_Pro Tools Increase Grid Value.lua
   [main] hsuanice_Pro Tools Increase Nudge Value.lua
+  [main] hsuanice_Pro Tools Input Monitor Tracks with an Edit Selection.lua
   [main] hsuanice_Pro Tools Insertion Follows Playback.lua
   [main] hsuanice_Pro Tools Link Timeline and Edit Selection.lua
   [main] hsuanice_Pro Tools Link Track And Edit Selection.lua
@@ -50,11 +52,14 @@
   [main] hsuanice_Pro Tools Move Edit Insertion To Previous Edit - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Previous Edit.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection.lua
+  [main] hsuanice_Pro Tools Move Edit Insertion To Session End.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Session Start - Extend Selection.lua
+  [main] hsuanice_Pro Tools Move Edit Insertion To Song Start.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Next Clip - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Next Clip.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Previous Clip - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Previous Clip.lua
+  [main] hsuanice_Pro Tools Mute Tracks with an Edit Selection.lua
   [main] hsuanice_Pro Tools Mute Unmute Clip.lua
   [main] hsuanice_Pro Tools Nudge Clip Contents Earlier By Grid.lua
   [main] hsuanice_Pro Tools Nudge Clip Contents Later By Grid.lua
@@ -81,6 +86,7 @@
   [main] hsuanice_Pro Tools Quantize Clips.lua
   [main] hsuanice_Pro Tools QuickPunch.lua
   [main] hsuanice_Pro Tools Quit.lua
+  [main] hsuanice_Pro Tools Record Arm Tracks with an Edit Selection.lua
   [main] hsuanice_Pro Tools Record Punch.lua
   [main] hsuanice_Pro Tools Redo.lua
   [main] hsuanice_Pro Tools Rename Clips.lua
@@ -97,6 +103,7 @@
   [main] hsuanice_Pro Tools Slip Mode.lua
   [main] hsuanice_Pro Tools Snap To Next.lua
   [main] hsuanice_Pro Tools Snap To Previous.lua
+  [main] hsuanice_Pro Tools Solo Tracks with an Edit Selection.lua
   [main] hsuanice_Pro Tools Space Clips.lua
   [main] hsuanice_Pro Tools Spot Mode.lua
   [main] hsuanice_Pro Tools Tab to Transient.lua
@@ -121,12 +128,12 @@
   [nomain] hsuanice_PT_NudgeEdge.lua
   [nomain] hsuanice_PT_QuickPunch Pass Monitor.lua
   [nomain] hsuanice_PT_QuickPunch.lua
+  [nomain] hsuanice_PT_TrackEdit.lua
   [nomain] hsuanice_PT_Transient.lua
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - New: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Move Edit Insertion To Session End / Song Start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -188,6 +195,7 @@
   - Identify Sync Point: Cmd+,
   - Increase Grid Value: +, Opt+Control+NumPad +
   - Increase Nudge Value: Opt++, Cmd+Opt+NumPad +, Cmd+Opt+=
+  - Input Monitor Tracks with an Edit Selection: Shift+I
   - Insertion Follows Playback: N, Control+N
   - Link Timeline and Edit Selection: Shift+NumPad /, ?
   - Link Track And Edit Selection: Shift+T
@@ -203,11 +211,14 @@
   - Move Edit Insertion To Previous Edit - Extend Selection: Shift+Control+L, Opt+Shift+Tab, Shift+L
   - Move Edit Insertion To Previous Edit: L, Control+L, Opt+Tab
   - Move Edit Insertion To Session End - Extend Selection: Opt+Shift+Return
+  - Move Edit Insertion To Session End: Opt+Return
   - Move Edit Insertion To Session Start - Extend Selection: Shift+Return
+  - Move Edit Insertion To Song Start: Shift+Control+Return
   - Move Edit Selection To Next Clip - Extend Selection: Cmd+Control+", Shift+Control+Tab
   - Move Edit Selection To Next Clip: Cmd+Control+', Control+Tab
   - Move Edit Selection To Previous Clip - Extend Selection: Opt+Shift+Control+Tab, Cmd+Shift+Control+L
   - Move Edit Selection To Previous Clip: Opt+Control+Tab, Cmd+Control+L
+  - Mute Tracks with an Edit Selection: Shift+M
   - Mute Unmute Clip: Cmd+M
   - Nudge Clip Contents Earlier By Grid: Control+NumPad -
   - Nudge Clip Contents Later By Grid: Control+NumPad +
@@ -234,6 +245,7 @@
   - Quantize Clips: Cmd+NumPad 0, Cmd+0
   - QuickPunch: NumPad 6, Cmd+Shift+P
   - Quit: Cmd+Q
+  - Record Arm Tracks with an Edit Selection: Shift+R
   - Record Punch: F12, Cmd+Space, NumPad 3
   - Redo: Shift+Control+Z, Shift+Z, Cmd+Shift+Z
   - Rename Clips: Cmd+Opt+Shift+R
@@ -248,6 +260,7 @@
   - Slip Mode: F2, Opt+2
   - Snap To Next: Opt+Control+.
   - Snap To Previous: Opt+Control+,
+  - Solo Tracks with an Edit Selection: Shift+S
   - Space Clips: Opt+Shift+H
   - Spot Mode: F3, Opt+3
   - Tab to Transient: Cmd+Opt+Tab
