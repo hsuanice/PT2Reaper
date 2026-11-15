@@ -1,16 +1,17 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion To Session End
-@version 26.1115.1428pre1
+@version 26.1115.1513pre1
 @author hsuanice
 @noindex
 @changelog
-  - First implementation (was a stub).
+  - Session end = last item on a VISIBLE track (hidden tracks were counted: jumped far too late).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Move Edit Insertion To Session End**
   (PT key: Opt+Return)
 
-  Moves the edit insertion (edit cursor) to the session end = the end of the last item
+  Moves the edit insertion (edit cursor) to the session end = the end of the last item on a
+  visible track
   (same end as Move Edit Insertion To Session End - Extend Selection). The edit selection
   (time selection, razor areas) is collapsed to the insertion point; the view follows.
 
@@ -33,11 +34,18 @@ local function collapse_selection()
   end
 end
 
+-- Session end = end of the last item on a visible track (hidden tracks - archives, QuickPunch
+-- buffer tracks - are not part of the session you see)
 local session_end = 0
-for i = 0, r.CountMediaItems(0) - 1 do
-  local it = r.GetMediaItem(0, i)
-  local e = r.GetMediaItemInfo_Value(it, "D_POSITION") + r.GetMediaItemInfo_Value(it, "D_LENGTH")
-  if e > session_end then session_end = e end
+for ti = 0, r.CountTracks(0) - 1 do
+  local tr = r.GetTrack(0, ti)
+  if r.IsTrackVisible(tr, false) then
+    for ii = 0, r.CountTrackMediaItems(tr) - 1 do
+      local it = r.GetTrackMediaItem(tr, ii)
+      local e = r.GetMediaItemInfo_Value(it, "D_POSITION") + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+      if e > session_end then session_end = e end
+    end
+  end
 end
 
 r.PreventUIRefresh(1)

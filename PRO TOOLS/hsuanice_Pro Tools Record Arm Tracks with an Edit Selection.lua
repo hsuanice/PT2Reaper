@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Record Arm Tracks with an Edit Selection
-@version 26.1115.1428pre1
+@version 26.1115.1513pre1
 @author hsuanice
 @noindex
 @changelog
-  - First implementation (was a stub).
+  - Mixed selection: every track flips its own state, like Pro Tools (was: all made the same).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Record Arm Tracks with an Edit Selection**
@@ -12,7 +12,7 @@
 
   Record-arms / disarms the tracks of the Edit Selection: tracks with a razor area; with no razor area,
   the selected tracks; with neither, the tracks of the selected items.
-  Pro Tools style toggle: if any of these tracks is off, all go on; if all are on, all go off.
+  Pro Tools style toggle: every track flips its own state (a mixed selection stays mixed).
   Works like clicking the track button (track groups and REAPER's preferences apply).
 
   - Tags : Tracks, Editing
@@ -34,10 +34,10 @@ if #tracks == 0 then return r.defer(function() end) end
 
 r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
-local on = TE.toggle_all(tracks,
+local n_on, n_off = TE.toggle_each(tracks,
   function(tr) return r.GetMediaTrackInfo_Value(tr, "I_RECARM") == 1 end,
   function(tr, on) r.SetTrackUIRecArm(tr, on and 1 or 0, 0) end)
 r.PreventUIRefresh(-1)
 r.TrackList_AdjustWindows(false)
 r.UpdateArrange()
-r.Undo_EndBlock('Pro Tools: Record arm ' .. (on and 'on' or 'off') .. ' (' .. #tracks .. ' track' .. (#tracks == 1 and '' or 's') .. ')', -1)
+r.Undo_EndBlock('Pro Tools: Record arm toggle (' .. n_on .. ' on, ' .. n_off .. ' off)', -1)

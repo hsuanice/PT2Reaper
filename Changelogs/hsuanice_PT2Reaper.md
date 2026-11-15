@@ -2,6 +2,11 @@
 
 PT2Reaper package
 
+## 26.1115.1513pre1
+
+- Tracks with an Edit Selection: every track flips its own state, like Pro Tools (a mixed selection stays mixed).
+- Move Edit Insertion To Session End (+ Extend Selection): session end = last item on a visible track (hidden tracks made it jump far too late).
+
 ## 26.1115.1428pre1
 
 - New: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Move Edit Insertion To Session End / Song Start.

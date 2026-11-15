@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1115.1428pre1
+@version 26.1115.1513pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version: edit_tracks() + toggle_all() for the "... Tracks with an Edit Selection" actions.
+  - toggle_each(): every track flips its own state, like Pro Tools (a mixed selection stays mixed).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper "... Tracks with an Edit Selection" actions. Loaded with dofile().
@@ -35,18 +35,17 @@ function M.edit_tracks()
   return items
 end
 
--- Pro Tools style toggle for several tracks: if any track is off, all go on; if all are
--- on, all go off. is_on(track) -> bool, set(track, on).
--- Returns the new state (true / false) or nil when there is no track.
-function M.toggle_all(tracks, is_on, set)
-  if #tracks == 0 then return nil end
-  local all_on = true
+-- Pro Tools style toggle for several tracks: every track flips its own state (a mixed
+-- selection stays mixed - Pro Tools does not make them all the same).
+-- is_on(track) -> bool, set(track, on). Returns how many tracks went on and off.
+function M.toggle_each(tracks, is_on, set)
+  local n_on, n_off = 0, 0
   for _, tr in ipairs(tracks) do
-    if not is_on(tr) then all_on = false; break end
+    local on = not is_on(tr)
+    set(tr, on)
+    if on then n_on = n_on + 1 else n_off = n_off + 1 end
   end
-  local on = not all_on
-  for _, tr in ipairs(tracks) do set(tr, on) end
-  return on
+  return n_on, n_off
 end
 
 return M

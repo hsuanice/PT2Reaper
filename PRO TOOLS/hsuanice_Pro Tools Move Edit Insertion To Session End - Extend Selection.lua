@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection
-@version 26.1115.1407
+@version 26.1115.1513pre1
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Session end = last item on a VISIBLE track (hidden tracks were counted: jumped far too late).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools:
@@ -36,11 +35,12 @@ local function get_selected_tracks()
 end
 
 local function get_session_end()
-  -- Find the end of the last item in the project
+  -- Find the end of the last item on a visible track (hidden tracks - archives, QuickPunch
+  -- buffer tracks - are not part of the session you see)
   local session_end = 0
   for ti = 0, r.CountTracks(0)-1 do
     local tr = r.GetTrack(0, ti)
-    for ii = 0, r.CountTrackMediaItems(tr)-1 do
+    for ii = 0, (r.IsTrackVisible(tr, false) and r.CountTrackMediaItems(tr) or 0)-1 do
       local it  = r.GetTrackMediaItem(tr, ii)
       local pos = r.GetMediaItemInfo_Value(it, "D_POSITION")
       local len = r.GetMediaItemInfo_Value(it, "D_LENGTH")

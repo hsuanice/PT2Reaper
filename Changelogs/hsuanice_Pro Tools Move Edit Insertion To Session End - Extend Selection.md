@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection
 
+## 26.1115.1513pre1
+
+- Session end = last item on a VISIBLE track (hidden tracks were counted: jumped far too late).
+
 ## 26.1115.1407
 
 - First release of the PT2Reaper package (all Pro Tools actions in one package).
