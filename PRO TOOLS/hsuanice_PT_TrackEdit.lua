@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1115.1539pre1
+@version 26.1115.1548
 @author hsuanice
 @noindex
 @changelog

@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1548
+
+- Tested in REAPER: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.
+
 ## 26.1115.1539pre1
 
 - Move Edit Insertion Up / Down: the edit selection collapses to one track below / above its top track, like Pro Tools.

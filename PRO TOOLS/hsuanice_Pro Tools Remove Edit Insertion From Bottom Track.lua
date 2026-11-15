@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Remove Edit Insertion From Bottom Track
-@version 26.1115.1533pre1
+@version 26.1115.1548
 @author hsuanice
 @noindex
 @changelog

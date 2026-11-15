@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1539pre1
+@version 26.1115.1548
 @author hsuanice
 @metapackage
 @provides
@@ -138,7 +138,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Move Edit Insertion Up / Down: the edit selection collapses to one track below / above its top track, like Pro Tools.
+  - Tested in REAPER: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

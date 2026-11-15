@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion Down
-@version 26.1115.1539pre1
+@version 26.1115.1548
 @author hsuanice
 @noindex
 @changelog
