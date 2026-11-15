@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="PT2Reaper" commit="59c95687ba013c494c4b3e84fbdf920cc4353d47">
+<index version="1" name="PT2Reaper" commit="47ffa2b73bebeff806ed12ea2813194b34dfbdf6">
   <category name="PRO TOOLS">
     <reapack name="hsuanice_PT2Reaper.lua" type="script" desc="PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER">
       <metadata>
@@ -52,6 +52,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Identify Sync Point: Cmd+,\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Increase Grid Value: +, Opt+Control+NumPad +\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Increase Nudge Value: Opt++, Cmd+Opt+NumPad +, Cmd+Opt+=\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Input Monitor Tracks with an Edit Selection: Shift+I\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Insertion Follows Playback: N, Control+N\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Link Timeline and Edit Selection: Shift+NumPad /, ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Link Track And Edit Selection: Shift+T\par}
@@ -67,11 +68,14 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Previous Edit - Extend Selection: Shift+Control+L, Opt+Shift+Tab, Shift+L\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Previous Edit: L, Control+L, Opt+Tab\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Session End - Extend Selection: Opt+Shift+Return\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Session End: Opt+Return\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Session Start - Extend Selection: Shift+Return\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Insertion To Song Start: Shift+Control+Return\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Selection To Next Clip - Extend Selection: Cmd+Control+", Shift+Control+Tab\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Selection To Next Clip: Cmd+Control+', Control+Tab\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Selection To Previous Clip - Extend Selection: Opt+Shift+Control+Tab, Cmd+Shift+Control+L\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Move Edit Selection To Previous Clip: Opt+Control+Tab, Cmd+Control+L\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Mute Tracks with an Edit Selection: Shift+M\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Mute Unmute Clip: Cmd+M\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Nudge Clip Contents Earlier By Grid: Control+NumPad -\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Nudge Clip Contents Later By Grid: Control+NumPad +\par}
@@ -98,6 +102,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quantize Clips: Cmd+NumPad 0, Cmd+0\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab QuickPunch: NumPad 6, Cmd+Shift+P\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Quit: Cmd+Q\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Record Arm Tracks with an Edit Selection: Shift+R\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Record Punch: F12, Cmd+Space, NumPad 3\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Redo: Shift+Control+Z, Shift+Z, Cmd+Shift+Z\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Rename Clips: Cmd+Opt+Shift+R\par}
@@ -112,6 +117,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Slip Mode: F2, Opt+2\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Snap To Next: Opt+Control+.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Snap To Previous: Opt+Control+,\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Solo Tracks with an Edit Selection: Shift+S\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Space Clips: Opt+Shift+H\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Spot Mode: F3, Opt+3\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tab to Transient: Cmd+Opt+Tab\par}
@@ -255,6 +261,138 @@
         <source file="hsuanice_PT_Transient.lua">https://github.com/hsuanice/PT2Reaper/raw/59c95687ba013c494c4b3e84fbdf920cc4353d47/PRO%20TOOLS/hsuanice_PT_Transient.lua</source>
         <source file="hsuanice_PT_Transport.lua">https://github.com/hsuanice/PT2Reaper/raw/59c95687ba013c494c4b3e84fbdf920cc4353d47/PRO%20TOOLS/hsuanice_PT_Transport.lua</source>
         <source file="hsuanice_PT_Trim.lua">https://github.com/hsuanice/PT2Reaper/raw/59c95687ba013c494c4b3e84fbdf920cc4353d47/PRO%20TOOLS/hsuanice_PT_Trim.lua</source>
+      </version>
+      <version name="26.1115.1428pre1" author="hsuanice" time="2026-11-15T06:28:57Z">
+        <changelog><![CDATA[- New: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Move Edit Insertion To Session End / Song Start.
+- Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)]]></changelog>
+        <source main="main" file="hsuanice_Grid Nudge Panel.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Grid%20Nudge%20Panel.lua</source>
+        <source main="main" file="hsuanice_Grid_Nudge_Panel_Reset_Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Grid_Nudge_Panel_Reset_Position.lua</source>
+        <source main="main" file="hsuanice_PT_Transient Settings.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Transient%20Settings.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Apply Next Fade Shape.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Apply%20Next%20Fade%20Shape.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Apply Previous Fade Shape.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Apply%20Previous%20Fade%20Shape.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Clear All Soloed Tracks.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Clear%20All%20Soloed%20Tracks.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Clear.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Clear.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Consolidate Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Consolidate%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip End To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20End%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip End To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20End%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip Start To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20Start%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip Start To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20Start%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip Sync Point To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20Sync%20Point%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Copy and Move Clip Sync Point To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Copy%20and%20Move%20Clip%20Sync%20Point%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Create Fades.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Create%20Fades.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Decrease Grid Value.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Decrease%20Grid%20Value.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Decrease Nudge Value.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Decrease%20Nudge%20Value.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Delete Fades.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Delete%20Fades.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Delete Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Delete%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Double Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Double%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Duplicate.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Duplicate.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Edit Lock Clip.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Edit%20Lock%20Clip.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Execute Crossfade using last setting.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Execute%20Crossfade%20using%20last%20setting.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Fade In From Start To Cursor.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Fade%20In%20From%20Start%20To%20Cursor.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Fade Out From Cursor To End.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Fade%20Out%20From%20Cursor%20To%20End.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Grid Mode.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Grid%20Mode.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Group Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Group%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Halve Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Halve%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Heal Separation.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Heal%20Separation.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Identify Sync Point.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Identify%20Sync%20Point.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Increase Grid Value.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Increase%20Grid%20Value.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Increase Nudge Value.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Increase%20Nudge%20Value.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Input Monitor Tracks with an Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Input%20Monitor%20Tracks%20with%20an%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Insertion Follows Playback.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Insertion%20Follows%20Playback.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Link Timeline and Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Link%20Timeline%20and%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Link Track And Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Link%20Track%20And%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Loop Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Loop%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip End To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20End%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip End To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20End%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip Start To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20Start%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip Start To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20Start%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip Sync Point To Current TC.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20Sync%20Point%20To%20Current%20TC.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Clip Sync Point To Play Position.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Clip%20Sync%20Point%20To%20Play%20Position.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Next Edit - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Next%20Edit%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Next Edit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Next%20Edit.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Previous Edit - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Previous%20Edit%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Previous Edit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Previous%20Edit.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Session%20End%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Session End.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Session%20End.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Session Start - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Session%20Start%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Insertion To Song Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Insertion%20To%20Song%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Selection To Next Clip - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Selection%20To%20Next%20Clip%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Selection To Next Clip.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Selection%20To%20Next%20Clip.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Selection To Previous Clip - Extend Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Selection%20To%20Previous%20Clip%20-%20Extend%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Move Edit Selection To Previous Clip.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Move%20Edit%20Selection%20To%20Previous%20Clip.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Mute Tracks with an Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Mute%20Tracks%20with%20an%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Mute Unmute Clip.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Mute%20Unmute%20Clip.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Contents Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Contents%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Contents Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Contents%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip End Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20End%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip End Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20End%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Start Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Start%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Clip Start Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Clip%20Start%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Play Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Play%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Play Earlier By Next Larger Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Play%20Earlier%20By%20Next%20Larger%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Play Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Play%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Play Later By Next Larger Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Play%20Later%20By%20Next%20Larger%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection End - Selection Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Earlier%20By%20Grid%20-%20Selection%20End%20-%20Selection%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection End.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Earlier%20By%20Grid%20-%20Selection%20End.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Earlier%20By%20Grid%20-%20Selection%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Earlier By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Earlier%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End - Selection Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Later%20By%20Grid%20-%20Selection%20End%20-%20Selection%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Later%20By%20Grid%20-%20Selection%20End.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Later By Grid - Selection Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Later%20By%20Grid%20-%20Selection%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Nudge Selection Later By Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Nudge%20Selection%20Later%20By%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Play Half Speed.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Play%20Half%20Speed.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Play-Stop.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Play-Stop.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Quantize Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Quantize%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools QuickPunch.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20QuickPunch.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Quit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Quit.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Record Arm Tracks with an Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Record%20Arm%20Tracks%20with%20an%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Record Punch.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Record%20Punch.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Redo.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Redo.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Rename Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Rename%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Repeat.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Repeat.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Save As.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Save%20As.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Save.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Save.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Select All.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Select%20All.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Separate Clip At Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Separate%20Clip%20At%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Separate Clip At Transients.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Separate%20Clip%20At%20Transients.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Separate Clip On Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Separate%20Clip%20On%20Grid.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Shrink Edit Selection To Next Edit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Shrink%20Edit%20Selection%20To%20Next%20Edit.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Shrink Edit Selection To Previous Edit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Shrink%20Edit%20Selection%20To%20Previous%20Edit.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Shuffle Mode.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Shuffle%20Mode.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Slip Mode.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Slip%20Mode.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Snap To Next.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Snap%20To%20Next.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Snap To Previous.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Snap%20To%20Previous.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Solo Tracks with an Edit Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Solo%20Tracks%20with%20an%20Edit%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Space Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Space%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Spot Mode.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Spot%20Mode.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Tab to Transient.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Tab%20to%20Transient.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Time Lock Clip.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Time%20Lock%20Clip.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip End To Cursor.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20End%20To%20Cursor.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip End to Fill Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20End%20to%20Fill%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip Start To Cursor.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20Start%20To%20Cursor.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip Start To Fill Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20Start%20To%20Fill%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip To File Boundaries.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20To%20File%20Boundaries.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip To Fill Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20To%20Fill%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clip To Selection.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clip%20To%20Selection.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clips End To File End.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clips%20End%20To%20File%20End.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Trim Clips Start To File Start.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Trim%20Clips%20Start%20To%20File%20Start.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Undo.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Undo.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Ungroup Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Ungroup%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Unloop Clips.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Unloop%20Clips.lua</source>
+        <source main="main" file="hsuanice_Pro Tools Zoom Toggle.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_Pro%20Tools%20Zoom%20Toggle.lua</source>
+        <source file="hsuanice_PT_Fades.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Fades.lua</source>
+        <source file="hsuanice_PT_GFXInputField.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_GFXInputField.lua</source>
+        <source file="hsuanice_PT_Grid.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Grid.lua</source>
+        <source file="hsuanice_PT_Nudge.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Nudge.lua</source>
+        <source file="hsuanice_PT_NudgeEdge.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_NudgeEdge.lua</source>
+        <source file="hsuanice_PT_QuickPunch Pass Monitor.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_QuickPunch%20Pass%20Monitor.lua</source>
+        <source file="hsuanice_PT_QuickPunch.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_QuickPunch.lua</source>
+        <source file="hsuanice_PT_TrackEdit.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_TrackEdit.lua</source>
+        <source file="hsuanice_PT_Transient.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Transient.lua</source>
+        <source file="hsuanice_PT_Transport.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Transport.lua</source>
+        <source file="hsuanice_PT_Trim.lua">https://github.com/hsuanice/PT2Reaper/raw/47ffa2b73bebeff806ed12ea2813194b34dfbdf6/PRO%20TOOLS/hsuanice_PT_Trim.lua</source>
       </version>
     </reapack>
   </category>
