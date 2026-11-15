@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion To Session End
-@version 26.1115.1513pre1
+@version 26.1115.1524pre1
 @author hsuanice
 @noindex
 @changelog
-  - Session end = last item on a VISIBLE track (hidden tracks were counted: jumped far too late).
+  - Clears every kind of selection: time selection, loop points, razor areas, item selection (track selection stays).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Move Edit Insertion To Session End**
@@ -12,8 +12,9 @@
 
   Moves the edit insertion (edit cursor) to the session end = the end of the last item on a
   visible track
-  (same end as Move Edit Insertion To Session End - Extend Selection). The edit selection
-  (time selection, razor areas) is collapsed to the insertion point; the view follows.
+  (same end as Move Edit Insertion To Session End - Extend Selection). Every kind of selection
+  (time selection, loop points, razor areas, item selection) is cleared; the track
+  selection stays. The view follows.
 
   - Tags : Selection, Editing
   Built with AI: written with Claude Code (Anthropic); designed and tested by hsuanice.
@@ -23,15 +24,17 @@
 
 local r = reaper
 
--- Edit insertion only: the edit selection (time selection + razor areas) is collapsed;
--- the track selection stays (it marks where the insertion is).
+-- Edit insertion only: every kind of selection is cleared - time selection, loop points,
+-- razor areas and item selection. The track selection stays (it marks where the insertion is).
 local function collapse_selection()
-  r.GetSet_LoopTimeRange(true, false, 0, 0, false)
+  r.GetSet_LoopTimeRange(true, false, 0, 0, false) -- time selection
+  r.GetSet_LoopTimeRange(true, true, 0, 0, false)  -- loop points
   for i = 0, r.CountTracks(0) - 1 do
     local tr = r.GetTrack(0, i)
     local _, rz = r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", false)
     if rz and rz ~= "" then r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", true) end
   end
+  r.SelectAllMediaItems(0, false)                  -- item selection
 end
 
 -- Session end = end of the last item on a visible track (hidden tracks - archives, QuickPunch

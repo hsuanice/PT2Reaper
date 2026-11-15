@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1524pre1
+
+- Return To Zero, Move Edit Insertion To Song Start / Session End: clear every kind of selection (time selection, loop points, razor areas, item selection); track selection stays.
+
 ## 26.1115.1519pre1
 
 - Tracks with an Edit Selection: each track really flips its own state (no selection ganging).

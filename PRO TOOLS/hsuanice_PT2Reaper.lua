@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1519pre1
+@version 26.1115.1524pre1
 @author hsuanice
 @metapackage
 @provides
@@ -134,8 +134,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tracks with an Edit Selection: each track really flips its own state (no selection ganging).
-  - New: Return To Zero - edit cursor to the project start, edit selection cleared.
+  - Return To Zero, Move Edit Insertion To Song Start / Session End: clear every kind of selection (time selection, loop points, razor areas, item selection); track selection stays.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
