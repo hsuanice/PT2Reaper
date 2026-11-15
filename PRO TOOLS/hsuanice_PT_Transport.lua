@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.2111pre1
+@version 26.1115.2121pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
+  - play_range() home: the playhead (edit cursor) can stay where it is while another range plays (Play Edit Selection).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -128,7 +128,7 @@ function T.watch_get()
   local a, b = r.GetExtState(T.NS, "watch"):match("^([^,]+),([^,]+)$")
   return tonumber(a), tonumber(b)
 end
-function T.watch_clear() r.SetExtState(T.NS, "watch", "", false) end
+function T.watch_clear() r.SetExtState(T.NS, "watch", "", false); r.SetExtState(T.NS, "watch_home", "", false) end
 
 local function ensure_watcher()
   local hb = tonumber(r.GetExtState(T.NS, "watcher_hb"))
@@ -139,32 +139,44 @@ end
 
 -- Start (or restart) playback at s and stop at e. Playing already: seek to s.
 -- after_qp: wait until the QuickPunch pass is finished, then start.
-function T.play_range(s, e, after_qp)
+-- home (optional): where the edit cursor (playhead) stays - playback runs from s, the edit
+-- cursor goes back to home at once and stays there (Play Edit Selection: the playhead /
+-- Timeline position is not lost). Without it, the playhead is s.
+function T.play_range(s, e, after_qp, home)
   r.SetExtState(T.NS, "watch", string.format("%.10f,%.10f", s, e), false)
+  r.SetExtState(T.NS, "watch_home", home and string.format("%.10f", home) or "", false)
   if after_qp then
     r.SetExtState(T.NS, "wait_qp", "1", false)
   else
     r.SetExtState(T.NS, "wait_qp", "", false)
-    if T.is_running() then
-      r.SetEditCurPos2(0, s, false, true) -- seek
-    else
-      r.SetEditCurPos2(0, s, true, false)
-      r.Main_OnCommand(CMD_PLAY, 0)
-    end
+    T.start_at(s, home)
   end
   ensure_watcher()
 end
 
+-- Playback from s (seek when already playing); then the edit cursor back to home (no seek)
+function T.start_at(s, home)
+  if T.is_running() then
+    r.SetEditCurPos2(0, s, false, true) -- seek
+  else
+    r.SetEditCurPos2(0, s, true, false)
+    r.Main_OnCommand(CMD_PLAY, 0)
+  end
+  if home then r.SetEditCurPos2(0, home, false, false) end
+end
+
+function T.watch_home() return tonumber(r.GetExtState(T.NS, "watch_home")) end
+
 -- What happens when playback reaches the range end (Pro Tools):
 --   Insertion Follows on : stop at the end, clear the Timeline Selection
---   off                  : stop, back to the range start, everything kept
-function T.range_end(s, e)
+--   off                  : stop, back to the range start (or the playhead it kept), all kept
+function T.range_end(s, e, home)
   r.Main_OnCommand(CMD_STOP, 0)
   if T.follows() then
     r.SetEditCurPos2(0, e, false, false)
     T.clear_timeline()
   else
-    r.SetEditCurPos2(0, s, false, false)
+    r.SetEditCurPos2(0, home or s, false, false)
   end
   r.UpdateArrange()
 end

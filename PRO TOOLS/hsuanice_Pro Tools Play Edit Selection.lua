@@ -1,19 +1,20 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1115.2111pre1
+@version 26.1115.2121pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
+  - The playhead (edit cursor) stays where it was while the Edit Selection plays - the Timeline position is not lost.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**
   (PT key: Control+[, Option+[)
 
   Plays the Edit Selection (razor areas, else the time selection) and stops at its end.
-  Insertion Follows Playback on: the edit cursor stays at the end and the Timeline Selection
-  is cleared (the loop points; razor areas and the time selection are kept); off: back to the selection
-  start, selections kept. The Edit Selection is never cleared.
+  The playhead (edit cursor, the Timeline position) stays where it is while the selection
+  plays. Insertion Follows Playback on: when playback stops, the edit cursor goes to the
+  stop position (at the end: the selection end) and the Timeline Selection (loop points) is
+  cleared; off: the edit cursor is still where it was. The Edit Selection is never cleared.
   Pressed while playing: plays the selection again from its start.
   No selection: plays from the edit cursor (like Play).
   During a QuickPunch pass: ends the recording, then plays.
@@ -40,11 +41,15 @@ T.reset_half_speed()
 T.refresh_follows_button()
 
 local s, e = T.edit_range()
+-- the playhead (edit cursor) is the Timeline position: it stays where it is while the Edit
+-- Selection plays (a retrigger keeps the one it had)
+local home = T.watch_home() or r.GetCursorPosition()
+if not T.is_running() then home = r.GetCursorPosition() end
 if QP.pass_active() and T.is_running() then
   QP.stop(T.follows())
-  if s then T.play_range(s, e, true) else T.play_range(r.GetCursorPosition(), 1e12, true) end
+  if s then T.play_range(s, e, true, r.GetCursorPosition()) else T.play_range(r.GetCursorPosition(), 1e12, true) end
 elseif s then
-  T.play_range(s, e)
+  T.play_range(s, e, false, home)
 elseif not T.is_running() then
   T.play()
 end

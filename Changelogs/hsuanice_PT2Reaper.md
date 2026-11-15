@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2121pre1
+
+- Play Edit Selection: the playhead (edit cursor) stays where it was while the Edit Selection plays.
+
 ## 26.1115.2111pre1
 
 - Timeline Selection = the loop points only; Insertion Follows Playback on clears only the loop points - razor areas and the time selection are always kept.

@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Edit Selection
 
+## 26.1115.2121pre1
+
+- The playhead (edit cursor) stays where it was while the Edit Selection plays - the Timeline position is not lost.
+
 ## 26.1115.2111pre1
 
 - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.

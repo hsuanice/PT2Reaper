@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1115.2121pre1
+
+- play_range() home: the playhead (edit cursor) can stay where it is while another range plays (Play Edit Selection).
+
 ## 26.1115.2111pre1
 
 - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.

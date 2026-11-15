@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
-@version 26.1115.2045pre1
+@version 26.1115.2121pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version.
+  - Keeps the playhead where it was when a range plays with a home position (Play Edit Selection).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Background helper of Play/Stop, Play Edit Selection and Play Timeline Selection.
@@ -49,8 +49,7 @@ local function loop()
       return r.defer(loop)
     end
     r.SetExtState(T.NS, "wait_qp", "", false)
-    r.SetEditCurPos2(0, s, true, false)
-    r.Main_OnCommand(1007, 0) -- Transport: Play
+    T.start_at(s, T.watch_home())
     since = r.time_precise()
     return r.defer(loop)
   end
@@ -68,8 +67,9 @@ local function loop()
     if r.GetSetRepeat(-1) == 1 then
       r.SetEditCurPos2(0, s, false, true)
     else
+      local home = T.watch_home()
       T.watch_clear()
-      T.range_end(s, e)
+      T.range_end(s, e, home)
       return finish()
     end
   end
