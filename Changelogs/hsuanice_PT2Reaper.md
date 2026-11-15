@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2125pre1
+
+- Insertion Follows Playback on + Link Timeline and Edit Selection on: the Edit Selection is cleared together with the loop points.
+
 ## 26.1115.2121pre1
 
 - Play Edit Selection: the playhead (edit cursor) stays where it was while the Edit Selection plays.

@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.2121pre1
+@version 26.1115.2125pre1
 @author hsuanice
 @metapackage
 @provides
@@ -147,7 +147,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Play Edit Selection: the playhead (edit cursor) stays where it was while the Edit Selection plays.
+  - Insertion Follows Playback on + Link Timeline and Edit Selection on: the Edit Selection is cleared together with the loop points.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

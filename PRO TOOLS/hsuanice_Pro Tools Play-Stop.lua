@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1115.2111pre1
+@version 26.1115.2125pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
+  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play/Stop**
@@ -16,8 +16,8 @@
   record-armed tracks, the play is a QuickPunch pass instead (background recording,
   punch with Record Punch or automatically at the time selection / selected items).
   Playing: stops. Insertion Follows Playback on: the edit cursor stays where playback
-  stopped and the Timeline Selection (loop points) is cleared, razor areas and the time
-  selection are kept; off: back
+  stopped and the Timeline Selection (loop points) is cleared (Link Timeline and Edit
+  Selection on: the Edit Selection too - razor areas, time selection); off: back
   to where playback started, selections kept. Stopping also ends a half speed play.
   Credits: behaviour modelled on TJF Scripts by Tim Farrell (github.com/sonictim/TJF-Scripts):
   TJF playback that reads insertion toggle, TJF Toggle Insertion follows Playback,

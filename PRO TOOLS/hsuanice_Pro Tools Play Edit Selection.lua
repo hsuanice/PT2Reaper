@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1115.2121pre1
+@version 26.1115.2125pre1
 @author hsuanice
 @noindex
 @changelog
-  - The playhead (edit cursor) stays where it was while the Edit Selection plays - the Timeline position is not lost.
+  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**
@@ -14,7 +14,8 @@
   The playhead (edit cursor, the Timeline position) stays where it is while the selection
   plays. Insertion Follows Playback on: when playback stops, the edit cursor goes to the
   stop position (at the end: the selection end) and the Timeline Selection (loop points) is
-  cleared; off: the edit cursor is still where it was. The Edit Selection is never cleared.
+  cleared - with Link Timeline and Edit Selection on, the Edit Selection too; off: the edit
+  cursor is still where it was, selections kept.
   Pressed while playing: plays the selection again from its start.
   No selection: plays from the edit cursor (like Play).
   During a QuickPunch pass: ends the recording, then plays.

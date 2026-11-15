@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Edit Selection
 
+## 26.1115.2125pre1
+
+- Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+
 ## 26.1115.2121pre1
 
 - The playhead (edit cursor) stays where it was while the Edit Selection plays - the Timeline position is not lost.

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1115.2111pre1
+@version 26.1115.2125pre1
 @author hsuanice
 @noindex
 @changelog
-  - Timeline Selection = the loop points only; Insertion Follows Playback on clears only them (razor areas and time selection kept).
+  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**
@@ -14,7 +14,7 @@
   (never stops). Insertion Follows Playback on: the edit cursor stays at the end and the
   Timeline Selection is cleared; off: back to its start, selections kept.
   Pressed while playing (retrigger): Insertion Follows Playback on - plays again from where
-  playback is now and clears the Timeline Selection; off - from the selection start
+  playback is now and clears the Timeline Selection (linked: the Edit Selection too); off - from the selection start
   (no selection: the edit cursor).
   No selection: plays from the edit cursor.
   During a QuickPunch pass: ends the recording, then plays.

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.2121pre1
+@version 26.1115.2125pre1
 @author hsuanice
 @noindex
 @changelog
-  - play_range() home: the playhead (edit cursor) can stay where it is while another range plays (Play Edit Selection).
+  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -112,9 +112,14 @@ function T.timeline_range()
   if le > ls + EPS then return ls, le end
 end
 
--- Insertion Follows Playback on: stopping clears the Timeline Selection = the loop points
--- only. Razor areas and the time selection (Edit Selection) are always kept, linked or not.
+-- Insertion Follows Playback on: stopping clears the Timeline Selection (the loop points).
+-- Link Timeline and Edit Selection on: the Edit Selection is linked to it and is cleared too
+-- (razor areas, time selection); off: the Edit Selection is kept.
 function T.clear_timeline()
+  if T.linked() then
+    r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
+    r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
+  end
   r.GetSet_LoopTimeRange2(0, true, true, 0, 0, false)
 end
 

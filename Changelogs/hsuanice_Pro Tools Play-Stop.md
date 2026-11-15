@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1115.2125pre1
+
+- Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+
 ## 26.1115.2111pre1
 
 - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
