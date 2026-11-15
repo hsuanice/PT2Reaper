@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1115.2057pre1
+@version 26.1115.2100pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pressed while playing: always plays again from the start (Insertion Follows Playback on too).
+  - Retrigger while playing: Insertion Follows Playback on plays again from the playhead; off from the selection start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**
@@ -14,7 +14,8 @@
   the razor areas / time selection) and stops at its end - like Space, but it always plays
   (never stops). Insertion Follows Playback on: the edit cursor stays at the end and the
   Timeline Selection is cleared; off: back to its start, selections kept.
-  Pressed while playing: plays again from the selection start (retrigger).
+  Pressed while playing (retrigger): Insertion Follows Playback on - plays again from where
+  playback is now; off - from the selection start (no selection: the edit cursor).
   No selection: plays from the edit cursor.
   During a QuickPunch pass: ends the recording, then plays.
 
@@ -44,8 +45,16 @@ if QP.pass_active() and T.is_running() then
   QP.stop(T.follows())
   if s then T.play_range(s, e, true) else T.play_range(r.GetCursorPosition(), 1e12, true) end
 elseif T.is_running() then
-  -- retrigger: play again from the Timeline Selection start, else from the edit cursor
-  if s then T.play_range(s, e) else T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true) end
+  -- retrigger. Insertion Follows Playback on: from where playback is now (the insertion
+  -- follows it; a running selection play still stops at its end); off: from the Timeline
+  -- Selection start, else from the edit cursor.
+  if T.follows() then
+    r.SetEditCurPos2(0, r.GetPlayPosition(), false, true)
+  elseif s then
+    T.play_range(s, e)
+  else
+    T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true)
+  end
 elseif s then
   T.play_range(s, e)
 else

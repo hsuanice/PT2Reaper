@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2100pre1
+
+- Play Timeline Selection: retrigger while playing - Insertion Follows Playback on from the playhead, off from the selection start.
+
 ## 26.1115.2057pre1
 
 - Play Timeline Selection: pressed while playing always plays again from the start.

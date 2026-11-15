@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1115.2100pre1
+
+- Retrigger while playing: Insertion Follows Playback on plays again from the playhead; off from the selection start.
+
 ## 26.1115.2057pre1
 
 - Pressed while playing: always plays again from the start (Insertion Follows Playback on too).
