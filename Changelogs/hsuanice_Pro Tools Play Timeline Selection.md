@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1115.2111pre1
+
+- Timeline Selection = the loop points only; Insertion Follows Playback on clears only them (razor areas and time selection kept).
+
 ## 26.1115.2104pre1
 
 - Retrigger with Insertion Follows Playback on also clears the Timeline Selection (Pro Tools).

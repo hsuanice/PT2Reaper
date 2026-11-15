@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.2104pre1
+@version 26.1115.2111pre1
 @author hsuanice
 @metapackage
 @provides
@@ -147,7 +147,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Play Timeline Selection: retrigger with Insertion Follows Playback on clears the Timeline Selection.
+  - Timeline Selection = the loop points only; Insertion Follows Playback on clears only the loop points - razor areas and the time selection are always kept.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

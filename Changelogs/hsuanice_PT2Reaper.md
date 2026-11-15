@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2111pre1
+
+- Timeline Selection = the loop points only; Insertion Follows Playback on clears only the loop points - razor areas and the time selection are always kept.
+
 ## 26.1115.2104pre1
 
 - Play Timeline Selection: retrigger with Insertion Follows Playback on clears the Timeline Selection.

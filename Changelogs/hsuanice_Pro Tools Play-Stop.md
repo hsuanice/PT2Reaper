@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1115.2111pre1
+
+- Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
+
 ## 26.1115.2045pre1
 
 - First release of the PT2Reaper package (all Pro Tools actions in one package).

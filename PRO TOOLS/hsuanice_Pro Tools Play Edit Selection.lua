@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1115.2045pre1
+@version 26.1115.2111pre1
 @author hsuanice
 @noindex
 @changelog
-  - Rewritten: Pro Tools behaviour with Insertion Follows Playback and Link Timeline and Edit Selection; stops at the selection end (Play Watcher, no task control dialog).
+  - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**
@@ -12,9 +12,8 @@
 
   Plays the Edit Selection (razor areas, else the time selection) and stops at its end.
   Insertion Follows Playback on: the edit cursor stays at the end and the Timeline Selection
-  is cleared (the loop points; linked: the Edit Selection too); off: back to the selection
-  start, selections kept. With Link Timeline and Edit Selection off the Edit Selection is
-  never cleared.
+  is cleared (the loop points; razor areas and the time selection are kept); off: back to the selection
+  start, selections kept. The Edit Selection is never cleared.
   Pressed while playing: plays the selection again from its start.
   No selection: plays from the edit cursor (like Play).
   During a QuickPunch pass: ends the recording, then plays.

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.2053pre1
+@version 26.1115.2111pre1
 @author hsuanice
 @noindex
 @changelog
-  - Fix: with no Timeline Selection, playback starts at the edit cursor (Link off: the Edit Selection no longer moves the play start).
+  - Insertion Follows Playback on clears only the Timeline Selection (loop points); razor areas and the time selection are always kept.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -54,7 +54,7 @@ end
 
 -- Where playback starts: the start of the Timeline Selection, else the edit cursor.
 -- The edit cursor is neutral (Pro Tools): a time selection that is only the Edit Selection
--- (Link Timeline and Edit Selection off) does not move the play start.
+-- (razor areas / time selection) does not move the play start.
 function T.start_position()
   local s = T.timeline_range()
   return s or r.GetCursorPosition()
@@ -80,9 +80,9 @@ end
 ------------------------------------------------------------------------------
 -- Selections (Pro Tools -> REAPER)
 --   Edit Selection     = razor areas (union of track-level areas), else the time selection
---   Timeline Selection = the loop points; with Link Timeline and Edit Selection on
---                        (REAPER 40621, loop points linked to time selection) it is the
---                        Edit Selection (one selection)
+--   Timeline Selection = the loop points (always; with Link Timeline and Edit Selection on,
+--                        REAPER 40621 makes them follow the time selection)
+--   The edit cursor is the playhead and belongs to neither selection.
 ------------------------------------------------------------------------------
 local EPS = 1e-9
 local CMD_LINK = 40621
@@ -108,18 +108,13 @@ function T.edit_range()
 end
 
 function T.timeline_range()
-  if T.linked() then return T.edit_range() end
   local ls, le = r.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
   if le > ls + EPS then return ls, le end
 end
 
--- Insertion Follows Playback on: stopping clears the Timeline Selection
--- (linked: that is the Edit Selection too - razor areas and time selection).
+-- Insertion Follows Playback on: stopping clears the Timeline Selection = the loop points
+-- only. Razor areas and the time selection (Edit Selection) are always kept, linked or not.
 function T.clear_timeline()
-  if T.linked() then
-    r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
-    r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
-  end
   r.GetSet_LoopTimeRange2(0, true, true, 0, 0, false)
 end
 
