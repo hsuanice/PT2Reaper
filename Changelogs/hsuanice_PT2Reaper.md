@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2128
+
+- Tested in REAPER: Play/Stop, Play Edit Selection, Play Timeline Selection with Pro Tools Insertion Follows Playback / Link rules.
+
 ## 26.1115.2125pre1
 
 - Insertion Follows Playback on + Link Timeline and Edit Selection on: the Edit Selection is cleared together with the loop points.

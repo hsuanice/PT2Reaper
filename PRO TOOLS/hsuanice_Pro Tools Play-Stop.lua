@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1115.2125pre1
+@version 26.1115.2128
 @author hsuanice
 @noindex
 @changelog
