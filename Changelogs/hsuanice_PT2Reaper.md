@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1638
+
+- Tested in REAPER: Extend Edit Insertion Up / Down.
+
 ## 26.1115.1555pre1
 
 - New: Extend Edit Insertion Up / Down (the selection only grows by one track).

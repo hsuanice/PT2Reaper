@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Extend Edit Insertion Up
-@version 26.1115.1555pre1
+@version 26.1115.1638
 @author hsuanice
 @noindex
 @changelog
