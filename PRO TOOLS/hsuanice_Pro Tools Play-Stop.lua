@@ -1,22 +1,24 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1115.1407
+@version 26.1115.2045pre1
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Pro Tools: plays the Timeline Selection and stops at its end; Insertion Follows Playback on: stop clears the Timeline Selection (linked: the Edit Selection too).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play/Stop**
   (PT key: Space, NumPad 0)
 
-  Stopped: plays from the start of the time selection, else from the edit cursor.
+  Stopped: plays the Timeline Selection (the loop points; with Link Timeline and Edit
+  Selection on, the razor areas / time selection) and stops at its end; with no selection,
+  plays from the edit cursor.
   With QuickPunch on (QuickPunch toggle, or an auto-punch record mode) and
   record-armed tracks, the play is a QuickPunch pass instead (background recording,
   punch with Record Punch or automatically at the time selection / selected items).
-  Playing: stops. With Insertion Follows Playback on, the edit cursor stays where
-  playback stopped. Stopping also ends a half speed play.
+  Playing: stops. Insertion Follows Playback on: the edit cursor stays where playback
+  stopped and the Timeline Selection is cleared (linked: the Edit Selection too); off: back
+  to where playback started, selections kept. Stopping also ends a half speed play.
   Credits: behaviour modelled on TJF Scripts by Tim Farrell (github.com/sonictim/TJF-Scripts):
   TJF playback that reads insertion toggle, TJF Toggle Insertion follows Playback,
   TJF Playback at Half Speed once.
@@ -43,11 +45,14 @@ T.refresh_follows_button()
 QP.disarm_buffers()
 
 if T.is_running() then
+  T.watch_clear()
   T.before_stop()
   if QP.pass_active() then QP.stop(T.follows()) else r.Main_OnCommand(1016, 0) end
+  if T.follows() then T.clear_timeline() end -- Pro Tools: N on clears the Timeline Selection
 elseif QP.mode_on() then
   if QP.start_pass(false, T.start_position()) == "none" then T.play() end
 else
-  T.play()
+  local s, e = T.timeline_range()
+  if s then T.play_range(s, e) else T.play() end
 end
 r.defer(function() end) -- no "ReaScript: Run" undo point (the pass makes its own)

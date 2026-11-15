@@ -20,6 +20,7 @@
 !/PRO TOOLS/hsuanice_PT_MouseSelect.lua
 !/PRO TOOLS/hsuanice_PT_Nudge.lua
 !/PRO TOOLS/hsuanice_PT_NudgeEdge.lua
+!/PRO TOOLS/hsuanice_PT_Play Watcher.lua
 !/PRO TOOLS/hsuanice_PT_QuickPunch Pass Monitor.lua
 !/PRO TOOLS/hsuanice_PT_QuickPunch.lua
 !/PRO TOOLS/hsuanice_PT_TrackEdit.lua
@@ -108,7 +109,9 @@
 !/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End.lua
 !/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid - Selection Start.lua
 !/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Play Edit Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Play Half Speed.lua
+!/PRO TOOLS/hsuanice_Pro Tools Play Timeline Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Play-Stop.lua
 !/PRO TOOLS/hsuanice_Pro Tools Quantize Clips.lua
 !/PRO TOOLS/hsuanice_Pro Tools QuickPunch.lua

@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1932
+@version 26.1115.2045pre1
 @author hsuanice
 @metapackage
 @provides
@@ -88,7 +88,9 @@
   [main] hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End.lua
   [main] hsuanice_Pro Tools Nudge Selection Later By Grid - Selection Start.lua
   [main] hsuanice_Pro Tools Nudge Selection Later By Grid.lua
+  [main] hsuanice_Pro Tools Play Edit Selection.lua
   [main] hsuanice_Pro Tools Play Half Speed.lua
+  [main] hsuanice_Pro Tools Play Timeline Selection.lua
   [main] hsuanice_Pro Tools Play-Stop.lua
   [main] hsuanice_Pro Tools Quantize Clips.lua
   [main] hsuanice_Pro Tools QuickPunch.lua
@@ -137,6 +139,7 @@
   [nomain] hsuanice_PT_MouseSelect.lua
   [nomain] hsuanice_PT_Nudge.lua
   [nomain] hsuanice_PT_NudgeEdge.lua
+  [nomain] hsuanice_PT_Play Watcher.lua
   [nomain] hsuanice_PT_QuickPunch Pass Monitor.lua
   [nomain] hsuanice_PT_QuickPunch.lua
   [nomain] hsuanice_PT_TrackEdit.lua
@@ -144,7 +147,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Mouse - Shift-Click Extends Edit Selection, Double-Click Selects Gap Between Clips, Shift-Double-Click Extends Edit Selection Over Gap.
+  - Play Edit Selection / Play Timeline Selection / Play-Stop: Pro Tools behaviour - stop at the selection end; Insertion Follows Playback and Link Timeline and Edit Selection decide where playback ends and what is cleared.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -258,7 +261,9 @@
   - Nudge Selection Later By Grid - Selection End: Cmd+Shift+NumPad +
   - Nudge Selection Later By Grid - Selection Start: Opt+Shift+NumPad +
   - Nudge Selection Later By Grid: Shift+NumPad +
+  - Play Edit Selection: Control+[, Opt+[
   - Play Half Speed: Shift+Space
+  - Play Timeline Selection: Control+], Opt+]
   - Play-Stop: NumPad 0, Space
   - Quantize Clips: Cmd+NumPad 0, Cmd+0
   - QuickPunch: NumPad 6, Cmd+Shift+P

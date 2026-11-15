@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.1407
+@version 26.1115.2045pre1
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Edit / Timeline Selection helpers, play_range() + Play Watcher (stop at the selection end), Pro Tools end rules.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -75,6 +74,103 @@ end
 function T.stop()
   T.before_stop()
   r.Main_OnCommand(CMD_STOP, 0)
+end
+
+------------------------------------------------------------------------------
+-- Selections (Pro Tools -> REAPER)
+--   Edit Selection     = razor areas (union of track-level areas), else the time selection
+--   Timeline Selection = the loop points; with Link Timeline and Edit Selection on
+--                        (REAPER 40621, loop points linked to time selection) it is the
+--                        Edit Selection (one selection)
+------------------------------------------------------------------------------
+local EPS = 1e-9
+local CMD_LINK = 40621
+T.WATCHER_SCRIPT = (debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or '') .. "hsuanice_PT_Play Watcher.lua"
+
+function T.linked() return r.GetToggleCommandState(CMD_LINK) == 1 end
+
+function T.edit_range()
+  local s, e
+  for i = 0, r.CountTracks(0) - 1 do
+    local _, str = r.GetSetMediaTrackInfo_String(r.GetTrack(0, i), "P_RAZOREDITS", "", false)
+    for a, b, g in (str or ""):gmatch('(%S+)%s+(%S+)%s+"([^"]*)"') do
+      local x, y = tonumber(a), tonumber(b)
+      if g == "" and x and y and y > x + EPS then
+        s = s and math.min(s, x) or x
+        e = e and math.max(e, y) or y
+      end
+    end
+  end
+  if s then return s, e end
+  local ts, te = r.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+  if te > ts + EPS then return ts, te end
+end
+
+function T.timeline_range()
+  if T.linked() then return T.edit_range() end
+  local ls, le = r.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
+  if le > ls + EPS then return ls, le end
+end
+
+-- Insertion Follows Playback on: stopping clears the Timeline Selection
+-- (linked: that is the Edit Selection too - razor areas and time selection).
+function T.clear_timeline()
+  if T.linked() then
+    r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
+    r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
+  end
+  r.GetSet_LoopTimeRange2(0, true, true, 0, 0, false)
+end
+
+------------------------------------------------------------------------------
+-- Play a range and stop at its end (Pro Tools Play Edit / Timeline Selection, Space)
+-- The key scripts end at once; "hsuanice_PT_Play Watcher.lua" (a separate defer script,
+-- launched when it is not running) stops playback at the range end. State in ExtState:
+--   watch = "start,end" (empty = nothing to watch), wait_qp = "1" (start after QuickPunch)
+------------------------------------------------------------------------------
+function T.watch_get()
+  local a, b = r.GetExtState(T.NS, "watch"):match("^([^,]+),([^,]+)$")
+  return tonumber(a), tonumber(b)
+end
+function T.watch_clear() r.SetExtState(T.NS, "watch", "", false) end
+
+local function ensure_watcher()
+  local hb = tonumber(r.GetExtState(T.NS, "watcher_hb"))
+  if hb and r.time_precise() - hb < 1 then return end
+  local cmd = r.AddRemoveReaScript(true, 0, T.WATCHER_SCRIPT, true)
+  if cmd and cmd ~= 0 then r.Main_OnCommand(cmd, 0) end
+end
+
+-- Start (or restart) playback at s and stop at e. Playing already: seek to s.
+-- after_qp: wait until the QuickPunch pass is finished, then start.
+function T.play_range(s, e, after_qp)
+  r.SetExtState(T.NS, "watch", string.format("%.10f,%.10f", s, e), false)
+  if after_qp then
+    r.SetExtState(T.NS, "wait_qp", "1", false)
+  else
+    r.SetExtState(T.NS, "wait_qp", "", false)
+    if T.is_running() then
+      r.SetEditCurPos2(0, s, false, true) -- seek
+    else
+      r.SetEditCurPos2(0, s, true, false)
+      r.Main_OnCommand(CMD_PLAY, 0)
+    end
+  end
+  ensure_watcher()
+end
+
+-- What happens when playback reaches the range end (Pro Tools):
+--   Insertion Follows on : stop at the end, clear the Timeline Selection
+--   off                  : stop, back to the range start, everything kept
+function T.range_end(s, e)
+  r.Main_OnCommand(CMD_STOP, 0)
+  if T.follows() then
+    r.SetEditCurPos2(0, e, false, false)
+    T.clear_timeline()
+  else
+    r.SetEditCurPos2(0, s, false, false)
+  end
+  r.UpdateArrange()
 end
 
 return T

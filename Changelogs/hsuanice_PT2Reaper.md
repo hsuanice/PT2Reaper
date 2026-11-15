@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2045pre1
+
+- Play Edit Selection / Play Timeline Selection / Play-Stop: Pro Tools behaviour - stop at the selection end; Insertion Follows Playback and Link Timeline and Edit Selection decide where playback ends and what is cleared.
+
 ## 26.1115.1932
 
 - Tested in REAPER: Mouse - Shift-Click Extends Edit Selection, Double-Click Selects Gap Between Clips, Shift-Double-Click Extends Edit Selection Over Gap.
