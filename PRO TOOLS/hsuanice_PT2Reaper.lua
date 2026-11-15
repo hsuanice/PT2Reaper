@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1548
+@version 26.1115.1555pre1
 @author hsuanice
 @metapackage
 @provides
@@ -27,6 +27,8 @@
   [main] hsuanice_Pro Tools Duplicate.lua
   [main] hsuanice_Pro Tools Edit Lock Clip.lua
   [main] hsuanice_Pro Tools Execute Crossfade using last setting.lua
+  [main] hsuanice_Pro Tools Extend Edit Insertion Down.lua
+  [main] hsuanice_Pro Tools Extend Edit Insertion Up.lua
   [main] hsuanice_Pro Tools Fade In From Start To Cursor.lua
   [main] hsuanice_Pro Tools Fade Out From Cursor To End.lua
   [main] hsuanice_Pro Tools Grid Mode.lua
@@ -138,7 +140,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.
+  - New: Extend Edit Insertion Up / Down (the selection only grows by one track).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -191,6 +193,8 @@
   - Duplicate: Cmd+D
   - Edit Lock Clip: Cmd+L
   - Execute Crossfade using last setting: Cmd+Control+F, Control+F, F
+  - Extend Edit Insertion Down: :, Control+:
+  - Extend Edit Insertion Up: Shift+P, Shift+Control+P
   - Fade In From Start To Cursor: D, Control+D
   - Fade Out From Cursor To End: Control+G, G
   - Grid Mode: Opt+4, F4

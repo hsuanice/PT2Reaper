@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1555pre1
+
+- New: Extend Edit Insertion Up / Down (the selection only grows by one track).
+
 ## 26.1115.1548
 
 - Tested in REAPER: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.

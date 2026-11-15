@@ -2,6 +2,10 @@
 
 hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
 
+## 26.1115.1555pre1
+
+- extend_insertion(): Extend Edit Insertion Up / Down - the selection only grows by one track.
+
 ## 26.1115.1548
 
 - move_insertion(): the edit selection collapses to one track below / above its top track, like Pro Tools.

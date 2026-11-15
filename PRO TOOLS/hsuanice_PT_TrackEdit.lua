@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1115.1548
+@version 26.1115.1555pre1
 @author hsuanice
 @noindex
 @changelog
-  - move_insertion(): the edit selection collapses to one track below / above its top track, like Pro Tools.
+  - extend_insertion(): Extend Edit Insertion Up / Down - the selection only grows by one track.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper "... Tracks with an Edit Selection" actions. Loaded with dofile().
@@ -115,6 +115,28 @@ function M.move_insertion(dir)
     for _, tr in ipairs(rows) do r.SetTrackSelected(tr, false) end
     r.SetTrackSelected(target, true)
   end
+  return true
+end
+
+-- dir = 1 (down) or -1 (up). Pro Tools Extend Edit Insertion: the edit selection only grows -
+-- one visible track is added below its bottom track (down) / above its top track (up), with
+-- the same time range (Audio 6-7 -> Extend Down -> 6-8 -> Extend Up -> 5-8).
+-- Nothing happens when there is no such track. Returns true when a track was added.
+function M.extend_insertion(dir)
+  local mode, rows, vis, idx, sel_follows = edit_rows()
+  if #rows == 0 then return false end
+  local edge = dir > 0 and rows[#rows] or rows[1]
+  local target = vis[idx[edge] + dir]
+  if not target then return false end
+  if mode == "razor" then
+    local zones = ""
+    for _, tr in ipairs(rows) do
+      zones = track_zones(get_razor(tr))
+      if zones ~= "" then break end
+    end
+    r.GetSetMediaTrackInfo_String(target, "P_RAZOREDITS", zones, true)
+  end
+  if sel_follows then r.SetTrackSelected(target, true) end
   return true
 end
 
