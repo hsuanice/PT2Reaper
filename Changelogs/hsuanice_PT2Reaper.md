@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1932
+
+- Tested in REAPER: Mouse - Shift-Click Extends Edit Selection, Double-Click Selects Gap Between Clips, Shift-Double-Click Extends Edit Selection Over Gap.
+
 ## 26.1115.1930pre1
 
 - Pro Tools: Shift-click on a track outside the selection only adds the track (the range stays).

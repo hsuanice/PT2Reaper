@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_MouseSelect - Pro Tools mouse clicks on the Edit Selection (PT2Reaper library)
-@version 26.1115.1930pre1
+@version 26.1115.1932
 @author hsuanice
 @noindex
 @changelog

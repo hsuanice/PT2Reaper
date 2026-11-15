@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Mouse - Double-Click Selects Gap Between Clips
-@version 26.1115.1825pre1
+@version 26.1115.1932
 @author hsuanice
 @noindex
 @changelog

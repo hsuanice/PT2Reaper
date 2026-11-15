@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection
-@version 26.1115.1930pre1
+@version 26.1115.1932
 @author hsuanice
 @noindex
 @changelog
