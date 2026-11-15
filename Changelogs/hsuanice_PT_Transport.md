@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1115.2053pre1
+
+- Edit / Timeline Selection helpers, play_range() + Play Watcher (stop at the selection end), Pro Tools end rules. Play start = Timeline Selection start, else the edit cursor (a time selection that is only the Edit Selection no longer moves it).
+
 ## 26.1115.2045pre1
 
 - First release of the PT2Reaper package (all Pro Tools actions in one package).

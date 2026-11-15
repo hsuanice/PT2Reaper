@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.2045pre1
+@version 26.1115.2053pre1
 @author hsuanice
 @noindex
 @changelog
-  - Edit / Timeline Selection helpers, play_range() + Play Watcher (stop at the selection end), Pro Tools end rules.
+  - Fix: with no Timeline Selection, playback starts at the edit cursor (Link off: the Edit Selection no longer moves the play start).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -52,11 +52,12 @@ function T.reset_half_speed()
   end
 end
 
--- Where playback starts: the start of the time selection, else the edit cursor.
+-- Where playback starts: the start of the Timeline Selection, else the edit cursor.
+-- The edit cursor is neutral (Pro Tools): a time selection that is only the Edit Selection
+-- (Link Timeline and Edit Selection off) does not move the play start.
 function T.start_position()
-  local ts, te = r.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
-  if te > ts then return ts end
-  return r.GetCursorPosition()
+  local s = T.timeline_range()
+  return s or r.GetCursorPosition()
 end
 
 function T.is_running() return r.GetPlayState() ~= 0 end

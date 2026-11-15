@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2053pre1
+
+- Fix: with no Timeline Selection, playback starts at the edit cursor (Link off: the Edit Selection no longer moves the play start).
+
 ## 26.1115.2045pre1
 
 - Play Edit Selection / Play Timeline Selection / Play-Stop: Pro Tools behaviour - stop at the selection end; Insertion Follows Playback and Link Timeline and Edit Selection decide where playback ends and what is cleared.
