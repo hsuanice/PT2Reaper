@@ -2,6 +2,10 @@
 
 hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
 
+## 26.1115.1539pre1
+
+- move_insertion(): the edit selection collapses to one track below / above its top track, like Pro Tools.
+
 ## 26.1115.1533pre1
 
 - move_insertion() / remove_insertion() for Move Edit Insertion Up / Down and Remove Edit Insertion From Top / Bottom Track.

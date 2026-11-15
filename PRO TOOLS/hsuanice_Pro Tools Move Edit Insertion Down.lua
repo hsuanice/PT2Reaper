@@ -1,17 +1,18 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion Down
-@version 26.1115.1533pre1
+@version 26.1115.1539pre1
 @author hsuanice
 @noindex
 @changelog
-  - First implementation (was a stub).
+  - Like Pro Tools: the selection collapses to one track below its top track (was: whole selection moved).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Move Edit Insertion Down**
   (PT key: Control+; (Commands Focus: ;))
 
-  Moves the whole Edit Selection one visible track DOWN (same time range). Nothing moves when
-  a track of it is already the last visible track. Razor areas on envelope lanes are dropped.
+  Like Pro Tools, the Edit Selection collapses to ONE track: the visible track below the top
+  track of the selection, same time range (Audio 6-8 -> Audio 7 -> Audio 8 for Down). Nothing
+  moves when there is no such track. Razor areas on envelope lanes are dropped.
   Edit Selection tracks: the tracks with a razor area (the track selection follows when all
   of them were selected); with no razor area, the selected tracks. Hidden tracks are skipped.
   The edit cursor and the time selection stay.

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1115.1533pre1
+@version 26.1115.1539pre1
 @author hsuanice
 @noindex
 @changelog
-  - move_insertion() / remove_insertion() for Move Edit Insertion Up / Down and Remove Edit Insertion From Top / Bottom Track.
+  - move_insertion(): the edit selection collapses to one track below / above its top track, like Pro Tools.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper "... Tracks with an Edit Selection" actions. Loaded with dofile().
@@ -93,22 +93,27 @@ local function edit_rows()
   return "tracks", rows, vis, idx, true
 end
 
--- dir = 1 (down) or -1 (up). Returns true when something moved.
+-- dir = 1 (down) or -1 (up). Pro Tools: the edit selection collapses to ONE track, the one
+-- below (down) / above (up) the TOP track of the selection, same time range (Audio 6-8 ->
+-- down -> Audio 7 -> down -> Audio 8). Nothing moves when there is no such track.
+-- Returns true when something moved.
 function M.move_insertion(dir)
   local mode, rows, vis, idx, sel_follows = edit_rows()
   if #rows == 0 then return false end
-  for _, tr in ipairs(rows) do
-    if not vis[idx[tr] + dir] then return false end -- at the top / bottom: nothing moves
-  end
+  local target = vis[idx[rows[1]] + dir]
+  if not target then return false end
   if mode == "razor" then
-    local moved = {}
-    for _, tr in ipairs(rows) do moved[vis[idx[tr] + dir]] = track_zones(get_razor(tr)) end
+    local zones = ""
+    for _, tr in ipairs(rows) do
+      zones = track_zones(get_razor(tr))
+      if zones ~= "" then break end -- the top track's time range (first one that has one)
+    end
     for _, tr in ipairs(rows) do r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", true) end
-    for tr, z in pairs(moved) do r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", z, true) end
+    r.GetSetMediaTrackInfo_String(target, "P_RAZOREDITS", zones, true)
   end
   if sel_follows then
     for _, tr in ipairs(rows) do r.SetTrackSelected(tr, false) end
-    for _, tr in ipairs(rows) do r.SetTrackSelected(vis[idx[tr] + dir], true) end
+    r.SetTrackSelected(target, true)
   end
   return true
 end
