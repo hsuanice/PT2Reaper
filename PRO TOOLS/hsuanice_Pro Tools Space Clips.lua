@@ -1,71 +1,50 @@
--- @description hsuanice_Pro Tools Space Clips
--- @version 0.5.0 [260509.0220]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Space Clips** (Opt+Shift+H)
---
---   Repositions selected items so each item starts at a fixed
---   `interval` distance after the previous item's anchor (Item Start
---   or Item End). The first item in the sort order is left in place;
---   subsequent items are repositioned.
---
---   ## Units (simple decimal formats)
---   - **Frames**  — whole frames at the project frame rate, e.g. `30`
---   - **Secs**    — seconds with three decimals, e.g. `1.500`
---   - **Bar.Beat** — decimal bars at the project's first time
---                    signature / tempo, e.g. `1.50` (= 1.5 bars).
---                    Tempo / time-sig variation is approximated.
---
---   ## Modes
---   - **Anchor**:
---     - Item End   — gap of `interval` between adjacent items
---                    (default; interval=0 → items abut)
---     - Item Start — every item placed at prev.start + interval
---                    (constant pitch / overlap)
---   - **Mode**:
---     - Single Track — sort + position per track independently
---     - Cross Track  — sort all selected items globally, position one
---                      after another regardless of track
---
---   ## Persistence
---   ExtState namespace `hsuanice_PT_SpaceClips` keeps `interval_sec`
---   (numeric, in seconds), `unit`, `anchor`, `mode` between runs.
---   Switching unit reformats the same internal seconds value.
---
---   ## Dependency
---   - `PRO TOOLS/hsuanice_PT_GFXInputField.lua`
---
---   - Tags: Editing, Clips
--- @changelog
---   0.5.0 [260509.0220] - After spacing, expand the time selection
---                          and per-track razor zones to cover the
---                          repositioned items. Expand-only — never
---                          shrinks. TS / razor with no overlap with
---                          items are also adjusted (their bounds
---                          grow to include the items if items now
---                          extend past).
---   0.4.0 [260509.0206] - Simplify unit formats:
---                          Timecode (HH:MM:SS:FF) → Frames (decimal)
---                          Min:Secs (M:SS.mmm)     → Secs (0.000)
---                          Beats (decimal)         → Bar.Beat (0.00)
---                          Internal storage stays as seconds. Old
---                          ExtState values auto-migrate to new names.
---   0.3.0 [260509.0142] - Add Beats unit. Uses project-start tempo for
---                          beats↔seconds conversion (constant-tempo
---                          approximation; tempo-variant projects will
---                          see slight drift). Stored value remains
---                          internal seconds.
---   0.2.0 [260509.0129] - First implementation. GFX dialog (no
---                          ReaImGui) with Timecode / Min:Secs unit
---                          toggle, Item Start / Item End anchor
---                          toggle, Single / Cross Track mode toggle,
---                          OK / Cancel buttons. Settings persist
---                          via ExtState; switching unit reformats
---                          without losing the internal seconds value.
---                          Default anchor is Item End. Logic ported
---                          from Beta Testing/hsuanice_Item Reposition.
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Space Clips
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Space Clips** (Opt+Shift+H)
+
+  Repositions selected items so each item starts at a fixed
+  `interval` distance after the previous item's anchor (Item Start
+  or Item End). The first item in the sort order is left in place;
+  subsequent items are repositioned.
+
+  ## Units (simple decimal formats)
+  - **Frames**  — whole frames at the project frame rate, e.g. `30`
+  - **Secs**    — seconds with three decimals, e.g. `1.500`
+  - **Bar.Beat** — decimal bars at the project's first time
+                   signature / tempo, e.g. `1.50` (= 1.5 bars).
+                   Tempo / time-sig variation is approximated.
+
+  ## Modes
+  - **Anchor**:
+    - Item End   — gap of `interval` between adjacent items
+                   (default; interval=0 → items abut)
+    - Item Start — every item placed at prev.start + interval
+                   (constant pitch / overlap)
+  - **Mode**:
+    - Single Track — sort + position per track independently
+    - Cross Track  — sort all selected items globally, position one
+                     after another regardless of track
+
+  ## Persistence
+  ExtState namespace `hsuanice_PT_SpaceClips` keeps `interval_sec`
+  (numeric, in seconds), `unit`, `anchor`, `mode` between runs.
+  Switching unit reformats the same internal seconds value.
+
+  ## Dependency
+  - `PRO TOOLS/hsuanice_PT_GFXInputField.lua`
+
+  - Tags: Editing, Clips
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local _info = debug.getinfo(1, 'S')

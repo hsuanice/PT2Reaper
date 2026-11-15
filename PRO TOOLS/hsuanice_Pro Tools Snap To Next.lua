@@ -1,48 +1,46 @@
--- @description hsuanice_Pro Tools Snap To Next
--- @version 0.3.0 [260509.0031]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Snap To Next** (Opt+Ctrl+Period)
---
---   Group-moves the entire moving body (selected items + time
---   selection + razor edit zones) to the right so it abuts the next
---   non-selected item.
---
---   ## Algorithm
---   The "moving body" on each track contains:
---   - the selected items on that track
---   - the time selection (a global, treated as if present on every
---     constrained track)
---   - the razor edit zones on that track
---
---   1. Collect constrained tracks: every track that has selected
---      items OR razor zones.
---   2. Per constrained track, compute the rightmost extent of the
---      moving body — `right_end = max(item.fin, TS_end, razor.end)`.
---   3. Find the first non-selected item on the same track whose
---      start position is >= `right_end`.
---   4. delta = next_item.pos - right_end (only kept if > 0).
---   5. Across all constrained tracks, take min(delta) so no track's
---      moving body overlaps its next neighbour.
---   6. Shift all selected items, the time selection, and every
---      track's razor zones by `delta`.
---
---   Pure REAPER native — only `D_POSITION` and `P_RAZOREDITS` /
---   loop time range are written; length, fades, snap offset, and
---   take properties are all preserved.
---
---   - Tags: Editing, Clips
--- @changelog
---   0.3.0 [260509.0031] - Treat TS_end and per-track razor zones as
---                          part of the moving body when computing
---                          the right extent. Razor zones now shift
---                          along with items + TS.
---   0.2.0 [260509.0021] - First implementation. Per-track group-move
---                          using minimum-positive-delta to keep the
---                          move safe across all tracks; time
---                          selection follows the items.
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Snap To Next
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Snap To Next** (Opt+Ctrl+Period)
+
+  Group-moves the entire moving body (selected items + time
+  selection + razor edit zones) to the right so it abuts the next
+  non-selected item.
+
+  ## Algorithm
+  The "moving body" on each track contains:
+  - the selected items on that track
+  - the time selection (a global, treated as if present on every
+    constrained track)
+  - the razor edit zones on that track
+
+  1. Collect constrained tracks: every track that has selected
+     items OR razor zones.
+  2. Per constrained track, compute the rightmost extent of the
+     moving body — `right_end = max(item.fin, TS_end, razor.end)`.
+  3. Find the first non-selected item on the same track whose
+     start position is >= `right_end`.
+  4. delta = next_item.pos - right_end (only kept if > 0).
+  5. Across all constrained tracks, take min(delta) so no track's
+     moving body overlaps its next neighbour.
+  6. Shift all selected items, the time selection, and every
+     track's razor zones by `delta`.
+
+  Pure REAPER native — only `D_POSITION` and `P_RAZOREDITS` /
+  loop time range are written; length, fades, snap offset, and
+  take properties are all preserved.
+
+  - Tags: Editing, Clips
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r   = reaper
 local EPS = 1e-9

@@ -1,37 +1,33 @@
--- @description hsuanice_Pro Tools Move Clip Start To Play Position
--- @version 0.4.1 [260506.1325]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip Start To Play Position** (Ctrl+H)
---
---   Aligns the SELECTION's start to the EDIT cursor. Items that overlap the
---   selection get their portion-inside-selection cut out and moved with the
---   selection — cut-and-paste semantics, NOT a "selection auto-extends to
---   the whole item" semantics. Parts of items outside the selection are
---   split off and stay put.
---
---   Example: selection 5..8, item 4..6, edit cursor at 1 → split item at 5;
---   the 4..5 piece stays where it is; the 5..6 piece moves with the
---   selection (delta = 1 − 5 = −4), landing at 1..2.
---
---   PT testing showed Play Position uses the EDIT cursor in REAPER (not the
---   play head), even during playback. For "move to project start" use the
---   "Move Clip Start To Current TC" variant instead.
---
---   - Tags: Clips, Editing
--- @changelog
---   0.4.1 [260506.1325] - Always split at selection boundaries, even when
---                          delta is zero (cursor at selection start). PT's
---                          Play Position variant has Spot semantics that
---                          always cut the inside-selection portion into its
---                          own item, regardless of whether anything ends up
---                          moving.
---   0.4.0 [260506.1305] - Switch to PT-style cut-and-paste split on partial
---                          overlaps. Shares logic with the Current TC variant
---                          but uses edit cursor as the target.
---   0.2.0 [260506.1145] - Real implementation (auto-extend variant).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip Start To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip Start To Play Position** (Ctrl+H)
+
+  Aligns the SELECTION's start to the EDIT cursor. Items that overlap the
+  selection get their portion-inside-selection cut out and moved with the
+  selection — cut-and-paste semantics, NOT a "selection auto-extends to
+  the whole item" semantics. Parts of items outside the selection are
+  split off and stay put.
+
+  Example: selection 5..8, item 4..6, edit cursor at 1 → split item at 5;
+  the 4..5 piece stays where it is; the 5..6 piece moves with the
+  selection (delta = 1 − 5 = −4), landing at 1..2.
+
+  PT testing showed Play Position uses the EDIT cursor in REAPER (not the
+  play head), even during playback. For "move to project start" use the
+  "Move Clip Start To Current TC" variant instead.
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

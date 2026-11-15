@@ -1,50 +1,38 @@
--- @description hsuanice_Pro Tools Move Clip Sync Point To Current TC
--- @version 0.3.2 [260506.1730]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip Sync Point To Current TC** (Ctrl+U)
---
---   Aligns the leftmost SYNC POINT among items in scope to project start
---   (timeline 0). All in-scope items shift by the same delta. The selection
---   (TS / razor) follows.
---
---   PT-style cut-and-paste split: items partially overlapping the selection
---   are split at sel_s/sel_e; only the inside-selection portion moves;
---   outside parts stay put.
---
---   REAPER's per-item sync point lives in D_SNAPOFFSET (offset from item
---   start to sync point). Sync point absolute position = item.pos +
---   D_SNAPOFFSET. When D_SNAPOFFSET = 0, the sync point sits at the item
---   start, so the action behaves like Move Clip Start.
---
---   Reference: among all in-scope items, the one with the LEFTMOST sync
---   point absolute position. delta = target − ref_sync_abs.
---
---   Scope priority: Razor > Time selection > Item selection. Items-only
---   mode shifts all selected items by the same delta (no splitting).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.3.2 [260506.1730] - PT-style fit check: if aligning the leftmost sync
---                          to project start would push any moved item to a
---                          negative position, the action no-ops entirely
---                          (items stay, selection stays). Matches PT —
---                          "sync point to current TC" can't satisfy items
---                          whose snap_offset > 0 when target is timeline 0.
---   0.3.1 [260506.1700] - Time-selection mode now requires items to also be
---                          item-selected. Previously items overlapping the
---                          time selection on tracks the user wasn't focused
---                          on (no item selection there) would also be split
---                          and moved. Now we iterate only selected items in
---                          time mode (matches PT — time selection alone
---                          doesn't pick up unselected items).
---   0.3.0 [260506.1620] - Add cut-and-paste split (matches Move Clip
---                          Start/End behavior). Reference changed to
---                          earliest sync absolute position (was earliest
---                          item start). Selection follows the moved content.
---   0.2.0 [260506.1515] - First implementation (group move, no split).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip Sync Point To Current TC
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip Sync Point To Current TC** (Ctrl+U)
+
+  Aligns the leftmost SYNC POINT among items in scope to project start
+  (timeline 0). All in-scope items shift by the same delta. The selection
+  (TS / razor) follows.
+
+  PT-style cut-and-paste split: items partially overlapping the selection
+  are split at sel_s/sel_e; only the inside-selection portion moves;
+  outside parts stay put.
+
+  REAPER's per-item sync point lives in D_SNAPOFFSET (offset from item
+  start to sync point). Sync point absolute position = item.pos +
+  D_SNAPOFFSET. When D_SNAPOFFSET = 0, the sync point sits at the item
+  start, so the action behaves like Move Clip Start.
+
+  Reference: among all in-scope items, the one with the LEFTMOST sync
+  point absolute position. delta = target − ref_sync_abs.
+
+  Scope priority: Razor > Time selection > Item selection. Items-only
+  mode shifts all selected items by the same delta (no splitting).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

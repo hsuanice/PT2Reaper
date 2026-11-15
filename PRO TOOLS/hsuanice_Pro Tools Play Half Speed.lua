@@ -1,32 +1,47 @@
--- @description hsuanice_Pro Tools Play Half Speed
--- @version 0.1.0 [260413.1324]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Stub script for the Pro Tools action:
---   **Play Half Speed**
---
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
---
---   ## Details
---   - Pro Tools equivalent : Play Half Speed
---   - Module               : Transport
---   - Mac shortcut (PT)    : Shift + Space
---   - Tags                 : Transport
---
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
---
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
--- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Play Half Speed
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Play Half Speed**
+  (PT key: Shift+Space)
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Play Half Speed", "PT2Reaper", 0)
+  Stopped: plays at half speed from the start of the time selection, else from
+  the edit cursor. Playing: stops (Insertion Follows Playback is respected; a
+  running QuickPunch pass is stopped properly). The next stop or play goes back
+  to normal speed. Never starts a QuickPunch pass.
+  Credits: behaviour modelled on TJF Scripts by Tim Farrell (github.com/sonictim/TJF-Scripts):
+  TJF playback that reads insertion toggle, TJF Toggle Insertion follows Playback,
+  TJF Playback at Half Speed once.
+
+  Self-contained: uses hsuanice_PT_Transport.lua and hsuanice_PT_QuickPunch.lua
+  (same folder), copies of the Beta Testing/QuickPunch scripts (26.1114).
+  Built with AI: written with Claude Code (Anthropic); designed and tested by hsuanice.
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
+
+local r = reaper
+local DIR = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or ''
+local ok1, T = pcall(dofile, DIR .. 'hsuanice_PT_Transport.lua')
+local ok2, QP = pcall(dofile, DIR .. 'hsuanice_PT_QuickPunch.lua')
+if not (ok1 and ok2) then
+  r.ShowMessageBox('Could not load hsuanice_PT_Transport.lua / hsuanice_PT_QuickPunch.lua\n\n'
+    .. tostring(ok1 and '' or T) .. tostring(ok2 and '' or QP), 'Error', 0)
+  return
+end
+
+if T.is_running() then
+  T.before_stop()
+  if QP.pass_active() then QP.stop(T.follows()) else r.Main_OnCommand(1016, 0) end
+  T.reset_half_speed()
+else
+  T.set_half_speed()
+  T.play()
+end
+r.defer(function() end) -- no undo point

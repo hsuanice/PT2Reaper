@@ -1,7 +1,12 @@
 --[[
 @description hsuanice_PT_Nudge - Nudge Library
-@version 0.4.5 [260504.1230]
+@version 26.1115.1407
 @author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Library for all hsuanice nudge scripts.
   Reads nudge mode and preset from hsuanice_Grid Nudge Panel ExtState.
@@ -10,29 +15,6 @@
   nudgewhat values (ApplyNudge):
     0 = position, 1 = left trim, 2 = left edge,
     3 = right edge, 4 = contents, 6 = edit cursor
-
-@changelog
-  0.4.5 [260504.1230]
-    - Public M.calc_delta_sec(preset, reverse) — exposes the seconds conversion that
-      was internal to nudge_razor. Lets scripts do per-item processing (e.g. Contents
-      Later/Earlier with source-bound clamp) without duplicating the unit conversion.
-  0.4.4 [260503.1918]
-    - Fix: r.ApplyNudge with unit=18 (frames) doesn't track project fps
-      reliably — at non-24 fps it appears to default to 24, so item
-      nudges came out wrong (e.g. 6 frames at 25 fps gave 12000 samples
-      instead of 11520 at 48k). M.apply now converts frame-unit values
-      to seconds (unit=1) before calling ApplyNudge, using the same fps
-      lookup calc_delta_sec uses for razor-area mode.
-  0.4.3 [260503.1909]
-    - Fix: TimeMap_curFrameRate returns (fps, isdrop) — fps is FIRST.
-      `calc_delta_sec` was doing `local _, fps = ...` which captured
-      isdrop (a boolean) as the frame rate. Frame-unit nudges (Timecode
-      / Feet+Frames) were always computed at the 24 fps fallback for
-      non-drop projects, and crashed on drop-frame projects.
-  0.2.0 [260418.1931]
-    - Sync NUDGE_PRESETS with Grid Nudge Panel (Feet+Frames restored)
-  0.1.0 [260418.1534]
-    - Initial release
 --]]
 
 local EXT = 'hsuanice_GridNudgePanel'
@@ -94,6 +76,11 @@ function M.get_state()
   local presets = NUDGE_PRESETS[mode]
   if not presets then mode = 'Timecode'; presets = NUDGE_PRESETS[mode]; idx = 3 end
   idx = math.max(1, math.min(idx, #presets))
+  -- Temporary step override (e.g. Nudge Play ... By Next Larger Grid sets -1
+  -- before running a nudge script). Presets go large -> small, so -1 = larger.
+  -- Not saved: the Grid Nudge Panel value is unchanged.
+  local step = tonumber(rawget(_G, 'HSUANICE_PT_NUDGE_STEP'))
+  if step then idx = math.max(1, math.min(idx + step, #presets)) end
   return mode, idx
 end
 
@@ -366,6 +353,88 @@ function M.apply(nudgewhat, reverse)
     -- Update razor areas
     nudge_razor(delta, nudgewhat)
   end
+end
+
+-- Nudge the Edit Selection only (time selection + every razor area); items
+-- never move. edge = 'both' | 'start' | 'end'. With no selection, 'both' and
+-- 'start' move the edit cursor (PT edit insertion); 'end' does nothing.
+-- Returns true when something moved.
+function M.nudge_selection(edge, reverse)
+  local r = reaper
+  local EPS = 1e-9
+  local mode, idx = M.get_state()
+  local preset = M.get_preset(mode, idx)
+  if not preset then return false end
+  local delta = M.calc_delta_sec(preset, reverse)
+  if math.abs(delta) < 1e-10 then return false end
+
+  -- Collect the selection
+  local ts, te = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
+  local has_ts = te > ts + EPS
+  local razors = {} -- { track, { {s, e, guid}, ... } }
+  local min_start = has_ts and ts or math.huge
+  for ti = 0, r.CountTracks(0) - 1 do
+    local tr = r.GetTrack(0, ti)
+    local _, str = r.GetSetMediaTrackInfo_String(tr, 'P_RAZOREDITS', '', false)
+    if str and str ~= '' then
+      local zones = {}
+      for a, b, g in str:gmatch('(%S+)%s+(%S+)%s+(%S+)') do
+        local s, e = tonumber(a), tonumber(b)
+        if s and e then
+          zones[#zones + 1] = { s, e, g }
+          if s < min_start then min_start = s end
+        end
+      end
+      if #zones > 0 then razors[#razors + 1] = { tr, zones } end
+    end
+  end
+
+  -- No selection: move the edit insertion (cursor)
+  if not has_ts and #razors == 0 then
+    if edge == 'end' then return false end
+    local cur = r.GetCursorPosition()
+    local new_pos = math.max(0, cur + delta)
+    if math.abs(new_pos - cur) < 1e-10 then return false end
+    r.SetEditCurPos(new_pos, true, false)
+    return true
+  end
+
+  -- Whole selection: keep it from going below project start
+  if edge == 'both' and min_start + delta < 0 then
+    delta = -min_start
+    if math.abs(delta) < 1e-10 then return false end
+  end
+
+  local function move(s, e)
+    if edge == 'both' then return s + delta, e + delta end
+    if edge == 'start' then
+      local ns = math.max(0, s + delta)
+      if ns >= e - EPS then return s, e end -- start may not pass the end
+      return ns, e
+    end
+    local ne = e + delta
+    if ne <= s + EPS then return s, e end   -- end may not pass the start
+    return s, ne
+  end
+
+  local moved = false
+  if has_ts then
+    local ns, ne = move(ts, te)
+    if ns ~= ts or ne ~= te then
+      r.GetSet_LoopTimeRange(true, false, ns, ne, false)
+      moved = true
+    end
+  end
+  for _, rz in ipairs(razors) do
+    local parts = {}
+    for _, z in ipairs(rz[2]) do
+      local ns, ne = move(z[1], z[2])
+      if ns ~= z[1] or ne ~= z[2] then moved = true end
+      parts[#parts + 1] = string.format('%.14f %.14f %s', ns, ne, z[3])
+    end
+    r.GetSetMediaTrackInfo_String(rz[1], 'P_RAZOREDITS', table.concat(parts, ' '), true)
+  end
+  return moved
 end
 
 function M.increase()

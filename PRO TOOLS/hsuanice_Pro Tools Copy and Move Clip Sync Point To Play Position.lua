@@ -1,30 +1,30 @@
--- @description hsuanice_Pro Tools Copy and Move Clip Sync Point To Play Position
--- @version 0.3.1 [260506.1700]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Copy and Move Clip Sync Point To Play Position**
---   (Opt+Ctrl+J)
---
---   Like "Move Clip Sync Point To Play Position" but originals stay intact —
---   only COPIES of inside-selection portions are placed at the target so
---   the leftmost SYNC POINT among in-scope items lands on the EDIT cursor.
---   Selection (TS / razor) follows the copies. Always clones even when
---   delta = 0 (Spot semantics).
---
---   PT-style cut-and-paste split for partial overlaps: only the inside
---   portion is cloned (chunk-clone with STARTOFFS adjusted by
---   inside-offset * playrate per take).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.3.1 [260506.1700] - Time mode now requires items to also be
---                          item-selected (matches PT — time selection alone
---                          doesn't pick up unselected items on other tracks).
---   0.3.0 [260506.1635] - Add cut-and-paste split for partial overlaps.
---                          Reference = earliest sync absolute position.
---   0.2.0 [260506.1600] - First implementation (whole-item clone).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Copy and Move Clip Sync Point To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Copy and Move Clip Sync Point To Play Position**
+  (Opt+Ctrl+J)
+
+  Like "Move Clip Sync Point To Play Position" but originals stay intact —
+  only COPIES of inside-selection portions are placed at the target so
+  the leftmost SYNC POINT among in-scope items lands on the EDIT cursor.
+  Selection (TS / razor) follows the copies. Always clones even when
+  delta = 0 (Spot semantics).
+
+  PT-style cut-and-paste split for partial overlaps: only the inside
+  portion is cloned (chunk-clone with STARTOFFS adjusted by
+  inside-offset * playrate per take).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

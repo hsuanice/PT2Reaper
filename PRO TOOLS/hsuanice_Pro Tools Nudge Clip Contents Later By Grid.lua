@@ -1,19 +1,23 @@
--- @description hsuanice_Pro Tools Nudge Clip Contents Later By Grid
--- @version 0.3.0 [260504.1230]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Nudge Clip Contents Later By Grid**
---   Nudges the contents (audio offset) of selected items later in time —
---   STARTOFFS decreases by delta * playrate. Item position / length unchanged.
---   Uses nudge value from hsuanice_Grid Nudge Panel.
---   Source-bound clamp: if shifting would push STARTOFFS below 0, that item silently
---   doesn't move (no warning popup, just stops at the boundary).
---   - Tags: Editing
--- @changelog
---   0.3.0 [260504.1230] - Bypass r.ApplyNudge; do per-item D_STARTOFFS shift with
---                          source-bound check (silent skip when out of range).
---   0.2.0 [260418.1931] - Rewrite: use ApplyNudge with hsuanice_PT_Nudge library
+--[[
+@description hsuanice_Pro Tools Nudge Clip Contents Later By Grid
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Nudge Clip Contents Later By Grid**
+  Nudges the contents (audio offset) of selected items later in time —
+  STARTOFFS decreases by delta * playrate. Item position / length unchanged.
+  Uses nudge value from hsuanice_Grid Nudge Panel.
+  Source-bound clamp: if shifting would push STARTOFFS below 0, that item silently
+  doesn't move (no warning popup, just stops at the boundary).
+  - Tags: Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local info = debug.getinfo(1,'S')

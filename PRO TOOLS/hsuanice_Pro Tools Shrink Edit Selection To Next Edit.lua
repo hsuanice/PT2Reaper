@@ -1,38 +1,41 @@
--- @description hsuanice_Pro Tools Shrink Edit Selection To Next Edit
--- @version 0.2.0 [260509.1036]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Shrink Edit Selection To Next Edit**
---   (Cmd+Opt+Shift+L)
---
---   Shrinks the selection from the LEFT side: TS_s moves rightward
---   to the next edit point that is still inside the current TS.
---   - Tab to Transient ON  → next edit = next transient
---     (filtered by shared min-gap setting).
---   - Tab to Transient OFF → next edit = next item edge.
---
---   Time selection + razor zones on selected tracks shrink together.
---   No-op if no TS / next edit would land on / past TS_e.
---
---   ## Dependency
---   - `Library/hsuanice_PT_Transient.lua`
---
---   - Tags : Editing, Selection
---
--- @changelog
---   0.2.0 [260509.1036] - First implementation. Shrinks left side via
---                          native 40319 (or transient walk via library).
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Shrink Edit Selection To Next Edit
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Shrink Edit Selection To Next Edit**
+  (Cmd+Opt+Shift+L)
+
+  Shrinks the selection from the LEFT side: TS_s moves rightward
+  to the next edit point that is still inside the current TS.
+  - Tab to Transient ON  → next edit = next transient
+    (filtered by shared min-gap setting).
+  - Tab to Transient OFF → next edit = next item edge.
+
+  Time selection + razor zones on selected tracks shrink together.
+  No-op if no TS / next edit would land on / past TS_e.
+
+  ## Dependency
+  - `Library/hsuanice_PT_Transient.lua`
+
+  - Tags : Editing, Selection
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-4
 
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local Tran  = dofile(_dir .. '../Library/hsuanice_PT_Transient.lua')
+local Tran  = dofile(_dir .. 'hsuanice_PT_Transient.lua')
 if not Tran then
-  r.ShowMessageBox("Could not load Library/hsuanice_PT_Transient.lua",
+  r.ShowMessageBox("Could not load hsuanice_PT_Transient.lua",
     "Shrink Edit Selection To Next Edit", 0)
   return
 end

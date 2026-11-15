@@ -1,19 +1,21 @@
--- @description hsuanice_Pro Tools Decrease Grid Value
--- @version 0.4.1 [260503.1409]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Decreases grid to next smaller value within the current mode
---   (Measure / Min:Secs / Timecode / Feet+Frames / Samples).
---   Mode and current preset are read from the Grid Nudge Panel ExtState.
---   Mac shortcut (PT): Shift + Minus
---   Tags: Editing
--- @changelog
---   0.4.1 [260503.1409] - Drop local 40904 bail; let library handle native_frame transitions
---   0.4.0 [260503.1314] - Use shared hsuanice_PT_Grid.lua library; supports all 5 modes
---   0.3.0 [260502.1928] - Honor Timecode grid mode from Grid Nudge Panel
---   0.2.0 [260419.0934] - Remove tooltip (blocks rapid switching)
---   0.1.0 [260419.0921] - Initial release
+--[[
+@description hsuanice_Pro Tools Decrease Grid Value
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Decreases grid to next smaller value within the current mode
+  (Measure / Min:Secs / Timecode / Feet+Frames / Samples).
+  Mode and current preset are read from the Grid Nudge Panel ExtState.
+  Mac shortcut (PT): Shift + Minus
+  Tags: Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local info = debug.getinfo(1, 'S')

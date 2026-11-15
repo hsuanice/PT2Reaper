@@ -1,21 +1,25 @@
--- @description hsuanice_Pro Tools Copy and Move Clip End To Play Position
--- @version 0.2.0 [260506.1500]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Copy and Move Clip End To Play Position**
---   (Opt+Ctrl+K)
---
---   Like "Move Clip End To Play Position" but originals stay intact —
---   only COPIES of the inside-selection portions are placed at the target
---   so the selection END aligns to the EDIT cursor. Selection (TS / razor)
---   follows the copies. Always clones even when delta = 0 (Spot semantics).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.2.0 [260506.1500] - Real implementation. Mirrors Copy and Move
---                          Clip End To Current TC, but target = edit cursor.
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Copy and Move Clip End To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Copy and Move Clip End To Play Position**
+  (Opt+Ctrl+K)
+
+  Like "Move Clip End To Play Position" but originals stay intact —
+  only COPIES of the inside-selection portions are placed at the target
+  so the selection END aligns to the EDIT cursor. Selection (TS / razor)
+  follows the copies. Always clones even when delta = 0 (Spot semantics).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

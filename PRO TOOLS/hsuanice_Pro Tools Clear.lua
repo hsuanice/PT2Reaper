@@ -1,62 +1,41 @@
--- @description hsuanice_Pro Tools Clear
--- @version 0.4.2 [260506.2010]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Wrapper replicating Pro Tools: **Clear** (Cmd+B)
---
---   PT's Clear is context-aware — it removes whatever is currently
---   "selected": items, envelope points, automation items, or the time
---   selection itself. This script mirrors that, with PT-style partial
---   removal that preserves fades on the surviving outer pieces.
---
---   ## Mapping
---   - Razor zones exist           → Split items at zone edges, remove
---                                    inside pieces (per zone, per track).
---                                    Outer pieces keep their fades.
---   - Selected items + time sel   → Split selected items at TS edges,
---                                    remove inside pieces. Outer pieces
---                                    keep their fades.
---   - Selected items only         → Remove items (40006).
---   - Selected envelope points    → Delete envelope points (40333).
---   - Automation items selected   → Delete automation items (42086).
---   - Time selection exists       → Remove time selection (40635).
---   - Razor at end                → Clear razor zones (always, regardless
---                                    of which branch ran).
---
---   - Mac shortcut (PT) : Cmd+B
---   - Tags              : Editing
---
--- @changelog
---   0.4.2 [260506.2010]
---     - Always clear time selection at end too (alongside razor + item
---       selection). After Clear runs, all selection-like state is gone.
---   0.4.1 [260506.1945]
---     - Fade preservation on outer pieces: left piece keeps its original
---       fade-in (truncated to its new length), right piece gets a fade-in
---       equal to whatever portion of the original fade-in extended past
---       the cut, fade-out kept (truncated). Previously REAPER's split
---       cleared fades on the new edges so a cut through a fade region
---       lost the fade entirely.
---     - Always clear item selection at end (matches PT — after Clear, no
---       items remain selected).
---   0.4.0 [260506.1920]
---     - PT-style partial removal: when items + time selection (or razor)
---       intersect, split items at the boundaries and remove only the
---       inside pieces. Surviving outer pieces keep their fade-in /
---       fade-out (REAPER's SplitMediaItem preserves boundary fades),
---       matching PT behavior. Previously 40006 removed whole items so
---       fades disappeared.
---   0.3.1 [260506.1850]
---     - Always clear razor edit zones at the end.
---   0.3.0 [260506.1830]
---     - Context-aware clear (mirrors Delete Selection priority ladder).
---   0.2.0 [260506.1810]
---     - Thin wrapper over native 40006.
---   0.1.0 [260413.1324]
---     - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Clear
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  # hsuanice Pro Tools Keybindings for REAPER
+
+  Wrapper replicating Pro Tools: **Clear** (Cmd+B)
+
+  PT's Clear is context-aware — it removes whatever is currently
+  "selected": items, envelope points, automation items, or the time
+  selection itself. This script mirrors that, with PT-style partial
+  removal that preserves fades on the surviving outer pieces.
+
+  ## Mapping
+  - Razor zones exist           → Split items at zone edges, remove
+                                   inside pieces (per zone, per track).
+                                   Outer pieces keep their fades.
+  - Selected items + time sel   → Split selected items at TS edges,
+                                   remove inside pieces. Outer pieces
+                                   keep their fades.
+  - Selected items only         → Remove items (40006).
+  - Selected envelope points    → Delete envelope points (40333).
+  - Automation items selected   → Delete automation items (42086).
+  - Time selection exists       → Remove time selection (40635).
+  - Razor at end                → Clear razor zones (always, regardless
+                                   of which branch ran).
+
+  - Mac shortcut (PT) : Cmd+B
+  - Tags              : Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

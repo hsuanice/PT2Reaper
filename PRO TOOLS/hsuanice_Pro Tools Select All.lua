@@ -1,32 +1,34 @@
--- @description hsuanice_Pro Tools Select All
--- @version 0.1.1 [260416.1347]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Replicates Pro Tools: **Select All**
---
---   ## Behaviour
---   Selects all items on the selected track(s), then sets time selection
---   and razor area to cover the full span of selected items —
---   mirroring PT's "Select All sets Edit Selection" behaviour.
---
---   - Mac shortcut (PT) : Command + A
---   - Tags              : Edit menu, Editing
---
--- @changelog
---   0.1.1 [260416.1347]
---     - Rewrite: now sets time selection + razor to cover all items
---   0.1.0 [260416.1323]
---     - Initial release (simple 40421 map)
+--[[
+@description hsuanice_Pro Tools Select All
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  # hsuanice Pro Tools Keybindings for REAPER
+
+  Replicates Pro Tools: **Select All**
+
+  ## Behaviour
+  Selects all items on the selected track(s), then sets time selection
+  and razor area to cover the full span of selected items —
+  mirroring PT's "Select All sets Edit Selection" behaviour.
+
+  - Mac shortcut (PT) : Command + A
+  - Tags              : Edit menu, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 
 local function load_sync()
   local info = debug.getinfo(1, 'S').source:match("^@?(.*[/\\])")
   if not info then return nil end
-  local ok, mod = pcall(dofile, info .. "../Library/hsuanice_PT_SelectionSync.lua")
+  local ok, mod = pcall(dofile, info .. "hsuanice_PT_SelectionSync.lua")
   return ok and mod or nil
 end
 

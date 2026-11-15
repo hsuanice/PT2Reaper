@@ -1,38 +1,39 @@
--- @description hsuanice_Pro Tools Copy and Move Clip Start To Play Position
--- @version 0.2.1 [260506.1430]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Copy and Move Clip Start To Play Position**
---   (Opt+Ctrl+H)
---
---   Like "Move Clip Start To Play Position" but the originals stay intact —
---   only COPIES of the inside-selection portions are placed at the target.
---   Target = edit cursor (PT-tested: Play Position uses edit cursor in
---   REAPER, even during playback).
---
---   For each item overlapping the selection, the part inside selection is
---   cloned (chunk + STARTOFFS adjustment for partial overlaps) and placed
---   on the same track at the target. Outside-selection parts and the
---   original item itself are not touched.
---
---   Always clones, even when the cursor is already at the selection start
---   (delta = 0) — matches PT's Spot semantics for the Play Position variant.
---
---   Selection (TS / razor) IS shifted to the target so it follows the new
---   copies (matches PT).
---
---   Scope priority: Razor > Time selection > Item selection. Items-only
---   mode duplicates each selected item to the target (no splitting).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.2.1 [260506.1430] - Selection (TS / razor) now follows the copies to
---                          the target — matches PT. Originals still untouched.
---   0.2.0 [260506.1400] - Real implementation. Mirrors Copy and Move
---                          Clip Start To Current TC, but target is edit
---                          cursor. Always clones even when delta=0.
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Copy and Move Clip Start To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Copy and Move Clip Start To Play Position**
+  (Opt+Ctrl+H)
+
+  Like "Move Clip Start To Play Position" but the originals stay intact —
+  only COPIES of the inside-selection portions are placed at the target.
+  Target = edit cursor (PT-tested: Play Position uses edit cursor in
+  REAPER, even during playback).
+
+  For each item overlapping the selection, the part inside selection is
+  cloned (chunk + STARTOFFS adjustment for partial overlaps) and placed
+  on the same track at the target. Outside-selection parts and the
+  original item itself are not touched.
+
+  Always clones, even when the cursor is already at the selection start
+  (delta = 0) — matches PT's Spot semantics for the Play Position variant.
+
+  Selection (TS / razor) IS shifted to the target so it follows the new
+  copies (matches PT).
+
+  Scope priority: Razor > Time selection > Item selection. Items-only
+  mode duplicates each selected item to the target (no splitting).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

@@ -1,44 +1,39 @@
--- @description hsuanice_Pro Tools Delete Fades
--- @version 0.2.1 [260505.1635]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Delete Fades**
---   Removes fade-in / fade-out / crossfade from items in scope.
---
---   **Crossfade behavior (PT-style):** when removing a crossfade, the two
---   items are snapped to TOUCH at the crossfade MIDPOINT — not left as
---   overlapping with their fades stripped. This matches PT (and avoids the
---   amagalma "Remove fades" + 41193 combo which leaves the items overlapping).
---
---   **Scope priority: Razor > Time selection > Item selection** (same as
---   Apply Next/Previous). Crossfade requires both items in the active set
---   for the pair-snap behavior; otherwise only manual fades on the active
---   side are cleared, leaving the xfade itself intact.
---
---   Razor, time selection, and item selection are preserved after delete.
---   - Tags: Editing, Fades
--- @changelog
---   0.2.1 [260505.1635] - Fix razor priority: when an xfade pair is processed,
---                          only the xfade-side fades are cleared (left's
---                          fade-out + right's fade-in). The OTHER side's
---                          fades (left's fade-in, right's fade-out) are no
---                          longer touched. So razor on just the crossfade
---                          region now correctly deletes only the crossfade
---                          and snaps to midpoint, leaving any unrelated
---                          fade-in/out on those items intact.
---   0.2.0 [260505.1608] - Real implementation. Uses Library/hsuanice_PT_Fades.lua
---                          for scope detection. Snap-to-midpoint for xfades.
---                          Manual fades cleared by zeroing D_FADEIN/OUTLEN.
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Delete Fades
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Delete Fades**
+  Removes fade-in / fade-out / crossfade from items in scope.
+
+  **Crossfade behavior (PT-style):** when removing a crossfade, the two
+  items are snapped to TOUCH at the crossfade MIDPOINT — not left as
+  overlapping with their fades stripped. This matches PT (and avoids the
+  amagalma "Remove fades" + 41193 combo which leaves the items overlapping).
+
+  **Scope priority: Razor > Time selection > Item selection** (same as
+  Apply Next/Previous). Crossfade requires both items in the active set
+  for the pair-snap behavior; otherwise only manual fades on the active
+  side are cleared, leaving the xfade itself intact.
+
+  Razor, time selection, and item selection are preserved after delete.
+  - Tags: Editing, Fades
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local F = dofile(_dir .. '../Library/hsuanice_PT_Fades.lua')
+local F = dofile(_dir .. 'hsuanice_PT_Fades.lua')
 if not F then
-  r.ShowMessageBox("Could not load Library/hsuanice_PT_Fades.lua", "Delete Fades", 0)
+  r.ShowMessageBox("Could not load hsuanice_PT_Fades.lua", "Delete Fades", 0)
   return
 end
 

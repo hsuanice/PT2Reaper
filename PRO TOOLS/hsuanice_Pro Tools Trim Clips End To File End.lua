@@ -1,26 +1,28 @@
--- @description hsuanice_Pro Tools Trim Clips End To File End
--- @version 0.3.0 [260504.1620]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Trim Clip End to File End**
---   Extends the RIGHT edge of each selected item up to:
---     • the next neighbor's start on the same track, or
---     • the source media end if no neighbor exists.
---   Auto-unloops and clamps any item that was previously stretched past the
---   source by SWS "Trim to fill selection". Respects playrate and STARTOFFS.
---   - Tags: Editing
--- @changelog
---   0.3.0 [260504.1620] - Selection follows extend: razor (per track) and time selection
---                          now expand to encompass the items' new extents (right edge only).
---   0.2.0 [260504.1520] - Header standardized to PT2Reaper line-comment style;
---                          logic unchanged from v0.1.
---   0.1                 - Beta release
+--[[
+@description hsuanice_Pro Tools Trim Clips End To File End
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Trim Clip End to File End**
+  Extends the RIGHT edge of each selected item up to:
+    • the next neighbor's start on the same track, or
+    • the source media end if no neighbor exists.
+  Auto-unloops and clamps any item that was previously stretched past the
+  source by SWS "Trim to fill selection". Respects playrate and STARTOFFS.
+  - Tags: Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 -- Load PT_Trim library (for snapshot_selection / expand_selection_to_items)
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local _ok, Trim = pcall(dofile, _dir .. '../Library/hsuanice_PT_Trim.lua')
+local _ok, Trim = pcall(dofile, _dir .. 'hsuanice_PT_Trim.lua')
 if not _ok then Trim = nil end
 
 reaper.Undo_BeginBlock()

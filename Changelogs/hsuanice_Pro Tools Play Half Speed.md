@@ -1,0 +1,18 @@
+# hsuanice_Pro Tools Play Half Speed.lua — Changelog
+
+hsuanice_Pro Tools Play Half Speed
+
+## 26.1115.1407
+
+- First release of the PT2Reaper package (all Pro Tools actions in one package).
+- File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+
+History before 26.1115.1407 (moved out of the script header; last header version: `0.3.1 [261115.1331]`).
+
+```text
+0.3.1 [261115.1331] - Insertion Follows Playback respected when stopping a QuickPunch pass.
+0.3.0 [261115.1250] - Stops a QuickPunch pass properly (copy of Play at Half Speed Once 26.1114).
+0.2.0 [261115.1230] - First implementation (copied from hsuanice_Transport 26.1114).
+0.1.0 [260413.1324] - Stub placeholder created.
+```
+

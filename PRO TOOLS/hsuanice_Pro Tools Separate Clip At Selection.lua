@@ -1,75 +1,50 @@
--- @description hsuanice_Pro Tools Separate Clip At Selection
--- @version 0.8.2 [260508.1313]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Separate Clip At Selection** (Cmd+E)
---
---   ## Modes
---   - **Time selection exists** → split selected items at TS_s and TS_e.
---     After: TS / razor preserved; item selection keeps the boundary-aware
---     inside-TS piece per item plus crossfade-resolved survivors. When a TS
---     edge split is suppressed by fade-boundary alignment, the surviving
---     piece that extends past TS to the item's edge stays selected (so the
---     "inside-TS portion" never silently goes unselected).
---   - **No time selection**     → split selected items at the edit cursor.
---     After: razor / TS / item selection cleared.
---
---   ## Boundary suppression (no-separate cases)
---   - TS_s OR TS_e at a fade boundary (fade-in out point or fade-out in
---     point) on a selected item → that split point is skipped on that item.
---   - TS_s = cf_start AND TS_e = cf_end (TS exactly equals crossfade) →
---     entire pair untouched.
---
---   ## Crossfade-in-TS rules (TS overlaps a crossfade pair)
---   - TS_s = cf_start, TS_e < cf_end → trim BOTH Left.fin and Right.pos to
---     TS_e (fully breaks the crossfade); select Left only (the side whose
---     range overlaps the TS).
---   - TS_s > cf_start, TS_e = cf_end → trim BOTH Left.fin and Right.pos to
---     TS_s (fully breaks the crossfade); select Right only.
---   - TS strictly inside crossfade   → fall through to plain split + crossfade
---     trim at TS_s; select inside-TS pieces only.
---
---   ## Crossfade-at-cursor rule
---   Cursor inside an overlap region trims BOTH items to cursor.
---
---   ## Plain split fade rule
---   - split inside fade-in  → left.fade-in cleared, right gets remainder.
---   - split inside fade-out → right.fade-out cleared, left gets portion.
---   - Tags: Editing, Clips
--- @changelog
---   0.8.2 [260508.1313] - Boundary-aware inside-TS selection. When a TS edge
---                          split is suppressed because TS_s/TS_e land on a
---                          fade-in out point or fade-out in point, the
---                          extended Left/Right piece (or the original item,
---                          if both edges were suppressed) stays selected
---                          instead of being filtered out by the strict
---                          "pos >= ts_s AND fin <= ts_e" rule.
---   0.8.1 [260508.1259] - Boundary cases: select only the surviving item that
---                          overlaps the TS (Left for s_at_start, Right for
---                          e_at_end). The other survivor is left untouched
---                          but unselected.
---   0.8.0 [260507.1500] - TS-in-crossfade boundary cases now trim BOTH items
---                          to fully break the crossfade. TS_s = cf_start:
---                          trim Left.fin AND Right.pos to ts_e. TS_e = cf_end:
---                          trim Left.fin AND Right.pos to ts_s. Both
---                          survivors selected. (Previously only one side was
---                          trimmed, leaving an unintended residual overlap.)
---   0.7.0 [260507.1430] - Don't delete items in TS-in-crossfade cases (fixes
---                          regression from 0.6.0 where outer pieces were
---                          erased entirely). TS_s = cf_start case: trim Left
---                          to ts_e and leave Right alone (manual selection
---                          mark). TS_e = cf_end case: mirror. TS strictly
---                          inside: v0.5.0 logic + selection filter.
---                          Boundary-suppression: split point at fade-in/out
---                          boundaries no-ops on that item.
---   0.6.0 [260507.1330] - TS-in-crossfade resolves to ONE surviving item with
---                          deletion of the other (USER REJECTED this).
---   0.5.0 [260507.1230] - Crossfade-aware (cursor + TS).
---   0.4.0 [260507.1130] - Asymmetric fade rule + per-mode selection handling.
---   0.3.0 [260507.1100] - First custom version.
---   0.2.0 [260506.2030] - Map to native 40196.
---   0.1.0 [260415.1250] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Separate Clip At Selection
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Separate Clip At Selection** (Cmd+E)
+
+  ## Modes
+  - **Time selection exists** → split selected items at TS_s and TS_e.
+    After: TS / razor preserved; item selection keeps the boundary-aware
+    inside-TS piece per item plus crossfade-resolved survivors. When a TS
+    edge split is suppressed by fade-boundary alignment, the surviving
+    piece that extends past TS to the item's edge stays selected (so the
+    "inside-TS portion" never silently goes unselected).
+  - **No time selection**     → split selected items at the edit cursor.
+    After: razor / TS / item selection cleared.
+
+  ## Boundary suppression (no-separate cases)
+  - TS_s OR TS_e at a fade boundary (fade-in out point or fade-out in
+    point) on a selected item → that split point is skipped on that item.
+  - TS_s = cf_start AND TS_e = cf_end (TS exactly equals crossfade) →
+    entire pair untouched.
+
+  ## Crossfade-in-TS rules (TS overlaps a crossfade pair)
+  - TS_s = cf_start, TS_e < cf_end → trim BOTH Left.fin and Right.pos to
+    TS_e (fully breaks the crossfade); select Left only (the side whose
+    range overlaps the TS).
+  - TS_s > cf_start, TS_e = cf_end → trim BOTH Left.fin and Right.pos to
+    TS_s (fully breaks the crossfade); select Right only.
+  - TS strictly inside crossfade   → fall through to plain split + crossfade
+    trim at TS_s; select inside-TS pieces only.
+
+  ## Crossfade-at-cursor rule
+  Cursor inside an overlap region trims BOTH items to cursor.
+
+  ## Plain split fade rule
+  - split inside fade-in  → left.fade-in cleared, right gets remainder.
+  - split inside fade-out → right.fade-out cleared, left gets portion.
+  - Tags: Editing, Clips
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

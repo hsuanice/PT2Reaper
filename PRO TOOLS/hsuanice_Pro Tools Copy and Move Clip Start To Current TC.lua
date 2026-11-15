@@ -1,35 +1,35 @@
--- @description hsuanice_Pro Tools Copy and Move Clip Start To Current TC
--- @version 0.2.1 [260506.1430]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Copy and Move Clip Start To Current TC**
---   (Opt+Ctrl+Y)
---
---   Like Move Clip Start To Current TC, but the originals stay intact —
---   only COPIES of the inside-selection portions are placed at the target.
---   Target = project start (timeline 0).
---
---   For each item overlapping the selection, the part inside selection is
---   cloned (chunk + STARTOFFS adjustment for partial overlaps) and placed
---   on the same track at the target. Outside-selection parts and the
---   original item itself are not touched.
---
---   Selection (TS / razor) IS shifted to the target so it follows the new
---   copies (matches PT — selection lands on the duplicated content).
---
---   Scope priority: Razor > Time selection > Item selection. Items-only
---   mode duplicates each selected item to the target (no splitting).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.2.1 [260506.1430] - Selection (TS / razor) now follows the copies to
---                          the target — matches PT. Originals still untouched.
---   0.2.0 [260506.1400] - Real implementation. Chunk-clone for partial
---                          overlaps with STARTOFFS adjusted by inside-offset
---                          * playrate per take. Selection stayed at origin
---                          (later moved with copies in 0.2.1).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Copy and Move Clip Start To Current TC
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Copy and Move Clip Start To Current TC**
+  (Opt+Ctrl+Y)
+
+  Like Move Clip Start To Current TC, but the originals stay intact —
+  only COPIES of the inside-selection portions are placed at the target.
+  Target = project start (timeline 0).
+
+  For each item overlapping the selection, the part inside selection is
+  cloned (chunk + STARTOFFS adjustment for partial overlaps) and placed
+  on the same track at the target. Outside-selection parts and the
+  original item itself are not touched.
+
+  Selection (TS / razor) IS shifted to the target so it follows the new
+  copies (matches PT — selection lands on the duplicated content).
+
+  Scope priority: Razor > Time selection > Item selection. Items-only
+  mode duplicates each selected item to the target (no splitting).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

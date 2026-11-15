@@ -1,33 +1,31 @@
--- @description hsuanice_Pro Tools Repeat
--- @version 0.1.3 [260415.1629]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Replicates Pro Tools: **Repeat**
---
---   ## Behaviour
---   - Error shown first if no items selected
---   - Dialog: "Number Of Repeats:" (matches Pro Tools)
---   - Remembers last entered value across sessions
---   - Each repeat placed on the SAME track as source, ignoring track selection
---   - Only newly created items are selected after repeat
---   - Notifies hsuanice_PT_SelectionSync so active link daemons update immediately
---   - Undo in one step
---
---   - Mac shortcut (PT) : Option + R
---   - Tags              : Edit menu, Editing
---
--- @changelog
---   0.1.3 [260415.1629]
---     - Add: calls hsuanice_PT_SelectionSync.notify() after selection change
---   0.1.2 [260415.1620]
---     - Fix: use GetItemStateChunk/SetItemStateChunk for proper item copy
---   0.1.1 [260415.1615]
---     - Fix: error before dialog if no selection; track-aware placement
---   0.1.0 [260415.1600]
---     - Initial release
+--[[
+@description hsuanice_Pro Tools Repeat
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  # hsuanice Pro Tools Keybindings for REAPER
+
+  Replicates Pro Tools: **Repeat**
+
+  ## Behaviour
+  - Error shown first if no items selected
+  - Dialog: "Number Of Repeats:" (matches Pro Tools)
+  - Remembers last entered value across sessions
+  - Each repeat placed on the SAME track as source, ignoring track selection
+  - Only newly created items are selected after repeat
+  - Notifies hsuanice_PT_SelectionSync so active link daemons update immediately
+  - Undo in one step
+
+  - Mac shortcut (PT) : Option + R
+  - Tags              : Edit menu, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 
@@ -35,7 +33,7 @@ local r = reaper
 local function load_sync()
   local info = debug.getinfo(1, 'S').source:match("^@?(.*[/\\])")
   if not info then return nil end
-  local lib_path = info .. "../Library/hsuanice_PT_SelectionSync.lua"
+  local lib_path = info .. "hsuanice_PT_SelectionSync.lua"
   local ok, mod = pcall(dofile, lib_path)
   return ok and mod or nil
 end
@@ -48,7 +46,7 @@ local EXT_KEY     = "Repeat_LastCount"
 local function copy_item_to(src_item, dst_track, new_pos)
   local _, chunk = r.GetItemStateChunk(src_item, "", false)
   local tmp = r.AddMediaItemToTrack(dst_track)
-  local new_guid = r.BR_GetMediaItemGUID(tmp)
+  local _, new_guid = r.GetSetMediaItemInfo_String(tmp, "GUID", "", false) -- native (no SWS)
   r.DeleteTrackMediaItem(dst_track, tmp)
   chunk = chunk:gsub("IGUID {[^}]+}", "IGUID " .. new_guid)
   local new_item = r.AddMediaItemToTrack(dst_track)

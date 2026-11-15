@@ -1,36 +1,39 @@
--- @description hsuanice_Pro Tools Move Edit Selection To Previous Clip
--- @version 0.2.0 [260509.1036]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Edit Selection To Previous Clip**
---   (Cmd+Ctrl+L / Opt+Ctrl+Tab)
---
---   Same logic as Move Edit Insertion To Previous Edit:
---   - Tab to Transient ON  → moves cursor to previous transient
---     (filtered by shared min-gap setting in
---     Library/hsuanice_PT_Transient.lua).
---   - Tab to Transient OFF → moves cursor to previous item edge.
---
---   Saves and restores item selection so the user sees no change.
---
---   ## Dependency
---   - `Library/hsuanice_PT_Transient.lua`
---
---   - Tags : Editing, Navigation, Selection
---
--- @changelog
---   0.2.0 [260509.1036] - First implementation. Mirrors Move Edit
---                          Insertion To Previous Edit v0.2.0.
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Move Edit Selection To Previous Clip
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Edit Selection To Previous Clip**
+  (Cmd+Ctrl+L / Opt+Ctrl+Tab)
+
+  Same logic as Move Edit Insertion To Previous Edit:
+  - Tab to Transient ON  → moves cursor to previous transient
+    (filtered by shared min-gap setting in
+    Library/hsuanice_PT_Transient.lua).
+  - Tab to Transient OFF → moves cursor to previous item edge.
+
+  Saves and restores item selection so the user sees no change.
+
+  ## Dependency
+  - `Library/hsuanice_PT_Transient.lua`
+
+  - Tags : Editing, Navigation, Selection
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local Tran  = dofile(_dir .. '../Library/hsuanice_PT_Transient.lua')
+local Tran  = dofile(_dir .. 'hsuanice_PT_Transient.lua')
 if not Tran then
-  r.ShowMessageBox("Could not load Library/hsuanice_PT_Transient.lua",
+  r.ShowMessageBox("Could not load hsuanice_PT_Transient.lua",
     "Move Edit Selection To Previous Clip", 0)
   return
 end

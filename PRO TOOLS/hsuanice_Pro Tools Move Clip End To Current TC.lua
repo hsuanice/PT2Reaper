@@ -1,24 +1,27 @@
--- @description hsuanice_Pro Tools Move Clip End To Current TC
--- @version 0.2.0 [260506.1445]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip End To Current TC** (Ctrl+I)
---
---   Aligns the SELECTION's END to project start (timeline 0). Items that
---   overlap the selection get their portion-inside-selection cut out and
---   moved with the selection — cut-and-paste semantics. Parts of items
---   outside the selection are split off and stay put.
---
---   Mirrors "Move Clip Start To Current TC" but the alignment reference is
---   the selection END (sel_e) instead of the start.
---
---   - Tags: Clips, Editing
--- @changelog
---   0.2.0 [260506.1445] - Real implementation. Mirrors Move Clip Start To
---                          Current TC, with delta = target - sel_e (and
---                          items-only mode uses latest item end).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip End To Current TC
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip End To Current TC** (Ctrl+I)
+
+  Aligns the SELECTION's END to project start (timeline 0). Items that
+  overlap the selection get their portion-inside-selection cut out and
+  moved with the selection — cut-and-paste semantics. Parts of items
+  outside the selection are split off and stay put.
+
+  Mirrors "Move Clip Start To Current TC" but the alignment reference is
+  the selection END (sel_e) instead of the start.
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

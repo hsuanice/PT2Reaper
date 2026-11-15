@@ -1,14 +1,19 @@
--- @description hsuanice_Pro Tools Unloop Clips
--- @version 0.2.0 [260506.1810]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Unloop Clips** — disables loop source on
---   selected items (B_LOOPSRC = 0). Items longer than the source will
---   stop tiling.
--- @changelog
---   0.2.0 [260506.1810] - Set B_LOOPSRC = 0 on each selected item.
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Unloop Clips
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Unloop Clips** — disables loop source on
+  selected items (B_LOOPSRC = 0). Items longer than the source will
+  stop tiling.
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local n = r.CountSelectedMediaItems(0)

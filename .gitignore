@@ -1,1 +1,137 @@
+# Whitelist: only the published PT2Reaper files are tracked.
+# Everything else in PRO TOOLS/ (unfinished stubs, local tools, SelectionSync) stays local.
+/*
+!/.gitignore
+!/.github/
+!/.reapack-index.conf
+!/README.md
+!/index.xml
+!/Changelogs/
+!/.dev/
+
+!/PRO TOOLS/
+/PRO TOOLS/*
+!/PRO TOOLS/hsuanice_Grid Nudge Panel.lua
+!/PRO TOOLS/hsuanice_Grid_Nudge_Panel_Reset_Position.lua
+!/PRO TOOLS/hsuanice_PT2Reaper.lua
+!/PRO TOOLS/hsuanice_PT_Fades.lua
+!/PRO TOOLS/hsuanice_PT_GFXInputField.lua
+!/PRO TOOLS/hsuanice_PT_Grid.lua
+!/PRO TOOLS/hsuanice_PT_Nudge.lua
+!/PRO TOOLS/hsuanice_PT_NudgeEdge.lua
+!/PRO TOOLS/hsuanice_PT_QuickPunch Pass Monitor.lua
+!/PRO TOOLS/hsuanice_PT_QuickPunch.lua
+!/PRO TOOLS/hsuanice_PT_Transient Settings.lua
+!/PRO TOOLS/hsuanice_PT_Transient.lua
+!/PRO TOOLS/hsuanice_PT_Transport.lua
+!/PRO TOOLS/hsuanice_PT_Trim.lua
+!/PRO TOOLS/hsuanice_Pro Tools Apply Next Fade Shape.lua
+!/PRO TOOLS/hsuanice_Pro Tools Apply Previous Fade Shape.lua
+!/PRO TOOLS/hsuanice_Pro Tools Clear.lua
+!/PRO TOOLS/hsuanice_Pro Tools Consolidate Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip End To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip End To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip Start To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip Start To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip Sync Point To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Copy and Move Clip Sync Point To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Create Fades.lua
+!/PRO TOOLS/hsuanice_Pro Tools Decrease Grid Value.lua
+!/PRO TOOLS/hsuanice_Pro Tools Decrease Nudge Value.lua
+!/PRO TOOLS/hsuanice_Pro Tools Delete Fades.lua
+!/PRO TOOLS/hsuanice_Pro Tools Delete Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Double Edit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Duplicate.lua
+!/PRO TOOLS/hsuanice_Pro Tools Edit Lock Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Execute Crossfade using last setting.lua
+!/PRO TOOLS/hsuanice_Pro Tools Fade In From Start To Cursor.lua
+!/PRO TOOLS/hsuanice_Pro Tools Fade Out From Cursor To End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Grid Mode.lua
+!/PRO TOOLS/hsuanice_Pro Tools Group Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Halve Edit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Heal Separation.lua
+!/PRO TOOLS/hsuanice_Pro Tools Identify Sync Point.lua
+!/PRO TOOLS/hsuanice_Pro Tools Increase Grid Value.lua
+!/PRO TOOLS/hsuanice_Pro Tools Increase Nudge Value.lua
+!/PRO TOOLS/hsuanice_Pro Tools Insertion Follows Playback.lua
+!/PRO TOOLS/hsuanice_Pro Tools Link Timeline and Edit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Link Track And Edit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Loop Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip End To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip End To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip Start To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip Start To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip Sync Point To Current TC.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Clip Sync Point To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Next Edit - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Next Edit.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Previous Edit - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Previous Edit.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Session Start - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Next Clip - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Next Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Previous Clip - Extend Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Previous Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Mute Unmute Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Contents Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Contents Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip End Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip End Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Start Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Clip Start Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Play Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Play Earlier By Next Larger Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Play Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Play Later By Next Larger Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection End - Selection Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Earlier By Grid - Selection Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Earlier By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End - Selection Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid - Selection End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid - Selection Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Nudge Selection Later By Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Play Half Speed.lua
+!/PRO TOOLS/hsuanice_Pro Tools Play-Stop.lua
+!/PRO TOOLS/hsuanice_Pro Tools Quantize Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools QuickPunch.lua
+!/PRO TOOLS/hsuanice_Pro Tools Quit.lua
+!/PRO TOOLS/hsuanice_Pro Tools Record Punch.lua
+!/PRO TOOLS/hsuanice_Pro Tools Redo.lua
+!/PRO TOOLS/hsuanice_Pro Tools Rename Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Repeat.lua
+!/PRO TOOLS/hsuanice_Pro Tools Save As.lua
+!/PRO TOOLS/hsuanice_Pro Tools Save.lua
+!/PRO TOOLS/hsuanice_Pro Tools Select All.lua
+!/PRO TOOLS/hsuanice_Pro Tools Separate Clip At Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Separate Clip At Transients.lua
+!/PRO TOOLS/hsuanice_Pro Tools Separate Clip On Grid.lua
+!/PRO TOOLS/hsuanice_Pro Tools Shrink Edit Selection To Next Edit.lua
+!/PRO TOOLS/hsuanice_Pro Tools Shrink Edit Selection To Previous Edit.lua
+!/PRO TOOLS/hsuanice_Pro Tools Shuffle Mode.lua
+!/PRO TOOLS/hsuanice_Pro Tools Slip Mode.lua
+!/PRO TOOLS/hsuanice_Pro Tools Snap To Next.lua
+!/PRO TOOLS/hsuanice_Pro Tools Snap To Previous.lua
+!/PRO TOOLS/hsuanice_Pro Tools Space Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Spot Mode.lua
+!/PRO TOOLS/hsuanice_Pro Tools Tab to Transient.lua
+!/PRO TOOLS/hsuanice_Pro Tools Time Lock Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip End To Cursor.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip End to Fill Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip Start To Cursor.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip Start To Fill Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip To File Boundaries.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip To Fill Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clip To Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clips End To File End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Trim Clips Start To File Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Undo.lua
+!/PRO TOOLS/hsuanice_Pro Tools Ungroup Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Unloop Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Zoom Toggle.lua
+
 .DS_Store
+__pycache__/

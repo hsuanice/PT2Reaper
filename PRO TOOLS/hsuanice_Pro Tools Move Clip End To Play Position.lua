@@ -1,22 +1,25 @@
--- @description hsuanice_Pro Tools Move Clip End To Play Position
--- @version 0.2.0 [260506.1445]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip End To Play Position** (Ctrl+K)
---
---   Aligns the SELECTION's END to the EDIT cursor. Items overlapping the
---   selection get their inside-portion cut out and moved with the
---   selection (cut-and-paste); outside parts are split off and stay put.
---
---   Always splits even when delta = 0 (PT Spot semantics).
---
---   - Tags: Clips, Editing
--- @changelog
---   0.2.0 [260506.1445] - Real implementation. Mirrors Move Clip End To
---                          Current TC, but target = edit cursor and always
---                          splits even when delta=0.
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip End To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip End To Play Position** (Ctrl+K)
+
+  Aligns the SELECTION's END to the EDIT cursor. Items overlapping the
+  selection get their inside-portion cut out and moved with the
+  selection (cut-and-paste); outside parts are split off and stay put.
+
+  Always splits even when delta = 0 (PT Spot semantics).
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

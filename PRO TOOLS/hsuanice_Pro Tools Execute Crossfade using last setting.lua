@@ -1,55 +1,43 @@
--- @description hsuanice_Pro Tools Execute Crossfade using last setting
--- @version 0.4.1 [260505.1945]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Execute Crossfade using last setting**
---   (Cmd+Ctrl+F / Ctrl+F). Re-runs Create Fades with the last shape +
---   length the user picked, without showing the GUI.
---
---   **Selection-aware (same as Create Fades):**
---     - Razor / time selection / item selection determines which type of
---       fade applies per item (fade-in / fade-out / crossfade)
---     - Single-category shape-only mode: length comes from the selection
---       (per-item for fade-in/out; selection length for crossfade)
---     - Mixed-type batch mode: length comes from stored ms / frame value
---
---   **Stored settings** (set every time Create Fades' OK is clicked, in
---   ExtState section "hsuanice_PT2Reaper_CreateFades"):
---     - fadein_shape / fadeout_shape / xfade_shape (1..7)
---     - fadein_ms / fadeout_ms / xfade_ms (number, in saved unit)
---     - length_unit ("ms" or "frame")
---
---   Razor, time selection, and item selection are preserved after apply.
---   - Tags: Editing, Fades
--- @changelog
---   0.4.1 [260505.1945] - Position the xfade exactly at the selection (not
---                          just match its length). Matches PT behavior:
---                          when the razor/TS doesn't sit on the existing
---                          midpoint, the recreated crossfade follows the
---                          selection bounds and the midpoint changes
---                          accordingly. Library v0.2.x exposes sel_start /
---                          sel_end via det for this; both touching and
---                          already-overlapping pair paths use it.
---   0.4.0 [260505.1930] - Rewrite to use F.detect_create_targets() (the
---                          shared Create-Fades-style detection). Now correctly
---                          recalls per-type shape AND length based on selection
---                          geometry — razor at item start applies fade-in only,
---                          razor on xfade region applies xfade only, etc.
---                          Crossfade length now comes from the selection in
---                          shape-only mode (matches Create Fades behavior),
---                          fall back to stored ms/frame in batch mode.
---   0.3.0 [260505.1815] - Honor the length_unit ExtState key.
---   0.2.0 [260505.1608] - Real implementation; reads ExtState.
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Execute Crossfade using last setting
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Execute Crossfade using last setting**
+  (Cmd+Ctrl+F / Ctrl+F). Re-runs Create Fades with the last shape +
+  length the user picked, without showing the GUI.
+
+  **Selection-aware (same as Create Fades):**
+    - Razor / time selection / item selection determines which type of
+      fade applies per item (fade-in / fade-out / crossfade)
+    - Single-category shape-only mode: length comes from the selection
+      (per-item for fade-in/out; selection length for crossfade)
+    - Mixed-type batch mode: length comes from stored ms / frame value
+
+  **Stored settings** (set every time Create Fades' OK is clicked, in
+  ExtState section "hsuanice_PT2Reaper_CreateFades"):
+    - fadein_shape / fadeout_shape / xfade_shape (1..7)
+    - fadein_ms / fadeout_ms / xfade_ms (number, in saved unit)
+    - length_unit ("ms" or "frame")
+
+  Razor, time selection, and item selection are preserved after apply.
+  - Tags: Editing, Fades
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 
 local _info = debug.getinfo(1, 'S')
 local _dir  = _info.source:match('^@(.*[/\\])') or ''
-local F = dofile(_dir .. '../Library/hsuanice_PT_Fades.lua')
+local F = dofile(_dir .. 'hsuanice_PT_Fades.lua')
 if not F then
-  r.ShowMessageBox("Could not load Library/hsuanice_PT_Fades.lua",
+  r.ShowMessageBox("Could not load hsuanice_PT_Fades.lua",
     "Execute Crossfade Last Setting", 0)
   return
 end

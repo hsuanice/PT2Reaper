@@ -1,53 +1,78 @@
--- @description hsuanice_Pro Tools Delete Selection
--- @version 0.3.2 [260506.2010]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Wrapper replicating Pro Tools: **Delete Selection** (Delete key)
---
---   PT's Delete is context-aware. This script mirrors that with PT-style
---   partial removal that preserves fades on the surviving outer pieces.
---
---   ## Mapping
---   - Razor zones exist           → Split items at zone edges, remove
---                                    inside pieces (per zone, per track).
---                                    Outer pieces keep their fades.
---   - Selected items + time sel   → Split selected items at TS edges,
---                                    remove inside pieces. Outer pieces
---                                    keep their fades.
---   - Selected items only         → Remove items (40006).
---   - Selected envelope points    → Delete envelope points (40333).
---   - Automation items selected   → Delete automation items (42086).
---   - Time selection exists       → Remove time selection (40635).
---   - Razor at end                → Clear razor zones (always).
---
---   - Mac shortcut (PT) : Delete
---   - Tags              : Editing
---
--- @changelog
---   0.3.2 [260506.2010]
---     - Always clear time selection at end too (alongside razor + item
---       selection).
---   0.3.1 [260506.1945]
---     - Fade preservation on outer pieces: left piece keeps its original
---       fade-in (truncated to its new length), right piece gets a fade-in
---       equal to whatever portion of the original fade-in extended past
---       the cut, fade-out kept (truncated).
---     - Always clear item selection at end (matches PT).
---   0.3.0 [260506.1920]
---     - PT-style partial removal: when items + time selection (or razor)
---       intersect, split items at the boundaries and remove only the
---       inside pieces. Surviving outer pieces keep their fade-in /
---       fade-out, matching PT behavior.
---   0.2.0 [260506.1850]
---     - Always clear razor edit zones at the end.
---   0.1.0 [260415.1250]
---     - Initial release: context-aware delete mirroring PT behaviour.
+--[[
+@description hsuanice_Pro Tools Delete Selection
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  # hsuanice Pro Tools Keybindings for REAPER
+
+  Wrapper replicating Pro Tools: **Delete Selection** (Delete key)
+
+  PT's Delete is context-aware. This script mirrors that with PT-style
+  partial removal that preserves fades on the surviving outer pieces.
+
+  ## Mapping
+  - Razor zones exist           → Split items at zone edges, remove
+                                   inside pieces (per zone, per track).
+                                   Outer pieces keep their fades.
+  - Selected items + time sel   → Split selected items at TS edges,
+                                   remove inside pieces. Outer pieces
+                                   keep their fades.
+  - Selected items only         → Remove items (40006).
+  - Selected envelope points    → Delete envelope points (40333).
+  - Automation items selected   → Delete automation items (42086).
+  - Time selection exists       → Remove time selection (40635).
+  - Razor at end                → Clear razor zones (always).
+
+  - Mac shortcut (PT) : Delete
+  - Tags              : Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9
+
+-- Fade line snapshot / shape restore (shape, curve, S-curve intensity).
+-- Own copy of fade_line / restore_fade_shape from hsuanice_Hover.lua (hsuanice Library),
+-- so the PT2Reaper scripts are self-contained.
+-- The item chunk's FADEIN / FADEOUT line holds shape, length, curve and S-curve intensity.
+-- Writing the fade fields through the API can reset the shape and curve to Linear, so the
+-- line is read before an edge edit and its shape/curve tokens are put back afterwards.
+local Hover = {}
+local function item_head(it)
+  local ok, chunk = r.GetItemStateChunk(it, "", false)
+  if not ok or not chunk then return nil end
+  local cut = chunk:find("\n<", 1, true) or #chunk  -- item-level lines come before any <TAKE / <SOURCE block
+  return chunk, cut
+end
+function Hover.fade_line(it, key)
+  local chunk, cut = item_head(it)
+  if not chunk then return nil end
+  return chunk:sub(1, cut):match("\n(" .. key .. " [^\r\n]*)")
+end
+-- Keep the new length tokens (2 and 3) and restore every other token from old_line
+function Hover.restore_fade_shape(it, key, old_line)
+  if not old_line then return end
+  local chunk, cut = item_head(it)
+  if not chunk then return end
+  local head, rest = chunk:sub(1, cut), chunk:sub(cut + 1)
+  local new_line = head:match("\n(" .. key .. " [^\r\n]*)")
+  if not new_line or new_line == old_line then return end
+  local old_t, new_t = {}, {}
+  for t in old_line:gmatch("%S+") do old_t[#old_t + 1] = t end
+  for t in new_line:gmatch("%S+") do new_t[#new_t + 1] = t end
+  if #old_t ~= #new_t or #new_t < 4 then return end
+  old_t[3], old_t[4] = new_t[3], new_t[4]  -- [1] is the key itself
+  local merged = table.concat(old_t, " ")
+  if merged == new_line then return end
+  local new_head = head:gsub("\n" .. key .. " [^\r\n]*", function() return "\n" .. merged end, 1)
+  r.SetItemStateChunk(it, new_head .. rest, false)
+end
 
 local function get_razor_zones()
   local zones = {}
@@ -70,13 +95,26 @@ local function get_razor_zones()
   return zones
 end
 
+-- Set a piece's fade lengths, then put back the original shape / curve
+-- (writing the length can reset the shape to Linear)
+local function set_piece_fades(piece, fi, fo, fi_line, fo_line)
+  r.SetMediaItemInfo_Value(piece, "D_FADEINLEN",  fi)
+  r.SetMediaItemInfo_Value(piece, "D_FADEOUTLEN", fo)
+  if Hover then
+    if fi > EPS then Hover.restore_fade_shape(piece, "FADEIN",  fi_line) end
+    if fo > EPS then Hover.restore_fade_shape(piece, "FADEOUT", fo_line) end
+  end
+end
+
 -- Split items overlapping [s, e] and remove inside pieces. Outer pieces
--- get their fades restored manually because REAPER's SplitMediaItem doesn't
--- preserve fade-in / fade-out across the new edges.
+-- keep their fades like a PT trim: a fade keeps its far end (fade-in end /
+-- fade-out start) and is shortened only when the cut runs into it.
 local function partial_remove(victims, s, e)
   for _, v in ipairs(victims) do
     local fi_orig = r.GetMediaItemInfo_Value(v.item, "D_FADEINLEN")  or 0
     local fo_orig = r.GetMediaItemInfo_Value(v.item, "D_FADEOUTLEN") or 0
+    local fi_line = Hover and Hover.fade_line(v.item, "FADEIN")
+    local fo_line = Hover and Hover.fade_line(v.item, "FADEOUT")
 
     local left_piece, right_piece
     local it = v.item
@@ -94,19 +132,19 @@ local function partial_remove(victims, s, e)
     if left_piece then
       local left_len = s - v.pos
       if left_len > EPS then
-        r.SetMediaItemInfo_Value(left_piece, "D_FADEINLEN",
-          math.min(fi_orig, left_len))
-        r.SetMediaItemInfo_Value(left_piece, "D_FADEOUTLEN", 0)
+        -- fade-out keeps its start; it survives only if it started before the cut
+        local fo_remain = (fo_orig > 0) and math.max(0, s - (v.fin - fo_orig)) or 0
+        set_piece_fades(left_piece, math.min(fi_orig, left_len),
+          math.min(fo_remain, left_len), fi_line, fo_line)
       end
     end
     if right_piece then
       local right_len = v.fin - e
       if right_len > EPS then
-        local fi_remain = math.max(0, v.pos + fi_orig - e)
-        r.SetMediaItemInfo_Value(right_piece, "D_FADEINLEN",
-          math.min(fi_remain, right_len))
-        r.SetMediaItemInfo_Value(right_piece, "D_FADEOUTLEN",
-          math.min(fo_orig, right_len))
+        -- fade-in keeps its end; it survives only if it ended after the cut
+        local fi_remain = (fi_orig > 0) and math.max(0, v.pos + fi_orig - e) or 0
+        set_piece_fades(right_piece, math.min(fi_remain, right_len),
+          math.min(fo_orig, right_len), fi_line, fo_line)
       end
     end
   end

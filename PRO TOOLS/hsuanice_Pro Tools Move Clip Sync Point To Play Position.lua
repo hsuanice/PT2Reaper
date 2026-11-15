@@ -1,33 +1,32 @@
--- @description hsuanice_Pro Tools Move Clip Sync Point To Play Position
--- @version 0.3.1 [260506.1700]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip Sync Point To Play Position** (Ctrl+J)
---
---   Aligns the leftmost SYNC POINT among items in scope to the EDIT cursor.
---   All in-scope items shift by the same delta. The selection (TS / razor)
---   follows.
---
---   PT-style cut-and-paste split: items partially overlapping the selection
---   are split at sel_s/sel_e; only the inside-selection portion moves;
---   outside parts stay put. Always splits even when delta = 0 (Spot semantics).
---
---   Reference: among all in-scope items, the one with the LEFTMOST sync
---   point absolute position. delta = target − ref_sync_abs.
---
---   Scope priority: Razor > Time selection > Item selection.
---
---   - Tags: Clips, Editing
--- @changelog
---   0.3.1 [260506.1700] - Time mode now requires items to also be
---                          item-selected (matches PT — time selection alone
---                          doesn't pick up unselected items on other tracks).
---   0.3.0 [260506.1620] - Add cut-and-paste split. Reference = earliest
---                          sync absolute position. Always splits even at
---                          delta=0 (matches Move Clip Start To Play Position).
---   0.2.0 [260506.1515] - First implementation (group move, no split).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip Sync Point To Play Position
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip Sync Point To Play Position** (Ctrl+J)
+
+  Aligns the leftmost SYNC POINT among items in scope to the EDIT cursor.
+  All in-scope items shift by the same delta. The selection (TS / razor)
+  follows.
+
+  PT-style cut-and-paste split: items partially overlapping the selection
+  are split at sel_s/sel_e; only the inside-selection portion moves;
+  outside parts stay put. Always splits even when delta = 0 (Spot semantics).
+
+  Reference: among all in-scope items, the one with the LEFTMOST sync
+  point absolute position. delta = target − ref_sync_abs.
+
+  Scope priority: Razor > Time selection > Item selection.
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

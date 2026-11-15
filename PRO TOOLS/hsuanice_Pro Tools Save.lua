@@ -1,32 +1,23 @@
--- @description hsuanice_Pro Tools Save
--- @version 0.1.0 [260413.1324]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   # hsuanice Pro Tools Keybindings for REAPER
---
---   Stub script for the Pro Tools action:
---   **Save**
---
---   ## Status
---   NOT YET IMPLEMENTED — placeholder only.
---
---   ## Details
---   - Pro Tools equivalent : Save
---   - Module               : Misc
---   - Mac shortcut (PT)    : Command + S
---   - Tags                 : File menu
---
---   ## About This Project
---   Part of the PT2Reaper project — a complete mapping of Pro Tools
---   keyboard shortcuts and actions to native REAPER equivalents.
---
---   ## Development
---   Developed with the assistance of Claude AI (Anthropic).
---
--- @changelog
---   0.1.0 [260413.1324]
---     - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Save
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Save**
+  (PT key: Cmd+S)
 
--- TODO: not yet mapped to a Reaper action
-reaper.ShowMessageBox("Not yet implemented: Save", "PT2Reaper", 0)
+  Thin wrapper over native 40026 (File: Save project).
+  Saves the current project (same as REAPER Cmd+S in Main).
+
+  - Tags : Misc, File menu
+  Built with AI: written with Claude Code (Anthropic).
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
+
+reaper.Main_OnCommand(40026, 0)

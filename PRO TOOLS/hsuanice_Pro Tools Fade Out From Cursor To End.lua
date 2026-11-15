@@ -1,23 +1,23 @@
--- @description hsuanice_Pro Tools Fade Out From Cursor To End
--- @version 0.3.0 [260505.2045]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Fade Out From Cursor To End** (Ctrl+G)
---   Thin wrapper over REAPER native action 40510 "Item: Fade items out
---   from cursor" — for each selected item, sets the fade-out length to
---   (item.fin − cursor). Items with the cursor outside their body are
---   skipped automatically by the native action. REAPER's default fade
---   shape is used.
---   - Tags: Editing, Fades
--- @changelog
---   0.3.0 [260505.2045] - Simplify to a thin wrapper around native
---                          40510. Custom shape-from-ExtState logic
---                          retained below as a NOTE block in case PT-style
---                          shape recall is wanted later.
---   0.2.0 [260505.2030] - First real implementation (custom iteration +
---                          shape from Create Fades ExtState).
---   0.1.0 [260413.1324] - Stub placeholder created.
+--[[
+@description hsuanice_Pro Tools Fade Out From Cursor To End
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Fade Out From Cursor To End** (Ctrl+G)
+  Thin wrapper over REAPER native action 40510 "Item: Fade items out
+  from cursor" — for each selected item, sets the fade-out length to
+  (item.fin − cursor). Items with the cursor outside their body are
+  skipped automatically by the native action. REAPER's default fade
+  shape is used.
+  - Tags: Editing, Fades
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 reaper.Main_OnCommand(40510, 0)  -- Item: Fade items out from cursor
 
@@ -31,7 +31,7 @@ so we can apply a specific shape per-item via FADEOUT_CMDS:
   local r = reaper
   local _info = debug.getinfo(1, 'S')
   local _dir  = _info.source:match('^@(.*[/\\])') or ''
-  local F = dofile(_dir .. '../Library/hsuanice_PT_Fades.lua')
+  local F = dofile(_dir .. 'hsuanice_PT_Fades.lua')
   if not F then return end
 
   local EXT_SEC = "hsuanice_PT2Reaper_CreateFades"

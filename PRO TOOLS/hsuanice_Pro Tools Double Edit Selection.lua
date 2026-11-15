@@ -1,23 +1,24 @@
--- @description hsuanice_Pro Tools Double Edit Selection
--- @version 0.2.0 [260509.1036]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Double Edit Selection**
---   (Cmd+Opt+Ctrl+Shift+')
---
---   Doubles the length of the time selection and every razor zone,
---   keeping the LEFT edge as the anchor (selection extends rightward).
---   No-op if neither time selection nor razor exists.
---
---   - Tags : Editing, Selection
---
--- @changelog
---   0.2.0 [260509.1036] - First implementation. Doubles TS + razor
---                          length from the left anchor. Replaces the
---                          incorrect 0.1.0 mapping to native 40031
---                          (which was View: Zoom time selection).
---   0.1.0 [260413.1324] - Initial stub mismapped to action 40031.
+--[[
+@description hsuanice_Pro Tools Double Edit Selection
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Double Edit Selection**
+  (Cmd+Opt+Ctrl+Shift+')
+
+  Doubles the length of the time selection and every razor zone,
+  keeping the LEFT edge as the anchor (selection extends rightward).
+  No-op if neither time selection nor razor exists.
+
+  - Tags : Editing, Selection
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9

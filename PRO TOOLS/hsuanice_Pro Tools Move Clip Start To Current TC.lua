@@ -1,47 +1,44 @@
--- @description hsuanice_Pro Tools Move Clip Start To Current TC
--- @version 0.4.0 [260506.1305]
--- @author hsuanice
--- @link https://forum.cockos.com/showthread.php?p=2910884#post2910884
--- @about
---   Replicates Pro Tools: **Move Clip Start To Current TC** (Ctrl+Y)
---
---   Aligns the SELECTION's start to project start (timeline 0). Items that
---   overlap the selection get their portion-inside-selection cut out and
---   moved with the selection — cut-and-paste semantics, NOT a "selection
---   auto-extends to the whole item" semantics. Parts of items outside the
---   selection are split off and stay put.
---
---   Example: selection 5..8, item 4..6 → split item at 5; the 4..5 piece
---   stays where it is; the 5..6 piece moves with the selection (delta = 0
---   − 5 = −5), landing at 0..1.
---
---   Items fully inside the selection are not split — they just move.
---
---   **Scope priority: Razor > Time selection > Item selection.**
---     - Razor: scope = union of all track-area razor zones; only items on
---       razor tracks are processed
---     - Time: scope = time-selection bounds; all tracks
---     - Items only: no splitting (items are already the unit of work);
---       earliest selected item's start = the alignment reference; all
---       selected items shift by the same delta
---
---   No-op when no items end up in scope.
---
---   For "move to edit cursor" use the "Move Clip Start To Play Position"
---   variant instead.
---
---   - Tags: Clips, Editing
--- @changelog
---   0.4.0 [260506.1305] - Switch to PT-style cut-and-paste split on partial
---                          overlaps. Items partially overlapping the
---                          selection are split at the selection boundaries
---                          and only the inside portion moves; the outside
---                          parts stay in place. Replaces the v0.2/v0.3
---                          "auto-extend selection to wrap whole item"
---                          behavior, which the user confirmed PT does NOT do.
---   0.3.0 [260506.1230] - Target changed to project start (timeline 0).
---   0.2.0 [260506.1145] - Real implementation (auto-extend variant).
---   0.1.0 [260413.1324] - Stub placeholder created
+--[[
+@description hsuanice_Pro Tools Move Clip Start To Current TC
+@version 26.1115.1407
+@author hsuanice
+@noindex
+@changelog
+  - First release of the PT2Reaper package (all Pro Tools actions in one package).
+  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Replicates Pro Tools: **Move Clip Start To Current TC** (Ctrl+Y)
+
+  Aligns the SELECTION's start to project start (timeline 0). Items that
+  overlap the selection get their portion-inside-selection cut out and
+  moved with the selection — cut-and-paste semantics, NOT a "selection
+  auto-extends to the whole item" semantics. Parts of items outside the
+  selection are split off and stay put.
+
+  Example: selection 5..8, item 4..6 → split item at 5; the 4..5 piece
+  stays where it is; the 5..6 piece moves with the selection (delta = 0
+  − 5 = −5), landing at 0..1.
+
+  Items fully inside the selection are not split — they just move.
+
+  **Scope priority: Razor > Time selection > Item selection.**
+    - Razor: scope = union of all track-area razor zones; only items on
+      razor tracks are processed
+    - Time: scope = time-selection bounds; all tracks
+    - Items only: no splitting (items are already the unit of work);
+      earliest selected item's start = the alignment reference; all
+      selected items shift by the same delta
+
+  No-op when no items end up in scope.
+
+  For "move to edit cursor" use the "Move Clip Start To Play Position"
+  variant instead.
+
+  - Tags: Clips, Editing
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
 
 local r = reaper
 local EPS = 1e-9
