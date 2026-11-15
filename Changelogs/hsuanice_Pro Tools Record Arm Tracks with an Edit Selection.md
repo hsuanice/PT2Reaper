@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Record Arm Tracks with an Edit Selection
 
+## 26.1115.1531
+
+- Fix: each track really flips its own state (no selection ganging; before, all selected tracks changed the same way).
+
 ## 26.1115.1519pre1
 
 - Fix: each track really flips its own state (no selection ganging; before, all selected tracks changed the same way).

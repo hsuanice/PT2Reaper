@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1524pre1
+@version 26.1115.1531
 @author hsuanice
 @metapackage
 @provides
@@ -134,7 +134,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Return To Zero, Move Edit Insertion To Song Start / Session End: clear every kind of selection (time selection, loop points, razor areas, item selection); track selection stays.
+  - Tested in REAPER: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Return To Zero, Move Edit Insertion To Song Start / Session End.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

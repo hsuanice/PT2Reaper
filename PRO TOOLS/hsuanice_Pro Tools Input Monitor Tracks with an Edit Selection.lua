@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Input Monitor Tracks with an Edit Selection
-@version 26.1115.1519pre1
+@version 26.1115.1531
 @author hsuanice
 @noindex
 @changelog

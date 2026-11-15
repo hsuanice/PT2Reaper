@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Clear All Soloed Tracks
-@version 26.1115.1428pre1
+@version 26.1115.1531
 @author hsuanice
 @noindex
 @changelog

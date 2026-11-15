@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Move Edit Insertion To Session End - Extend Selection
-@version 26.1115.1513pre1
+@version 26.1115.1531
 @author hsuanice
 @noindex
 @changelog

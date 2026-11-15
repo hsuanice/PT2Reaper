@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1531
+
+- Tested in REAPER: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Return To Zero, Move Edit Insertion To Song Start / Session End.
+
 ## 26.1115.1524pre1
 
 - Return To Zero, Move Edit Insertion To Song Start / Session End: clear every kind of selection (time selection, loop points, razor areas, item selection); track selection stays.

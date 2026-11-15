@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Move Edit Insertion To Session End
 
+## 26.1115.1531
+
+- Clears every kind of selection: time selection, loop points, razor areas, item selection (track selection stays).
+
 ## 26.1115.1524pre1
 
 - Clears every kind of selection: time selection, loop points, razor areas, item selection (track selection stays).

@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Record Arm Tracks with an Edit Selection
-@version 26.1115.1519pre1
+@version 26.1115.1531
 @author hsuanice
 @noindex
 @changelog
