@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1513pre1
+@version 26.1115.1519pre1
 @author hsuanice
 @metapackage
 @provides
@@ -91,6 +91,7 @@
   [main] hsuanice_Pro Tools Redo.lua
   [main] hsuanice_Pro Tools Rename Clips.lua
   [main] hsuanice_Pro Tools Repeat.lua
+  [main] hsuanice_Pro Tools Return To Zero.lua
   [main] hsuanice_Pro Tools Save As.lua
   [main] hsuanice_Pro Tools Save.lua
   [main] hsuanice_Pro Tools Select All.lua
@@ -133,8 +134,8 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tracks with an Edit Selection: every track flips its own state, like Pro Tools (a mixed selection stays mixed).
-  - Move Edit Insertion To Session End (+ Extend Selection): session end = last item on a visible track (hidden tracks made it jump far too late).
+  - Tracks with an Edit Selection: each track really flips its own state (no selection ganging).
+  - New: Return To Zero - edit cursor to the project start, edit selection cleared.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -251,6 +252,7 @@
   - Redo: Shift+Control+Z, Shift+Z, Cmd+Shift+Z
   - Rename Clips: Cmd+Opt+Shift+R
   - Repeat: Opt+R
+  - Return To Zero: Return
   - Save As: Cmd+Control+S
   - Save: Cmd+S
   - Select All: Cmd+A

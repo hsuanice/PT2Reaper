@@ -2,6 +2,11 @@
 
 PT2Reaper package
 
+## 26.1115.1519pre1
+
+- Tracks with an Edit Selection: each track really flips its own state (no selection ganging).
+- New: Return To Zero - edit cursor to the project start, edit selection cleared.
+
 ## 26.1115.1513pre1
 
 - Tracks with an Edit Selection: every track flips its own state, like Pro Tools (a mixed selection stays mixed).

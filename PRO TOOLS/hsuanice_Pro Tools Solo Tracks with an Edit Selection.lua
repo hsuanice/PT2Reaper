@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Solo Tracks with an Edit Selection
-@version 26.1115.1513pre1
+@version 26.1115.1519pre1
 @author hsuanice
 @noindex
 @changelog
-  - Mixed selection: every track flips its own state, like Pro Tools (was: all made the same).
+  - Fix: each track really flips its own state (no selection ganging; before, all selected tracks changed the same way).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Solo Tracks with an Edit Selection**
@@ -13,7 +13,8 @@
   Solos / unsolos the tracks of the Edit Selection: tracks with a razor area; with no razor area,
   the selected tracks; with neither, the tracks of the selected items.
   Pro Tools style toggle: every track flips its own state (a mixed selection stays mixed).
-  Works like clicking the track button (track groups and REAPER's preferences apply).
+  Works like clicking the track button (track groups and REAPER's preferences apply), but
+  without selection ganging (igngroupflags 2), so each track keeps its own state.
 
   - Tags : Tracks, Editing
   Built with AI: written with Claude Code (Anthropic); designed and tested by hsuanice.
@@ -36,7 +37,7 @@ r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
 local n_on, n_off = TE.toggle_each(tracks,
   function(tr) return r.GetMediaTrackInfo_Value(tr, "I_SOLO") > 0 end,
-  function(tr, on) r.SetTrackUISolo(tr, on and 1 or 0, 0) end)
+  function(tr, on) r.SetTrackUISolo(tr, on and 1 or 0, 2) end)
 r.PreventUIRefresh(-1)
 r.TrackList_AdjustWindows(false)
 r.UpdateArrange()
