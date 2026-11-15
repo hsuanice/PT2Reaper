@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1825pre1
+
+- Mouse modifier actions: Shift-click extends the Edit Selection; double-click empty track space selects the gap between clips; Shift-double-click adds the gap.
+
 ## 26.1115.1638
 
 - Tested in REAPER: Extend Edit Insertion Up / Down.

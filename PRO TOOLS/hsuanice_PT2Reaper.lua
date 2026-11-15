@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1638
+@version 26.1115.1825pre1
 @author hsuanice
 @metapackage
 @provides
@@ -43,6 +43,9 @@
   [main] hsuanice_Pro Tools Link Timeline and Edit Selection.lua
   [main] hsuanice_Pro Tools Link Track And Edit Selection.lua
   [main] hsuanice_Pro Tools Loop Clips.lua
+  [main] hsuanice_Pro Tools Mouse - Double-Click Selects Gap Between Clips.lua
+  [main] hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection.lua
+  [main] hsuanice_Pro Tools Mouse - Shift-Double-Click Extends Edit Selection Over Gap.lua
   [main] hsuanice_Pro Tools Move Clip End To Current TC.lua
   [main] hsuanice_Pro Tools Move Clip End To Play Position.lua
   [main] hsuanice_Pro Tools Move Clip Start To Current TC.lua
@@ -131,6 +134,7 @@
   [nomain] hsuanice_PT_Fades.lua
   [nomain] hsuanice_PT_GFXInputField.lua
   [nomain] hsuanice_PT_Grid.lua
+  [nomain] hsuanice_PT_MouseSelect.lua
   [nomain] hsuanice_PT_Nudge.lua
   [nomain] hsuanice_PT_NudgeEdge.lua
   [nomain] hsuanice_PT_QuickPunch Pass Monitor.lua
@@ -140,7 +144,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Extend Edit Insertion Up / Down.
+  - Mouse modifier actions: Shift-click extends the Edit Selection; double-click empty track space selects the gap between clips; Shift-double-click adds the gap.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -209,6 +213,9 @@
   - Link Timeline and Edit Selection: Shift+NumPad /, ?
   - Link Track And Edit Selection: Shift+T
   - Loop Clips: Cmd+Opt+L
+  - Mouse - Double-Click Selects Gap Between Clips: Mouse: double-click empty track space
+  - Mouse - Shift-Click Extends Edit Selection: Mouse: Shift+click
+  - Mouse - Shift-Double-Click Extends Edit Selection Over Gap: Mouse: Shift+double-click empty track space
   - Move Clip End To Current TC: Control+I, I
   - Move Clip End To Play Position: K, Control+K
   - Move Clip Start To Current TC: Control+Y, Y

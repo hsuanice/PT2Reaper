@@ -2,7 +2,6 @@
  "scripts": [
   "hsuanice_Grid Nudge Panel.lua",
   "hsuanice_Grid_Nudge_Panel_Reset_Position.lua",
-  "hsuanice_PT_Transient Settings.lua",
   "hsuanice_Pro Tools Apply Next Fade Shape.lua",
   "hsuanice_Pro Tools Apply Previous Fade Shape.lua",
   "hsuanice_Pro Tools Clear All Soloed Tracks.lua",
@@ -39,6 +38,9 @@
   "hsuanice_Pro Tools Link Timeline and Edit Selection.lua",
   "hsuanice_Pro Tools Link Track And Edit Selection.lua",
   "hsuanice_Pro Tools Loop Clips.lua",
+  "hsuanice_Pro Tools Mouse - Double-Click Selects Gap Between Clips.lua",
+  "hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection.lua",
+  "hsuanice_Pro Tools Mouse - Shift-Double-Click Extends Edit Selection Over Gap.lua",
   "hsuanice_Pro Tools Move Clip End To Current TC.lua",
   "hsuanice_Pro Tools Move Clip End To Play Position.lua",
   "hsuanice_Pro Tools Move Clip Start To Current TC.lua",
@@ -123,12 +125,14 @@
   "hsuanice_Pro Tools Undo.lua",
   "hsuanice_Pro Tools Ungroup Clips.lua",
   "hsuanice_Pro Tools Unloop Clips.lua",
-  "hsuanice_Pro Tools Zoom Toggle.lua"
+  "hsuanice_Pro Tools Zoom Toggle.lua",
+  "hsuanice_PT_Transient Settings.lua"
  ],
  "libs": [
   "hsuanice_PT_Fades.lua",
   "hsuanice_PT_GFXInputField.lua",
   "hsuanice_PT_Grid.lua",
+  "hsuanice_PT_MouseSelect.lua",
   "hsuanice_PT_Nudge.lua",
   "hsuanice_PT_NudgeEdge.lua",
   "hsuanice_PT_QuickPunch Pass Monitor.lua",
@@ -251,6 +255,9 @@
   "hsuanice_Pro Tools Trim Clips Start To File Start.lua": "Cmd+Control+R",
   "hsuanice_Pro Tools Undo.lua": "Z, Control+Z, Cmd+Z",
   "hsuanice_Pro Tools Ungroup Clips.lua": "Cmd+Opt+U",
-  "hsuanice_Pro Tools Zoom Toggle.lua": "Control+E, E"
+  "hsuanice_Pro Tools Zoom Toggle.lua": "Control+E, E",
+  "hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection.lua": "Mouse: Shift+click",
+  "hsuanice_Pro Tools Mouse - Double-Click Selects Gap Between Clips.lua": "Mouse: double-click empty track space",
+  "hsuanice_Pro Tools Mouse - Shift-Double-Click Extends Edit Selection Over Gap.lua": "Mouse: Shift+double-click empty track space"
  }
 }

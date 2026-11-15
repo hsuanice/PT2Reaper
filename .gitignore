@@ -17,6 +17,7 @@
 !/PRO TOOLS/hsuanice_PT_Fades.lua
 !/PRO TOOLS/hsuanice_PT_GFXInputField.lua
 !/PRO TOOLS/hsuanice_PT_Grid.lua
+!/PRO TOOLS/hsuanice_PT_MouseSelect.lua
 !/PRO TOOLS/hsuanice_PT_Nudge.lua
 !/PRO TOOLS/hsuanice_PT_NudgeEdge.lua
 !/PRO TOOLS/hsuanice_PT_QuickPunch Pass Monitor.lua
@@ -62,6 +63,9 @@
 !/PRO TOOLS/hsuanice_Pro Tools Link Timeline and Edit Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Link Track And Edit Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Loop Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Mouse - Double-Click Selects Gap Between Clips.lua
+!/PRO TOOLS/hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Mouse - Shift-Double-Click Extends Edit Selection Over Gap.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip End To Current TC.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip End To Play Position.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip Start To Current TC.lua
