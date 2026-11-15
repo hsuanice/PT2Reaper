@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1115.2104pre1
+
+- Retrigger with Insertion Follows Playback on also clears the Timeline Selection (Pro Tools).
+
 ## 26.1115.2100pre1
 
 - Retrigger while playing: Insertion Follows Playback on plays again from the playhead; off from the selection start.
