@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1825pre1
+@version 26.1115.1920pre1
 @author hsuanice
 @metapackage
 @provides
@@ -144,7 +144,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Mouse modifier actions: Shift-click extends the Edit Selection; double-click empty track space selects the gap between clips; Shift-double-click adds the gap.
+  - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

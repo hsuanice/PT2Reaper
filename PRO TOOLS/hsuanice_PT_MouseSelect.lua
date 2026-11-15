@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_MouseSelect - Pro Tools mouse clicks on the Edit Selection (PT2Reaper library)
-@version 26.1115.1825pre1
+@version 26.1115.1920pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version: Shift-click extends, double-click selects the gap between clips, Shift-double-click adds it.
+  - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper mouse modifier actions. Loaded with dofile().
@@ -136,10 +136,16 @@ function M.apply(t0, t1, sel)
   if M.SYNC_TIME_SELECTION then r.GetSet_LoopTimeRange(true, false, t0, t1, false) end
 end
 
--- Grow the current Edit Selection to cover [c0, c1] and add track tr (only grows).
-function M.extend(c0, c1, tr)
+-- Extend the current Edit Selection to cover [c0, c1] and add track tr.
+-- trim_t (optional, Pro Tools Shift-click): when [c0, c1] lies inside the selection, the
+-- nearer edge moves to trim_t instead (the selection shrinks).
+function M.extend(c0, c1, tr, trim_t)
   local t0, t1, sel, has = M.current()
-  t0, t1 = math.min(t0, c0), math.max(t1, c1)
+  if trim_t and c0 > t0 + EPS and c1 < t1 - EPS and trim_t > t0 + EPS and trim_t < t1 - EPS then
+    if trim_t - t0 < t1 - trim_t then t0 = trim_t else t1 = trim_t end
+  else
+    t0, t1 = math.min(t0, c0), math.max(t1, c1)
+  end
   if tr and track_index(tr) >= 0 then sel[track_index(tr)], has = true, true end
   if not has or t1 - t0 <= EPS then return false end
   M.apply(t0, t1, sel)

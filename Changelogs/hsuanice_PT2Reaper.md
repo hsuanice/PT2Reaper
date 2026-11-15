@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1920pre1
+
+- Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
+
 ## 26.1115.1825pre1
 
 - Mouse modifier actions: Shift-click extends the Edit Selection; double-click empty track space selects the gap between clips; Shift-double-click adds the gap.

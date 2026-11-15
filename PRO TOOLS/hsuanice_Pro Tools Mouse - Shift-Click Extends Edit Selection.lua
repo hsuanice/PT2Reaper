@@ -1,18 +1,19 @@
 --[[
 @description hsuanice_Pro Tools Mouse - Shift-Click Extends Edit Selection
-@version 26.1115.1825pre1
+@version 26.1115.1920pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version.
+  - Shift-click inside the Edit Selection trims the nearer edge to the click (Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Shift-click extends the Edit Selection** (mouse)
 
   Extends the Edit Selection to the mouse position. Only grows: clicking before the range
-  extends its start, after it extends its end, inside it keeps the range. Only the clicked
-  track is added; every track of the selection gets the same range.
-  Clicking a clip extends to cover the whole clip; empty track space follows snap / grid.
+  extends its start, after it extends its end. Clicking inside it trims the nearer edge
+  (start or end) to the click. The clicked track is added; every track of the selection
+  gets the same range. Clicking a clip outside the range extends to cover the whole clip;
+  the click position follows snap / grid.
   The edit cursor does not move.
 
   Setup: Preferences > Mouse Modifiers > Track (left click), Media item bottom half (left click)
@@ -37,18 +38,19 @@ end
 local x, y = r.GetMousePosition()
 local item = r.GetItemFromPoint(x, y, true)
 local c0, c1, tr
+local t = MS.mouse_time(true)
 if item then
   c0 = r.GetMediaItemInfo_Value(item, "D_POSITION")
   c1 = c0 + r.GetMediaItemInfo_Value(item, "D_LENGTH")
   tr = r.GetMediaItem_Track(item)
 else
-  c0 = MS.mouse_time(true); c1 = c0
+  c0, c1 = t, t
   tr = MS.mouse_track()
 end
 
 r.Undo_BeginBlock()
 r.PreventUIRefresh(1)
-MS.extend(c0, c1, tr)
+MS.extend(c0, c1, tr, t)
 r.PreventUIRefresh(-1)
 r.UpdateArrange()
 r.Undo_EndBlock("Pro Tools: Shift-click extends Edit Selection", -1)
