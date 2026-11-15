@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.1531
+@version 26.1115.1533pre1
 @author hsuanice
 @metapackage
 @provides
@@ -47,6 +47,7 @@
   [main] hsuanice_Pro Tools Move Clip Start To Play Position.lua
   [main] hsuanice_Pro Tools Move Clip Sync Point To Current TC.lua
   [main] hsuanice_Pro Tools Move Clip Sync Point To Play Position.lua
+  [main] hsuanice_Pro Tools Move Edit Insertion Down.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Next Edit - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Next Edit.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Previous Edit - Extend Selection.lua
@@ -55,6 +56,7 @@
   [main] hsuanice_Pro Tools Move Edit Insertion To Session End.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Session Start - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Insertion To Song Start.lua
+  [main] hsuanice_Pro Tools Move Edit Insertion Up.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Next Clip - Extend Selection.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Next Clip.lua
   [main] hsuanice_Pro Tools Move Edit Selection To Previous Clip - Extend Selection.lua
@@ -89,6 +91,8 @@
   [main] hsuanice_Pro Tools Record Arm Tracks with an Edit Selection.lua
   [main] hsuanice_Pro Tools Record Punch.lua
   [main] hsuanice_Pro Tools Redo.lua
+  [main] hsuanice_Pro Tools Remove Edit Insertion From Bottom Track.lua
+  [main] hsuanice_Pro Tools Remove Edit Insertion From Top Track.lua
   [main] hsuanice_Pro Tools Rename Clips.lua
   [main] hsuanice_Pro Tools Repeat.lua
   [main] hsuanice_Pro Tools Return To Zero.lua
@@ -134,7 +138,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Return To Zero, Move Edit Insertion To Song Start / Session End.
+  - New: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -207,6 +211,7 @@
   - Move Clip Start To Play Position: Control+H, H
   - Move Clip Sync Point To Current TC: Control+U, U
   - Move Clip Sync Point To Play Position: J, Control+J
+  - Move Edit Insertion Down: ;, Control+;
   - Move Edit Insertion To Next Edit - Extend Selection: ", Control+", Shift+Tab
   - Move Edit Insertion To Next Edit: ', Control+', Tab
   - Move Edit Insertion To Previous Edit - Extend Selection: Shift+Control+L, Opt+Shift+Tab, Shift+L
@@ -215,6 +220,7 @@
   - Move Edit Insertion To Session End: Opt+Return
   - Move Edit Insertion To Session Start - Extend Selection: Shift+Return
   - Move Edit Insertion To Song Start: Shift+Control+Return
+  - Move Edit Insertion Up: P, Control+P
   - Move Edit Selection To Next Clip - Extend Selection: Cmd+Control+", Shift+Control+Tab
   - Move Edit Selection To Next Clip: Cmd+Control+', Control+Tab
   - Move Edit Selection To Previous Clip - Extend Selection: Opt+Shift+Control+Tab, Cmd+Shift+Control+L
@@ -249,6 +255,8 @@
   - Record Arm Tracks with an Edit Selection: Shift+R
   - Record Punch: F12, Cmd+Space, NumPad 3
   - Redo: Shift+Control+Z, Shift+Z, Cmd+Shift+Z
+  - Remove Edit Insertion From Bottom Track: Opt+Control+;
+  - Remove Edit Insertion From Top Track: Opt+Control+P
   - Rename Clips: Cmd+Opt+Shift+R
   - Repeat: Opt+R
   - Return To Zero: Return

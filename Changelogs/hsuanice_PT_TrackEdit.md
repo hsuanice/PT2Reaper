@@ -2,6 +2,10 @@
 
 hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
 
+## 26.1115.1533pre1
+
+- move_insertion() / remove_insertion() for Move Edit Insertion Up / Down and Remove Edit Insertion From Top / Bottom Track.
+
 ## 26.1115.1531
 
 - toggle_each(): every track flips its own state, like Pro Tools (a mixed selection stays mixed).

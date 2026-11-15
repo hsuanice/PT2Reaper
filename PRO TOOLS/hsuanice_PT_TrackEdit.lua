@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1115.1531
+@version 26.1115.1533pre1
 @author hsuanice
 @noindex
 @changelog
-  - toggle_each(): every track flips its own state, like Pro Tools (a mixed selection stays mixed).
+  - move_insertion() / remove_insertion() for Move Edit Insertion Up / Down and Remove Edit Insertion From Top / Bottom Track.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper "... Tracks with an Edit Selection" actions. Loaded with dofile().
@@ -46,6 +46,81 @@ function M.toggle_each(tracks, is_on, set)
     if on then n_on = n_on + 1 else n_off = n_off + 1 end
   end
   return n_on, n_off
+end
+
+------------------------------------------------------------------------------
+-- Edit insertion up / down (Move Edit Insertion Up / Down, Remove Edit Insertion From
+-- Top / Bottom Track). Works on visible tracks only (hidden tracks are skipped).
+-- Razor mode: the tracks with a razor area; the track selection follows only when every
+-- one of those tracks was selected (Track and Razor link style). Else: the selected tracks.
+------------------------------------------------------------------------------
+local function visible_tracks()
+  local list, idx = {}, {}
+  for i = 0, r.CountTracks(0) - 1 do
+    local tr = r.GetTrack(0, i)
+    if r.IsTrackVisible(tr, false) then list[#list + 1] = tr; idx[tr] = #list end
+  end
+  return list, idx
+end
+
+local function get_razor(tr)
+  local _, s = r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", false)
+  return s or ""
+end
+
+-- track-level razor zones only (envelope-lane zones belong to that track's envelopes)
+local function track_zones(s)
+  local t = {}
+  for a, b, g in s:gmatch("(%S+)%s+(%S+)%s+(%S+)") do
+    if g == '""' then t[#t + 1] = a .. " " .. b .. ' ""' end
+  end
+  return table.concat(t, " ")
+end
+
+local function edit_rows()
+  local vis, idx = visible_tracks()
+  local rows, all_sel = {}, true
+  for _, tr in ipairs(vis) do
+    if get_razor(tr):match("%S") then
+      rows[#rows + 1] = tr
+      if not r.IsTrackSelected(tr) then all_sel = false end
+    end
+  end
+  if #rows > 0 then return "razor", rows, vis, idx, all_sel end
+  for _, tr in ipairs(vis) do
+    if r.IsTrackSelected(tr) then rows[#rows + 1] = tr end
+  end
+  return "tracks", rows, vis, idx, true
+end
+
+-- dir = 1 (down) or -1 (up). Returns true when something moved.
+function M.move_insertion(dir)
+  local mode, rows, vis, idx, sel_follows = edit_rows()
+  if #rows == 0 then return false end
+  for _, tr in ipairs(rows) do
+    if not vis[idx[tr] + dir] then return false end -- at the top / bottom: nothing moves
+  end
+  if mode == "razor" then
+    local moved = {}
+    for _, tr in ipairs(rows) do moved[vis[idx[tr] + dir]] = track_zones(get_razor(tr)) end
+    for _, tr in ipairs(rows) do r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", true) end
+    for tr, z in pairs(moved) do r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", z, true) end
+  end
+  if sel_follows then
+    for _, tr in ipairs(rows) do r.SetTrackSelected(tr, false) end
+    for _, tr in ipairs(rows) do r.SetTrackSelected(vis[idx[tr] + dir], true) end
+  end
+  return true
+end
+
+-- edge = "top" or "bottom". Keeps at least one track. Returns true when a track was removed.
+function M.remove_insertion(edge)
+  local mode, rows, _, _, sel_follows = edit_rows()
+  if #rows <= 1 then return false end
+  local tr = edge == "top" and rows[1] or rows[#rows]
+  if mode == "razor" then r.GetSetMediaTrackInfo_String(tr, "P_RAZOREDITS", "", true) end
+  if sel_follows then r.SetTrackSelected(tr, false) end
+  return true
 end
 
 return M

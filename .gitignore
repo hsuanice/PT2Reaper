@@ -66,6 +66,7 @@
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip Start To Play Position.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip Sync Point To Current TC.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Clip Sync Point To Play Position.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion Down.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Next Edit - Extend Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Next Edit.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Previous Edit - Extend Selection.lua
@@ -74,6 +75,7 @@
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Session End.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Session Start - Extend Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion To Song Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Move Edit Insertion Up.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Next Clip - Extend Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Next Clip.lua
 !/PRO TOOLS/hsuanice_Pro Tools Move Edit Selection To Previous Clip - Extend Selection.lua
@@ -108,6 +110,8 @@
 !/PRO TOOLS/hsuanice_Pro Tools Record Arm Tracks with an Edit Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Record Punch.lua
 !/PRO TOOLS/hsuanice_Pro Tools Redo.lua
+!/PRO TOOLS/hsuanice_Pro Tools Remove Edit Insertion From Bottom Track.lua
+!/PRO TOOLS/hsuanice_Pro Tools Remove Edit Insertion From Top Track.lua
 !/PRO TOOLS/hsuanice_Pro Tools Rename Clips.lua
 !/PRO TOOLS/hsuanice_Pro Tools Repeat.lua
 !/PRO TOOLS/hsuanice_Pro Tools Return To Zero.lua

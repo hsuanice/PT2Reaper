@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.1533pre1
+
+- New: Move Edit Insertion Up / Down, Remove Edit Insertion From Top / Bottom Track.
+
 ## 26.1115.1531
 
 - Tested in REAPER: Solo / Mute / Record Arm / Input Monitor Tracks with an Edit Selection, Clear All Soloed Tracks, Return To Zero, Move Edit Insertion To Song Start / Session End.
