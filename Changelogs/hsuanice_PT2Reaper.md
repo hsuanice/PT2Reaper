@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1115.2057pre1
+
+- Play Timeline Selection: pressed while playing always plays again from the start.
+
 ## 26.1115.2053pre1
 
 - Fix: with no Timeline Selection, playback starts at the edit cursor (Link off: the Edit Selection no longer moves the play start).

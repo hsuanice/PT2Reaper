@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1115.2045pre1
+@version 26.1115.2057pre1
 @author hsuanice
 @noindex
 @changelog
-  - Rewritten: Pro Tools behaviour with Insertion Follows Playback and Link Timeline and Edit Selection; stops at the selection end (Play Watcher, no task control dialog).
+  - Pressed while playing: always plays again from the start (Insertion Follows Playback on too).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**
@@ -14,8 +14,7 @@
   the razor areas / time selection) and stops at its end - like Space, but it always plays
   (never stops). Insertion Follows Playback on: the edit cursor stays at the end and the
   Timeline Selection is cleared; off: back to its start, selections kept.
-  Pressed while playing: Insertion Follows Playback on - playback goes on; off - plays again
-  from the selection start.
+  Pressed while playing: plays again from the selection start (retrigger).
   No selection: plays from the edit cursor.
   During a QuickPunch pass: ends the recording, then plays.
 
@@ -45,9 +44,8 @@ if QP.pass_active() and T.is_running() then
   QP.stop(T.follows())
   if s then T.play_range(s, e, true) else T.play_range(r.GetCursorPosition(), 1e12, true) end
 elseif T.is_running() then
-  if not T.follows() then
-    if s then T.play_range(s, e) else r.SetEditCurPos2(0, r.GetCursorPosition(), false, true) end
-  end
+  -- retrigger: play again from the Timeline Selection start, else from the edit cursor
+  if s then T.play_range(s, e) else T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true) end
 elseif s then
   T.play_range(s, e)
 else
