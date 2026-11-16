@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1116.2047pre1
+
+- Hover info on Items / Tracks (item details window) and on Pre-roll / Post-roll (name: on / off, value: type the length).
+
 ## 26.1116.2042pre1
 
 - Hover info on Items / Tracks: click opens the item details window, click again closes it.

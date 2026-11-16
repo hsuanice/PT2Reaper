@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2042pre1
+@version 26.1116.2047pre1
 @author hsuanice
 @noindex
 @changelog
-  - Hover info on Items / Tracks: click opens the item details window, click again closes it.
+  - Hover info on Items / Tracks (item details window) and on Pre-roll / Post-roll (name: on / off, value: type the length).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -22,7 +22,7 @@
     in their own floating window (MIDI / Audio / Empty items, channel counts); computed only
     while open. Hover over them for a reminder.
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
-    type a new length. Global setting, used by Play To / From / Through Edit Start / End.
+    type a new length. Hover for a reminder. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
   - Right-click: time format, font size, dock / undock, close. Dock state, position, font size
     and time format are remembered.
@@ -246,8 +246,8 @@ local function sections()
   local pre, pre_on = roll_value('preroll')
   local post, post_on = roll_value('postroll')
   S[#S + 1] = {
-    { 'Pre-roll', pre, pre_on and 'on' or 'off', function() toggle_roll('preroll') end, function() edit_roll('preroll') end },
-    { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end },
+    { 'Pre-roll', pre, pre_on and 'on' or 'off', function() toggle_roll('preroll') end, function() edit_roll('preroll') end, 'preroll' },
+    { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end, 'postroll' },
     { 'Tracks:', tostring(D.tracks), 'count', toggle_details, toggle_details },
   }
   S[#S + 1] = { { 'Start', D.tl[1] }, { 'End', D.tl[2] }, { 'Length', D.tl[3] } }
@@ -331,8 +331,9 @@ local function draw()
         if kind == 'count' then
           hits[#hits + 1] = { b.x, y, b.w, h, f_label, 'details' }
         else
-          if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label } end
-          if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value } end
+          local tip = row[6] -- hover info key (Pre-roll / Post-roll)
+          if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label, tip and (tip .. ':name') } end
+          if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value, tip and (tip .. ':value') } end
         end
       end
     end
@@ -384,9 +385,21 @@ local function hover_tip()
   end
   if zone ~= tip_zone then tip_zone, tip_since = zone, r.time_precise() end
   local text
-  if zone == 'details' and r.time_precise() - tip_since > 0.5 then
-    text = details_open() and 'Click to close the item details window'
-      or 'Click to open the item details window\n(MIDI / Audio / Empty items, channel counts).\nClick again to close it.'
+  if zone and r.time_precise() - tip_since > 0.5 then
+    if zone == 'details' then
+      text = details_open() and 'Click to close the item details window'
+        or 'Click to open the item details window\n(MIDI / Audio / Empty items, channel counts).\nClick again to close it.'
+    else
+      local which, part = zone:match('^(%a+):(%a+)$')
+      local name = which == 'preroll' and 'Pre-roll' or 'Post-roll'
+      local _, on = T.roll(which)
+      if part == 'name' then
+        text = 'Click to turn ' .. name .. ' ' .. (on and 'off' or 'on') .. '\n(now ' .. (on and 'on' or 'off')
+          .. '; green = on).\nUsed by Play To / From / Through Edit Start / End.'
+      else
+        text = 'Click to type the ' .. name .. ' length.'
+      end
+    end
   end
   if text ~= tip_shown then
     if text then

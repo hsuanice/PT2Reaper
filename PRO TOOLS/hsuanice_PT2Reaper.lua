@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1116.2042pre1
+@version 26.1116.2047pre1
 @author hsuanice
 @metapackage
 @provides
@@ -149,7 +149,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: hover info on Items / Tracks.
+  - Counters Panel: hover info on Pre-roll / Post-roll.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
