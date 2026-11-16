@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2056
+@version 26.1116.2231pre1
 @author hsuanice
 @noindex
 @changelog
-  - Hover info (after 0.5 s) on Grid, Nudge, Items / Tracks and Pre-roll / Post-roll.
+  - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -458,5 +458,6 @@ r.atexit(function()
   r.RefreshToolbar2(sec, cmd)
 end)
 
+T.refresh_follows_button() -- after a restart the N button shows the saved state again
 gfx.init(TITLE, 600, PAD * 2 + 3 * lh(), dock_state, win_x, win_y)
 loop()

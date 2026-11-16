@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1116.2123pre1
+@version 26.1116.2231pre1
 @author hsuanice
 @noindex
 @changelog
-  - play_around_edit(): Play To / From / Through Edit Start / End with the pre-roll / post-roll lengths.
+  - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -28,8 +28,11 @@ local CMD_EDIT_TO_PLAY = 40434 -- View: Move edit cursor to play cursor
 
 -- Insertion Follows Playback (Pro Tools "N"): saved, survives a REAPER restart.
 function T.follows() return r.GetExtState(T.NS, "insertion_follows") == "1" end
+local FOLLOWS_SCRIPT = (debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or '') .. "hsuanice_Pro Tools Insertion Follows Playback.lua"
 function T.refresh_follows_button()
-  local cmd = tonumber(r.GetExtState(T.NS, "cmd_follows"))
+  -- found by path: a command ID saved in an earlier session can be a different action now
+  local cmd = r.file_exists(FOLLOWS_SCRIPT) and r.AddRemoveReaScript(true, 0, FOLLOWS_SCRIPT, false) or 0
+  if not cmd or cmd == 0 then cmd = tonumber(r.GetExtState(T.NS, "cmd_follows")) end
   if cmd then
     r.SetToggleCommandState(0, cmd, T.follows() and 1 or 0)
     r.RefreshToolbar2(0, cmd)
@@ -212,6 +215,7 @@ end
 ------------------------------------------------------------------------------
 function T.play_around_edit(edge, how, QP)
   T.reset_half_speed()
+  T.refresh_follows_button() -- the N button shows the saved state (it is off after a restart)
   local es, ee = T.edit_range()
   local cur = r.GetCursorPosition()
   local p = edge == "end" and (ee or cur) or (es or cur)
