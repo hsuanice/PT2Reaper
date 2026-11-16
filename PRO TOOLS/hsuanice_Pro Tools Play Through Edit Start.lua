@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Play Through Edit Start
-@version 26.1116.2123pre1
+@version 26.1116.2255
 @author hsuanice
 @noindex
 @changelog

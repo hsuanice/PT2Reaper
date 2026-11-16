@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2255
+
+- Release: Play To / From / Through Edit Start / End (tested in REAPER); the N button shows the saved state after a restart.
+
 ## 26.1116.2231pre1
 
 - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).

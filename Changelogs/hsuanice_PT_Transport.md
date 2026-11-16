@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1116.2255
+
+- Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).
+
 ## 26.1116.2231pre1
 
 - play_around_edit(): Play To / From / Through Edit Start / End with the pre-roll / post-roll lengths.
