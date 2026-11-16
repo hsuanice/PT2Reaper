@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1115.2128
+@version 26.1116.1938pre1
 @author hsuanice
 @metapackage
 @provides
@@ -18,6 +18,7 @@
   [main] hsuanice_Pro Tools Copy and Move Clip Start To Play Position.lua
   [main] hsuanice_Pro Tools Copy and Move Clip Sync Point To Current TC.lua
   [main] hsuanice_Pro Tools Copy and Move Clip Sync Point To Play Position.lua
+  [main] hsuanice_Pro Tools Counters Panel.lua
   [main] hsuanice_Pro Tools Create Fades.lua
   [main] hsuanice_Pro Tools Decrease Grid Value.lua
   [main] hsuanice_Pro Tools Decrease Nudge Value.lua
@@ -147,7 +148,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Play/Stop, Play Edit Selection, Play Timeline Selection with Pro Tools Insertion Follows Playback / Link rules.
+  - Counters Panel: Edit Selection, Grid / Nudge with selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

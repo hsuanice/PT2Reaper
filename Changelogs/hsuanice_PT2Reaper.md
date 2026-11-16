@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.1938pre1
+
+- Counters Panel: Edit Selection, Grid / Nudge with selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
+
 ## 26.1115.2128
 
 - Tested in REAPER: Play/Stop, Play Edit Selection, Play Timeline Selection with Pro Tools Insertion Follows Playback / Link rules.

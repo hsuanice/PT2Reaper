@@ -1,0 +1,427 @@
+--[[
+@description hsuanice_Pro Tools Counters Panel
+@version 26.1116.1938pre1
+@author hsuanice
+@noindex
+@changelog
+  - First version: Edit Selection, Grid / Nudge + selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
+  - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
+@about
+  Pro Tools style counters in one dockable window (native gfx), laid out like the
+  Pro Tools Edit window counters and transport:
+
+    Edit Selection | Grid / Nudge     | Pre-roll / Post-roll | Timeline Selection | (details)
+    Start          | Grid   (click)   | Pre-roll  (click)    | Start
+    End            | Nudge  (click)   | Post-roll (click)    | End
+    Length         | Items  Tracks  > |                      | Length
+
+  - Edit Selection: razor areas, else the time selection (none: the edit cursor).
+  - Timeline Selection: the loop points (none: the edit cursor).
+  - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
+  - Items / Tracks: selected item / track counts. Click to show / hide the details
+    (MIDI / Audio / Empty items, channel counts); hidden details are not computed.
+  - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
+    type a new length. Global setting, used by Play To / From / Through Edit Start / End.
+  - Too narrow for one row: the sections wrap onto more rows.
+  - Right-click: time format, font size, dock / undock, close. Dock state, position, font size
+    and time format are remembered.
+
+  Combines hsuanice's "Grid Nudge Panel" and "Count Items and Tracks - Selection HUD"
+  (copied in, so the PT2Reaper set stays self-contained).
+  Inspired by the Pro Tools counters and transport. Optional: js_ReaScriptAPI gives the
+  keyboard focus back to the arrange view after a click.
+  Built with AI: written with Claude Code (Anthropic); designed and tested by hsuanice.
+@links
+  https://forum.cockos.com/showthread.php?p=2910884#post2910884
+--]]
+
+local r = reaper
+local DIR = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or ''
+local function load(name)
+  local ok, lib = pcall(dofile, DIR .. name)
+  if not ok or type(lib) ~= 'table' then
+    r.ShowMessageBox('Could not load ' .. name .. '\n\n' .. tostring(lib), 'Counters Panel', 0)
+    return nil
+  end
+  return lib
+end
+local Grid, Nudge, T = load('hsuanice_PT_Grid.lua'), load('hsuanice_PT_Nudge.lua'), load('hsuanice_PT_Transport.lua')
+if not (Grid and Nudge and T) then return end
+
+local NS = 'hsuanice_PT_CountersPanel'
+local TITLE = 'Pro Tools Counters'
+
+------------------------------------------------------------
+-- Settings
+------------------------------------------------------------
+local function num(k, d) return tonumber(r.GetExtState(NS, k)) or d end
+local font_size    = num('font_size', 14)
+local time_mode    = num('time_mode', -1) -- format_timestr: -1 ruler, 5 TC, 0 m:s, 2 bars, 3 sec, 4 smp
+local dock_state   = num('dock', 0)
+local win_x, win_y = num('x', 200), num('y', 200)
+local show_details = r.GetExtState(NS, 'details') == '1'
+
+local function save_state()
+  r.SetExtState(NS, 'font_size', tostring(font_size), true)
+  r.SetExtState(NS, 'time_mode', tostring(time_mode), true)
+  r.SetExtState(NS, 'dock', tostring(dock_state), true)
+  r.SetExtState(NS, 'x', tostring(win_x), true)
+  r.SetExtState(NS, 'y', tostring(win_y), true)
+  r.SetExtState(NS, 'details', show_details and '1' or '0', true)
+end
+
+------------------------------------------------------------
+-- Colors / layout
+------------------------------------------------------------
+local C = {
+  bg = { 0.10, 0.10, 0.10 }, sep = { 0.25, 0.25, 0.25 },
+  label = { 0.55, 0.55, 0.55 }, value = { 0.00, 0.87, 0.00 }, text = { 0.87, 0.87, 0.87 },
+  accent = { 0.60, 0.80, 1.00 }, on_bg = { 0.20, 0.55, 0.15 }, off_txt = { 0.40, 0.40, 0.40 },
+}
+local PAD, GAP, COLGAP = 8, 10, 14
+local function col(c) gfx.set(c[1], c[2], c[3], 1) end
+local function setfont() gfx.setfont(1, 'Arial', font_size) end
+local function lh() return font_size + 6 end
+
+------------------------------------------------------------
+-- Nudge value text (copied from hsuanice_Grid Nudge Panel)
+------------------------------------------------------------
+local function format_nudge_value(mode, preset)
+  if not preset then return '?' end
+  local fps = r.TimeMap_curFrameRate(0) -- returns fps first
+  if not fps or fps <= 0 then fps = 24 end
+  if mode == 'Timecode' then
+    if preset.unit == 1 then return '00:00:01:00.00' end
+    local frames = preset.value
+    local whole_f = math.floor(frames)
+    local sub = frames - whole_f
+    local secs = math.floor(whole_f / fps)
+    local ff = whole_f % fps
+    local mm = math.floor(secs / 60); local ss = secs % 60
+    local hh = math.floor(mm / 60); mm = mm % 60
+    return string.format('%02d:%02d:%02d:%02d.%02d', hh, mm, ss, ff, math.floor(sub * 100 + 0.5))
+  elseif mode == 'Feet+Frames' then
+    if preset.label == '1 foot' then return '1+00.00' end
+    local f = preset.value
+    if f < 1 then return string.format('0+00.%02d', math.floor(f * 100)) end
+    return string.format('0+%02d.00', math.floor(f))
+  elseif mode == 'Min:Secs' then
+    local ms = preset.unit == 1 and (preset.value * 1000) or preset.value
+    local total_s = math.floor(ms / 1000)
+    local rem_ms = math.floor(ms % 1000)
+    local mm = math.floor(total_s / 60); local ss = total_s % 60
+    return string.format('%02d:%02d.%03d', mm, ss, rem_ms)
+  elseif mode == 'Measure' then
+    if preset.unit == 16 then
+      local bars = math.floor(preset.value)
+      if bars >= 1 then return string.format('%d|00|000', bars) end
+      return '0|01|000'
+    end
+    local ticks = ({ [10] = 1920, [9] = 960, [8] = 480, [7] = 240, [6] = 120, [5] = 60 })[preset.unit] or 960
+    if ticks >= 960 then return string.format('0|%02d|000', ticks // 960) end
+    return string.format('0|00|%03d', ticks)
+  elseif mode == 'Samples' then
+    return tostring(math.floor(preset.value))
+  end
+  return preset.label
+end
+
+------------------------------------------------------------
+-- Data (rescanned only when something changed)
+------------------------------------------------------------
+local D = { edit = {}, tl = {}, items = 0, tracks = 0, types = { midi = 0, audio = 0, empty = 0 }, channels = {} }
+local last_key, last_detail_key, next_scan = nil, nil, 0
+
+local function pos(t) return r.format_timestr_pos(t, '', time_mode) end
+local function len(a, b) return r.format_timestr_len(b - a, '', a, time_mode) end
+local function triple(a, b) return { pos(a), pos(b), len(a, b) } end
+
+local function scan_details()
+  local types, chs = { midi = 0, audio = 0, empty = 0 }, {}
+  for i = 0, r.CountSelectedMediaItems(0) - 1 do
+    local take = r.GetActiveTake(r.GetSelectedMediaItem(0, i))
+    if not take then
+      types.empty = types.empty + 1
+    else
+      local src = r.GetMediaItemTake_Source(take)
+      local st = r.GetMediaSourceType(src, '')
+      if st == 'MIDI' or st == 'REX' then types.midi = types.midi + 1 else types.audio = types.audio + 1 end
+      local ch = r.GetMediaSourceNumChannels(src) or 0
+      if ch > 0 then chs[ch] = (chs[ch] or 0) + 1 end
+    end
+  end
+  D.types, D.channels = types, chs
+end
+
+local function scan(now)
+  if now < next_scan then return end
+  next_scan = now + 0.1
+  local cur = r.GetCursorPosition()
+  local es, ee = T.edit_range()
+  local ls, le = T.timeline_range()
+  local key = table.concat({ r.GetProjectStateChangeCount(0), r.CountSelectedMediaItems(0),
+    r.CountSelectedTracks(0), cur, es or '-', ee or '-', ls or '-', le or '-', time_mode,
+    r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll') }, '|')
+  if key == last_key then return end
+  last_key = key
+  D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
+  D.edit = es and triple(es, ee) or triple(cur, cur)
+  D.tl = ls and triple(ls, le) or triple(cur, cur)
+  if show_details then scan_details() end
+end
+
+------------------------------------------------------------
+-- Sections: each = list of rows { label, value, kind, on_label, on_value }
+------------------------------------------------------------
+local function refocus_main()
+  if r.JS_Window_SetFocus then r.JS_Window_SetFocus(r.GetMainHwnd()) end -- js_ReaScriptAPI (optional)
+end
+
+local function menu_at(items)
+  gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
+  return gfx.showmenu(table.concat(items, '|'))
+end
+
+local function grid_menu()
+  local mode, idx = Grid.get_state()
+  local presets = Grid.PRESETS[mode] or {}
+  local items = {}
+  for i, p in ipairs(presets) do items[#items + 1] = (i == idx and '!' or '') .. p.label end
+  items[#items + 1] = ''
+  for _, m in ipairs(Grid.MODES) do items[#items + 1] = (m == mode and '!' or '') .. m end
+  local ret = menu_at(items)
+  if ret == 0 then return end
+  if ret <= #presets then
+    if Grid.ensure_tempo(mode, presets[ret]) then Grid.apply(mode, ret) end
+  else
+    local m = Grid.MODES[ret - #presets]
+    if m and m ~= mode then
+      local di = Grid.get_default_idx(m)
+      if Grid.ensure_tempo(m, Grid.get_preset(m, di)) then Grid.apply(m, di) end
+    end
+  end
+end
+
+local function nudge_menu()
+  local mode, idx = Nudge.get_state()
+  local presets = Nudge.PRESETS[mode]
+  local items = {}
+  for i, p in ipairs(presets) do items[#items + 1] = (i == idx and '!' or '') .. p.label end
+  items[#items + 1] = ''
+  for _, m in ipairs(Nudge.MODES) do items[#items + 1] = (m == mode and '!' or '') .. m end
+  local ret = menu_at(items)
+  if ret == 0 then return end
+  if ret <= #presets then Nudge.set_state(mode, ret)
+  elseif Nudge.MODES[ret - #presets] then Nudge.set_state(Nudge.MODES[ret - #presets], 1) end
+end
+
+local function roll_value(which)
+  local sec, on = T.roll(which)
+  return r.format_timestr_len(sec, '', 0, time_mode), on
+end
+
+local function edit_roll(which)
+  local sec = T.roll(which)
+  local name = which == 'preroll' and 'Pre-roll' or 'Post-roll'
+  local ok, v = r.GetUserInputs(name, 1, name .. ' length:,extrawidth=80',
+    r.format_timestr_len(sec, '', 0, time_mode))
+  if not ok then return end
+  local t = r.parse_timestr_len(v, 0, time_mode)
+  if t == 0 and tonumber(v) then t = tonumber(v) end -- plain seconds
+  if t then T.set_roll(which, t); last_key = nil end
+end
+
+local function toggle_roll(which)
+  local _, on = T.roll(which)
+  T.set_roll(which, nil, not on); last_key = nil
+end
+
+local function sections()
+  local S = {}
+  S[#S + 1] = { { 'Start', D.edit[1] }, { 'End', D.edit[2] }, { 'Length', D.edit[3] } }
+  local mode, idx = Nudge.get_state()
+  S[#S + 1] = {
+    { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu },
+    { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu },
+    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks .. (show_details and '  <' or '  >'), 'counts',
+      'details', 'details' },
+  }
+  local pre, pre_on = roll_value('preroll')
+  local post, post_on = roll_value('postroll')
+  S[#S + 1] = {
+    { 'Pre-roll', pre, pre_on and 'on' or 'off', function() toggle_roll('preroll') end, function() edit_roll('preroll') end },
+    { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end },
+  }
+  S[#S + 1] = { { 'Start', D.tl[1] }, { 'End', D.tl[2] }, { 'Length', D.tl[3] } }
+  if show_details then
+    S[#S + 1] = { { 'MIDI', tostring(D.types.midi), 'detail' }, { 'Audio', tostring(D.types.audio), 'detail' },
+      { 'Empty', tostring(D.types.empty), 'detail' } }
+    local chl = {}
+    for ch, n in pairs(D.channels) do chl[#chl + 1] = { ch, n } end
+    table.sort(chl, function(a, b) return a[1] < b[1] end)
+    local rows = {}
+    for _, e in ipairs(chl) do
+      rows[#rows + 1] = { e[1] == 1 and 'Mono' or e[1] == 2 and 'Stereo' or (e[1] .. '-Ch'), tostring(e[2]), 'detail' }
+    end
+    if #rows == 0 then rows[1] = { 'Channels', '-', 'detail' } end
+    -- three rows per column
+    for i = 1, #rows, 3 do S[#S + 1] = { rows[i], rows[i + 1], rows[i + 2] } end
+  end
+  return S
+end
+
+------------------------------------------------------------
+-- Layout + draw (sections wrap onto more rows when the window is narrow)
+------------------------------------------------------------
+local hits = {} -- { x, y, w, h, fn }
+
+local function measure(sec)
+  local lw, vw = 0, 0
+  for i = 1, 3 do
+    local row = sec[i]
+    if row then
+      lw = math.max(lw, gfx.measurestr(row[1]))
+      vw = math.max(vw, gfx.measurestr(row[2]))
+    end
+  end
+  return lw, vw, lw + GAP + vw
+end
+
+local function layout(S)
+  local out, x, y, band_h = {}, PAD, PAD, 3 * lh()
+  for _, sec in ipairs(S) do
+    local lw, vw, w = measure(sec)
+    if x > PAD and x + w > gfx.w - PAD then x = PAD; y = y + band_h + PAD end
+    out[#out + 1] = { sec = sec, x = x, y = y, lw = lw, vw = vw, w = w }
+    x = x + w + COLGAP
+  end
+  return out, y + band_h + PAD
+end
+
+local function want_size()
+  setfont()
+  local S = sections()
+  local w = PAD
+  for _, sec in ipairs(S) do local _, _, sw = measure(sec); w = w + sw + COLGAP end
+  return w - COLGAP + PAD, PAD * 2 + 3 * lh()
+end
+
+local function draw()
+  setfont()
+  col(C.bg); gfx.rect(0, 0, gfx.w, gfx.h, 1)
+  hits = {}
+  local L = layout(sections())
+  local h = lh()
+  for k, b in ipairs(L) do
+    if k > 1 and L[k - 1].y == b.y then
+      col(C.sep); gfx.rect(b.x - COLGAP // 2 - 1, b.y, 1, 3 * h - 4, 1)
+    end
+    for i = 1, 3 do
+      local row = b.sec[i]
+      if row then
+        local y = b.y + (i - 1) * h
+        local label, value, kind = row[1], row[2], row[3]
+        if kind == 'counts' then
+          col(C.text); gfx.x, gfx.y = b.x, y; gfx.drawstr(label)
+          col(C.accent); gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
+        else
+          if kind == 'on' then
+            local tw = gfx.measurestr(label)
+            col(C.on_bg); gfx.rect(b.x - 3, y - 1, tw + 6, h - 4, 1)
+            col({ 0.92, 1, 0.88 })
+          elseif kind == 'off' then col(C.off_txt)
+          else col(C.label) end
+          gfx.x, gfx.y = b.x, y; gfx.drawstr(label)
+          col(kind == 'detail' and C.text or kind == 'off' and C.off_txt or C.value)
+          gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
+        end
+        local f_label, f_value = row[4], row[5]
+        if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label } end
+        if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value } end
+      end
+    end
+  end
+end
+
+------------------------------------------------------------
+-- Window
+------------------------------------------------------------
+local cur_w, cur_h = 0, 0
+local function fit_floating()
+  if gfx.dock(-1) ~= 0 then return end
+  local w, h = want_size()
+  if w == cur_w and h == cur_h then return end
+  cur_w, cur_h = w, h
+  local x, y = gfx.clienttoscreen(0, 0)
+  gfx.init(TITLE, w, h, 0, x, y)
+end
+
+local function context_menu()
+  local function m(v, cur) return v == cur and '!' or '' end
+  local docked = gfx.dock(-1) ~= 0
+  local items = {
+    m(-1, time_mode) .. 'Time: Follow ruler', m(5, time_mode) .. 'Time: Timecode',
+    m(0, time_mode) .. 'Time: Min:Secs', m(2, time_mode) .. 'Time: Measures.Beats',
+    m(3, time_mode) .. 'Time: Seconds', m(4, time_mode) .. 'Time: Samples', '',
+    m(12, font_size) .. 'Font: Small', m(14, font_size) .. 'Font: Medium',
+    m(16, font_size) .. 'Font: Large', m(20, font_size) .. 'Font: XL', '',
+    docked and 'Undock' or 'Dock', 'Close',
+  }
+  local ret = menu_at(items)
+  local modes = { -1, 5, 0, 2, 3, 4 }
+  local fonts = { 12, 14, 16, 20 }
+  if ret >= 1 and ret <= 6 then time_mode = modes[ret]; last_key = nil; cur_w = 0
+  elseif ret >= 7 and ret <= 10 then font_size = fonts[ret - 6]; cur_w = 0
+  elseif ret == 11 then
+    if docked then gfx.dock(0) else gfx.dock(1) end
+    cur_w = 0
+  elseif ret == 12 then return true end
+end
+
+local prev_cap = 0
+local function loop()
+  local char = gfx.getchar()
+  if char == -1 then return end
+  scan(r.time_precise())
+  fit_floating()
+  draw()
+
+  local cap = gfx.mouse_cap
+  if cap & 1 == 0 and prev_cap & 1 == 1 then -- left click (on release)
+    local mx, my = gfx.mouse_x, gfx.mouse_y
+    for _, hz in ipairs(hits) do
+      if mx >= hz[1] and mx < hz[1] + hz[3] and my >= hz[2] and my < hz[2] + hz[4] then
+        if hz[5] == 'details' then
+          show_details = not show_details; last_key = nil; cur_w = 0
+        else
+          hz[5](); last_key = nil
+        end
+        break
+      end
+    end
+    refocus_main()
+  end
+  if cap & 2 == 0 and prev_cap & 2 == 2 then -- right click
+    if context_menu() then gfx.quit(); return end
+    refocus_main()
+  end
+  prev_cap = cap & 3
+
+  -- remember where the window is: docked (dock state) or floating (position)
+  dock_state = gfx.dock(-1)
+  if dock_state == 0 then win_x, win_y = gfx.clienttoscreen(0, 0) end
+  gfx.update()
+  r.defer(loop)
+end
+
+local _, _, sec, cmd = r.get_action_context()
+r.SetToggleCommandState(sec, cmd, 1)
+r.RefreshToolbar2(sec, cmd)
+r.atexit(function()
+  save_state()
+  r.SetToggleCommandState(sec, cmd, 0)
+  r.RefreshToolbar2(sec, cmd)
+end)
+
+gfx.init(TITLE, 600, PAD * 2 + 3 * lh(), dock_state, win_x, win_y)
+loop()

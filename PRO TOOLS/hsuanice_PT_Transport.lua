@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1115.2128
+@version 26.1116.1938pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+  - Pre-roll / Post-roll settings (global, off by default) for the Counters Panel and the Play To / From / Through actions.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -184,6 +184,20 @@ function T.range_end(s, e, home)
     r.SetEditCurPos2(0, home or s, false, false)
   end
   r.UpdateArrange()
+end
+
+------------------------------------------------------------------------------
+-- Pre-roll / Post-roll (Pro Tools), global: seconds + on/off, saved across restarts.
+-- Set in the Counters Panel; used by Play To / From / Through Edit Start / End.
+------------------------------------------------------------------------------
+function T.roll(which) -- which = "preroll" | "postroll" -> seconds, on
+  local sec = tonumber(r.GetExtState(T.NS, which))
+  if not sec then sec = which == "preroll" and 2 or 1 end
+  return sec, r.GetExtState(T.NS, which .. "_on") == "1" -- off by default (Pro Tools)
+end
+function T.set_roll(which, sec, on)
+  if sec then r.SetExtState(T.NS, which, string.format("%.10f", math.max(0, sec)), true) end
+  if on ~= nil then r.SetExtState(T.NS, which .. "_on", on and "1" or "0", true) end
 end
 
 return T
