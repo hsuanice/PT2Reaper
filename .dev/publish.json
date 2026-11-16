@@ -132,6 +132,7 @@
   "hsuanice_PT_Transient Settings.lua"
  ],
  "libs": [
+  "hsuanice_PT_Counters Details.lua",
   "hsuanice_PT_Fades.lua",
   "hsuanice_PT_GFXInputField.lua",
   "hsuanice_PT_Grid.lua",

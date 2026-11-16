@@ -1,16 +1,16 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.1938pre1
+@version 26.1116.1945pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version: Edit Selection, Grid / Nudge + selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
+  - Selection details (MIDI / Audio / Empty, channel counts) open in their own floating window - the panel keeps its size.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
   Pro Tools Edit window counters and transport:
 
-    Edit Selection | Grid / Nudge     | Pre-roll / Post-roll | Timeline Selection | (details)
+    Edit Selection | Grid / Nudge     | Pre-roll / Post-roll | Timeline Selection
     Start          | Grid   (click)   | Pre-roll  (click)    | Start
     End            | Nudge  (click)   | Post-roll (click)    | End
     Length         | Items  Tracks  > |                      | Length
@@ -18,8 +18,8 @@
   - Edit Selection: razor areas, else the time selection (none: the edit cursor).
   - Timeline Selection: the loop points (none: the edit cursor).
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
-  - Items / Tracks: selected item / track counts. Click to show / hide the details
-    (MIDI / Audio / Empty items, channel counts); hidden details are not computed.
+  - Items / Tracks: selected item / track counts. Click to open / close the details in their
+    own floating window (MIDI / Audio / Empty items, channel counts); computed only while open.
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
     type a new length. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
@@ -59,7 +59,6 @@ local font_size    = num('font_size', 14)
 local time_mode    = num('time_mode', -1) -- format_timestr: -1 ruler, 5 TC, 0 m:s, 2 bars, 3 sec, 4 smp
 local dock_state   = num('dock', 0)
 local win_x, win_y = num('x', 200), num('y', 200)
-local show_details = r.GetExtState(NS, 'details') == '1'
 
 local function save_state()
   r.SetExtState(NS, 'font_size', tostring(font_size), true)
@@ -67,7 +66,6 @@ local function save_state()
   r.SetExtState(NS, 'dock', tostring(dock_state), true)
   r.SetExtState(NS, 'x', tostring(win_x), true)
   r.SetExtState(NS, 'y', tostring(win_y), true)
-  r.SetExtState(NS, 'details', show_details and '1' or '0', true)
 end
 
 ------------------------------------------------------------
@@ -129,29 +127,12 @@ end
 ------------------------------------------------------------
 -- Data (rescanned only when something changed)
 ------------------------------------------------------------
-local D = { edit = {}, tl = {}, items = 0, tracks = 0, types = { midi = 0, audio = 0, empty = 0 }, channels = {} }
+local D = { edit = {}, tl = {}, items = 0, tracks = 0 }
 local last_key, last_detail_key, next_scan = nil, nil, 0
 
 local function pos(t) return r.format_timestr_pos(t, '', time_mode) end
 local function len(a, b) return r.format_timestr_len(b - a, '', a, time_mode) end
 local function triple(a, b) return { pos(a), pos(b), len(a, b) } end
-
-local function scan_details()
-  local types, chs = { midi = 0, audio = 0, empty = 0 }, {}
-  for i = 0, r.CountSelectedMediaItems(0) - 1 do
-    local take = r.GetActiveTake(r.GetSelectedMediaItem(0, i))
-    if not take then
-      types.empty = types.empty + 1
-    else
-      local src = r.GetMediaItemTake_Source(take)
-      local st = r.GetMediaSourceType(src, '')
-      if st == 'MIDI' or st == 'REX' then types.midi = types.midi + 1 else types.audio = types.audio + 1 end
-      local ch = r.GetMediaSourceNumChannels(src) or 0
-      if ch > 0 then chs[ch] = (chs[ch] or 0) + 1 end
-    end
-  end
-  D.types, D.channels = types, chs
-end
 
 local function scan(now)
   if now < next_scan then return end
@@ -167,7 +148,6 @@ local function scan(now)
   D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
   D.edit = es and triple(es, ee) or triple(cur, cur)
   D.tl = ls and triple(ls, le) or triple(cur, cur)
-  if show_details then scan_details() end
 end
 
 ------------------------------------------------------------
@@ -236,6 +216,23 @@ local function toggle_roll(which)
   T.set_roll(which, nil, not on); last_key = nil
 end
 
+-- Selection details (MIDI / Audio / Empty, channel counts) open in their own floating
+-- window: hsuanice_PT_Counters Details.lua (runs only while it is open)
+local DETAILS_SCRIPT = DIR .. 'hsuanice_PT_Counters Details.lua'
+local function details_open()
+  local hb = tonumber(r.GetExtState(NS, 'details_hb'))
+  return hb ~= nil and r.time_precise() - hb < 1
+end
+local function toggle_details()
+  if details_open() then
+    r.SetExtState(NS, 'details_close', '1', false)
+  else
+    r.SetExtState(NS, 'details_close', '', false)
+    local cmd = r.AddRemoveReaScript(true, 0, DETAILS_SCRIPT, true)
+    if cmd and cmd ~= 0 then r.Main_OnCommand(cmd, 0) end
+  end
+end
+
 local function sections()
   local S = {}
   S[#S + 1] = { { 'Start', D.edit[1] }, { 'End', D.edit[2] }, { 'Length', D.edit[3] } }
@@ -243,8 +240,8 @@ local function sections()
   S[#S + 1] = {
     { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu },
     { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu },
-    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks .. (show_details and '  <' or '  >'), 'counts',
-      'details', 'details' },
+    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks .. (details_open() and '  <' or '  >'), 'counts',
+      toggle_details, toggle_details },
   }
   local pre, pre_on = roll_value('preroll')
   local post, post_on = roll_value('postroll')
@@ -253,20 +250,6 @@ local function sections()
     { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end },
   }
   S[#S + 1] = { { 'Start', D.tl[1] }, { 'End', D.tl[2] }, { 'Length', D.tl[3] } }
-  if show_details then
-    S[#S + 1] = { { 'MIDI', tostring(D.types.midi), 'detail' }, { 'Audio', tostring(D.types.audio), 'detail' },
-      { 'Empty', tostring(D.types.empty), 'detail' } }
-    local chl = {}
-    for ch, n in pairs(D.channels) do chl[#chl + 1] = { ch, n } end
-    table.sort(chl, function(a, b) return a[1] < b[1] end)
-    local rows = {}
-    for _, e in ipairs(chl) do
-      rows[#rows + 1] = { e[1] == 1 and 'Mono' or e[1] == 2 and 'Stereo' or (e[1] .. '-Ch'), tostring(e[2]), 'detail' }
-    end
-    if #rows == 0 then rows[1] = { 'Channels', '-', 'detail' } end
-    -- three rows per column
-    for i = 1, #rows, 3 do S[#S + 1] = { rows[i], rows[i + 1], rows[i + 2] } end
-  end
   return S
 end
 
@@ -391,11 +374,7 @@ local function loop()
     local mx, my = gfx.mouse_x, gfx.mouse_y
     for _, hz in ipairs(hits) do
       if mx >= hz[1] and mx < hz[1] + hz[3] and my >= hz[2] and my < hz[2] + hz[4] then
-        if hz[5] == 'details' then
-          show_details = not show_details; last_key = nil; cur_w = 0
-        else
-          hz[5](); last_key = nil
-        end
+        hz[5](); last_key = nil
         break
       end
     end

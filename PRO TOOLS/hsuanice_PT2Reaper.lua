@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1116.1938pre1
+@version 26.1116.1945pre1
 @author hsuanice
 @metapackage
 @provides
@@ -134,6 +134,7 @@
   [main] hsuanice_Pro Tools Ungroup Clips.lua
   [main] hsuanice_Pro Tools Unloop Clips.lua
   [main] hsuanice_Pro Tools Zoom Toggle.lua
+  [nomain] hsuanice_PT_Counters Details.lua
   [nomain] hsuanice_PT_Fades.lua
   [nomain] hsuanice_PT_GFXInputField.lua
   [nomain] hsuanice_PT_Grid.lua
@@ -148,7 +149,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: Edit Selection, Grid / Nudge with selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
+  - Counters Panel: the selection details open in their own floating window.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

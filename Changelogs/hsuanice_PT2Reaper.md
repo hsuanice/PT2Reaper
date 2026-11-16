@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.1945pre1
+
+- Counters Panel: the selection details open in their own floating window.
+
 ## 26.1116.1938pre1
 
 - Counters Panel: Edit Selection, Grid / Nudge with selection counts, Pre-roll / Post-roll and Timeline Selection in one dockable window.
