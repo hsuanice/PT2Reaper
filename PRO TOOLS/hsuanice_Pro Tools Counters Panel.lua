@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2047pre1
+@version 26.1116.2053pre1
 @author hsuanice
 @noindex
 @changelog
-  - Hover info on Items / Tracks (item details window) and on Pre-roll / Post-roll (name: on / off, value: type the length).
+  - Hover info (after 0.5 s) on Grid, Nudge, Items / Tracks and Pre-roll / Post-roll.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -239,8 +239,8 @@ local function sections()
   S[#S + 1] = { { 'Start', D.edit[1] }, { 'End', D.edit[2] }, { 'Length', D.edit[3] } }
   local mode, idx = Nudge.get_state()
   S[#S + 1] = {
-    { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu },
-    { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu },
+    { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu, 'grid' },
+    { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu, 'nudge' },
     { 'Items:', tostring(D.items), 'count', toggle_details, toggle_details },
   }
   local pre, pre_on = roll_value('preroll')
@@ -331,7 +331,7 @@ local function draw()
         if kind == 'count' then
           hits[#hits + 1] = { b.x, y, b.w, h, f_label, 'details' }
         else
-          local tip = row[6] -- hover info key (Pre-roll / Post-roll)
+          local tip = row[6] -- hover info key (Grid, Nudge, Pre-roll, Post-roll)
           if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label, tip and (tip .. ':name') } end
           if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value, tip and (tip .. ':value') } end
         end
@@ -389,6 +389,10 @@ local function hover_tip()
     if zone == 'details' then
       text = details_open() and 'Click to close the item details window'
         or 'Click to open the item details window\n(MIDI / Audio / Empty items, channel counts).\nClick again to close it.'
+    elseif zone:match('^grid:') then
+      text = 'Click to choose the Grid value or mode\n(the same Grid as the Pro Tools Grid actions).'
+    elseif zone:match('^nudge:') then
+      text = 'Click to choose the Nudge value or mode\n(used by the Pro Tools Nudge actions).'
     else
       local which, part = zone:match('^(%a+):(%a+)$')
       local name = which == 'preroll' and 'Pre-roll' or 'Post-roll'

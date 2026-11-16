@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1116.2053pre1
+
+- Hover info (after 0.5 s) on Grid, Nudge, Items / Tracks and Pre-roll / Post-roll.
+
 ## 26.1116.2047pre1
 
 - Hover info on Items / Tracks (item details window) and on Pre-roll / Post-roll (name: on / off, value: type the length).
