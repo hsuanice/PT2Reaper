@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.1945pre1
+@version 26.1116.1953pre1
 @author hsuanice
 @noindex
 @changelog
-  - Selection details (MIDI / Audio / Empty, channel counts) open in their own floating window - the panel keeps its size.
+  - Selection details open in their own floating window (click Items or Tracks); the window reopens where it was.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -18,8 +18,9 @@
   - Edit Selection: razor areas, else the time selection (none: the edit cursor).
   - Timeline Selection: the loop points (none: the edit cursor).
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
-  - Items / Tracks: selected item / track counts. Click to open / close the details in their
-    own floating window (MIDI / Audio / Empty items, channel counts); computed only while open.
+  - Items / Tracks: selected item / track counts. Click either to open / close the item details
+    in their own floating window (MIDI / Audio / Empty items, channel counts); computed only
+    while open.
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
     type a new length. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
@@ -240,7 +241,7 @@ local function sections()
   S[#S + 1] = {
     { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu },
     { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu },
-    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks .. (details_open() and '  <' or '  >'), 'counts',
+    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks, 'counts',
       toggle_details, toggle_details },
   }
   local pre, pre_on = roll_value('preroll')
@@ -306,7 +307,7 @@ local function draw()
         local label, value, kind = row[1], row[2], row[3]
         if kind == 'counts' then
           col(C.text); gfx.x, gfx.y = b.x, y; gfx.drawstr(label)
-          col(C.accent); gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
+          gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
         else
           if kind == 'on' then
             local tw = gfx.measurestr(label)
@@ -335,7 +336,7 @@ local function fit_floating()
   local w, h = want_size()
   if w == cur_w and h == cur_h then return end
   cur_w, cur_h = w, h
-  local x, y = gfx.clienttoscreen(0, 0)
+  local _, x, y = gfx.dock(-1, 0, 0, 0, 0) -- window position as gfx.init wants it
   gfx.init(TITLE, w, h, 0, x, y)
 end
 
@@ -388,7 +389,7 @@ local function loop()
 
   -- remember where the window is: docked (dock state) or floating (position)
   dock_state = gfx.dock(-1)
-  if dock_state == 0 then win_x, win_y = gfx.clienttoscreen(0, 0) end
+  if dock_state == 0 then local _, x, y = gfx.dock(-1, 0, 0, 0, 0); win_x, win_y = x, y end
   gfx.update()
   r.defer(loop)
 end

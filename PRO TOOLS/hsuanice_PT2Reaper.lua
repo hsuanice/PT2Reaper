@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1116.1945pre1
+@version 26.1116.1953pre1
 @author hsuanice
 @metapackage
 @provides
@@ -149,7 +149,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: the selection details open in their own floating window.
+  - Counters Panel: click Items or Tracks for the details; windows reopen where they were.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

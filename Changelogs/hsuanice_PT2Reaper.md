@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.1953pre1
+
+- Counters Panel: click Items or Tracks for the details; windows reopen where they were.
+
 ## 26.1116.1945pre1
 
 - Counters Panel: the selection details open in their own floating window.

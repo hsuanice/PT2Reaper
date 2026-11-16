@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Counters Details - selected items in detail (PT2Reaper Counters Panel)
-@version 26.1116.1945pre1
+@version 26.1116.1953pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version.
+  - Reopens exactly where it was (window position read with gfx.dock, not the client area).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Floating window opened / closed by clicking Items / Tracks in the Counters Panel:
@@ -79,7 +79,7 @@ local function fit(R)
   local h = PAD * 2 + #R * lh()
   if w == cur_w and h == cur_h then return end
   cur_w, cur_h = w, h
-  local x, y = gfx.clienttoscreen(0, 0)
+  local _, x, y = gfx.dock(-1, 0, 0, 0, 0) -- window position as gfx.init wants it
   gfx.init(TITLE, w, h, 0, x, y)
 end
 
@@ -107,7 +107,8 @@ local function loop()
     save(); gfx.quit(); return
   end
   r.SetExtState(NS, 'details_hb', string.format('%.3f', r.time_precise()), false)
-  if gfx.dock(-1) == 0 then px, py = gfx.clienttoscreen(0, 0) end
+  local d, x, y = gfx.dock(-1, 0, 0, 0, 0)
+  if d == 0 and x then px, py = x, y end
   font_size = num('font_size', 14)
   gfx.setfont(1, 'Arial', font_size)
   scan(r.time_precise())
