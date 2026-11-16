@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1116.2056
+
+- Pre-roll / Post-roll settings (global, off by default) for the Counters Panel and the Play To / From / Through actions.
+
 ## 26.1116.1938pre1
 
 - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.

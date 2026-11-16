@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_Counters Details - selected items in detail (PT2Reaper Counters Panel)
-@version 26.1116.1953pre1
+@version 26.1116.2056
 @author hsuanice
 @noindex
 @changelog

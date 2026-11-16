@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2056
+
+- Tested in REAPER: Counters Panel (with details window and hover info).
+
 ## 26.1116.2053pre1
 
 - Counters Panel: hover info on Grid / Nudge.

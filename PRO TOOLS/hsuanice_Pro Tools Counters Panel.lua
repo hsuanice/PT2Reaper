@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2053pre1
+@version 26.1116.2056
 @author hsuanice
 @noindex
 @changelog
