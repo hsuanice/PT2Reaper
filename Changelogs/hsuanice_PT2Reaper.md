@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2028pre1
+
+- Counters Panel: fixed width for Items / Tracks counts.
+
 ## 26.1116.1953pre1
 
 - Counters Panel: click Items or Tracks for the details; windows reopen where they were.

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.1953pre1
+@version 26.1116.2028pre1
 @author hsuanice
 @noindex
 @changelog
-  - Selection details open in their own floating window (click Items or Tracks); the window reopens where it was.
+  - Fixed column width for Items / Tracks (up to 99999 / 9999): large counts no longer push the next sections onto a new row.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -264,8 +264,12 @@ local function measure(sec)
   for i = 1, 3 do
     local row = sec[i]
     if row then
-      lw = math.max(lw, gfx.measurestr(row[1]))
-      vw = math.max(vw, gfx.measurestr(row[2]))
+      local a, b = row[1], row[2]
+      -- counts: reserve room for 5-digit items / 4-digit tracks, so the column (and the
+      -- sections after it) does not move when the numbers grow
+      if row[3] == 'counts' then a, b = 'Items: 88888', 'Tracks: 8888' end
+      lw = math.max(lw, gfx.measurestr(a))
+      vw = math.max(vw, gfx.measurestr(b))
     end
   end
   return lw, vw, lw + GAP + vw
