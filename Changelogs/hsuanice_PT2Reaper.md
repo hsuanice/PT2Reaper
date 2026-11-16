@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2042pre1
+
+- Counters Panel: hover info on Items / Tracks.
+
 ## 26.1116.2037pre1
 
 - Counters Panel: Items / Tracks in their own zone.

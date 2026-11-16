@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1116.2042pre1
+
+- Hover info on Items / Tracks: click opens the item details window, click again closes it.
+
 ## 26.1116.2037pre1
 
 - Items under Grid / Nudge, Tracks under Pre / Post-roll, in their own zone with a line above; numbers grow to the left, nothing moves; no extra gap after Grid.

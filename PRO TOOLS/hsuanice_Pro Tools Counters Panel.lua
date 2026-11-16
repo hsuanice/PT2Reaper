@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2037pre1
+@version 26.1116.2042pre1
 @author hsuanice
 @noindex
 @changelog
-  - Items under Grid / Nudge, Tracks under Pre / Post-roll, in their own zone with a line above; numbers grow to the left, nothing moves; no extra gap after Grid.
+  - Hover info on Items / Tracks: click opens the item details window, click again closes it.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -20,7 +20,7 @@
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
   - Items / Tracks: selected item / track counts. Click either to open / close the item details
     in their own floating window (MIDI / Audio / Empty items, channel counts); computed only
-    while open.
+    while open. Hover over them for a reminder.
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
     type a new length. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
@@ -329,7 +329,7 @@ local function draw()
         end
         local f_label, f_value = row[4], row[5]
         if kind == 'count' then
-          hits[#hits + 1] = { b.x, y, b.w, h, f_label }
+          hits[#hits + 1] = { b.x, y, b.w, h, f_label, 'details' }
         else
           if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label } end
           if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value } end
@@ -374,6 +374,31 @@ local function context_menu()
   elseif ret == 12 then return true end
 end
 
+-- Hover info (native tooltip, shown outside the window - not cut by a short docker)
+local tip_zone, tip_since, tip_shown = nil, 0, nil
+local function hover_tip()
+  local mx, my = gfx.mouse_x, gfx.mouse_y
+  local zone
+  for _, hz in ipairs(hits) do
+    if hz[6] and mx >= hz[1] and mx < hz[1] + hz[3] and my >= hz[2] and my < hz[2] + hz[4] then zone = hz[6]; break end
+  end
+  if zone ~= tip_zone then tip_zone, tip_since = zone, r.time_precise() end
+  local text
+  if zone == 'details' and r.time_precise() - tip_since > 0.5 then
+    text = details_open() and 'Click to close the item details window'
+      or 'Click to open the item details window\n(MIDI / Audio / Empty items, channel counts).\nClick again to close it.'
+  end
+  if text ~= tip_shown then
+    if text then
+      local sx, sy = gfx.clienttoscreen(mx + 12, my + 16)
+      r.TrackCtl_SetToolTip(text, sx, sy, true)
+    else
+      r.TrackCtl_SetToolTip('', 0, 0, true)
+    end
+    tip_shown = text
+  end
+end
+
 local prev_cap = 0
 local function loop()
   local char = gfx.getchar()
@@ -398,6 +423,7 @@ local function loop()
     refocus_main()
   end
   prev_cap = cap & 3
+  hover_tip()
 
   -- remember where the window is: docked (dock state) or floating (position)
   dock_state = gfx.dock(-1)
