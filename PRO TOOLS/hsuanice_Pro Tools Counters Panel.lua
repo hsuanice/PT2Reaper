@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2028pre1
+@version 26.1116.2037pre1
 @author hsuanice
 @noindex
 @changelog
-  - Fixed column width for Items / Tracks (up to 99999 / 9999): large counts no longer push the next sections onto a new row.
+  - Items under Grid / Nudge, Tracks under Pre / Post-roll, in their own zone with a line above; numbers grow to the left, nothing moves; no extra gap after Grid.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -13,7 +13,7 @@
     Edit Selection | Grid / Nudge     | Pre-roll / Post-roll | Timeline Selection
     Start          | Grid   (click)   | Pre-roll  (click)    | Start
     End            | Nudge  (click)   | Post-roll (click)    | End
-    Length         | Items  Tracks  > |                      | Length
+    Length         | Items:       n   | Tracks:          n   | Length
 
   - Edit Selection: razor areas, else the time selection (none: the edit cursor).
   - Timeline Selection: the loop points (none: the edit cursor).
@@ -241,14 +241,14 @@ local function sections()
   S[#S + 1] = {
     { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu },
     { 'Nudge', format_nudge_value(mode, Nudge.get_preset(mode, idx)), nil, nudge_menu, nudge_menu },
-    { 'Items: ' .. D.items, 'Tracks: ' .. D.tracks, 'counts',
-      toggle_details, toggle_details },
+    { 'Items:', tostring(D.items), 'count', toggle_details, toggle_details },
   }
   local pre, pre_on = roll_value('preroll')
   local post, post_on = roll_value('postroll')
   S[#S + 1] = {
     { 'Pre-roll', pre, pre_on and 'on' or 'off', function() toggle_roll('preroll') end, function() edit_roll('preroll') end },
     { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end },
+    { 'Tracks:', tostring(D.tracks), 'count', toggle_details, toggle_details },
   }
   S[#S + 1] = { { 'Start', D.tl[1] }, { 'End', D.tl[2] }, { 'Length', D.tl[3] } }
   return S
@@ -260,19 +260,21 @@ end
 local hits = {} -- { x, y, w, h, fn }
 
 local function measure(sec)
-  local lw, vw = 0, 0
+  local lw, vw, cw = 0, 0, 0
   for i = 1, 3 do
     local row = sec[i]
     if row then
-      local a, b = row[1], row[2]
-      -- counts: reserve room for 5-digit items / 4-digit tracks, so the column (and the
-      -- sections after it) does not move when the numbers grow
-      if row[3] == 'counts' then a, b = 'Items: 88888', 'Tracks: 8888' end
-      lw = math.max(lw, gfx.measurestr(a))
-      vw = math.max(vw, gfx.measurestr(b))
+      if row[3] == 'count' then
+        -- counts span the column (name left, number right) and do not set its width:
+        -- the number grows to the left, nothing moves. Room for 5 digits.
+        cw = math.max(cw, gfx.measurestr(row[1]) + GAP + gfx.measurestr('88888'))
+      else
+        lw = math.max(lw, gfx.measurestr(row[1]))
+        vw = math.max(vw, gfx.measurestr(row[2]))
+      end
     end
   end
-  return lw, vw, lw + GAP + vw
+  return lw, vw, math.max(lw + GAP + vw, cw)
 end
 
 local function layout(S)
@@ -309,7 +311,9 @@ local function draw()
       if row then
         local y = b.y + (i - 1) * h
         local label, value, kind = row[1], row[2], row[3]
-        if kind == 'counts' then
+        if kind == 'count' then
+          -- own zone: a line above it (separates it from Grid / Nudge, Pre / Post-roll)
+          col(C.sep); gfx.rect(b.x - COLGAP // 2, y - 3, b.w + COLGAP, 1, 1)
           col(C.text); gfx.x, gfx.y = b.x, y; gfx.drawstr(label)
           gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
         else
@@ -324,8 +328,12 @@ local function draw()
           gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
         end
         local f_label, f_value = row[4], row[5]
-        if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label } end
-        if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value } end
+        if kind == 'count' then
+          hits[#hits + 1] = { b.x, y, b.w, h, f_label }
+        else
+          if f_label then hits[#hits + 1] = { b.x, y, b.lw + GAP // 2, h, f_label } end
+          if f_value then hits[#hits + 1] = { b.x + b.lw + GAP // 2, y, b.w - b.lw - GAP // 2, h, f_value } end
+        end
       end
     end
   end

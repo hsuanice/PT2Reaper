@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1116.2037pre1
+
+- Items under Grid / Nudge, Tracks under Pre / Post-roll, in their own zone with a line above; numbers grow to the left, nothing moves; no extra gap after Grid.
+
 ## 26.1116.2028pre1
 
 - Fixed column width for Items / Tracks (up to 99999 / 9999): large counts no longer push the next sections onto a new row.

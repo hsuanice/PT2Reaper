@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2037pre1
+
+- Counters Panel: Items / Tracks in their own zone.
+
 ## 26.1116.2028pre1
 
 - Counters Panel: fixed width for Items / Tracks counts.
