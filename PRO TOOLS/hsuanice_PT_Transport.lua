@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1116.2056
+@version 26.1116.2123pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pre-roll / Post-roll settings (global, off by default) for the Counters Panel and the Play To / From / Through actions.
+  - play_around_edit(): Play To / From / Through Edit Start / End with the pre-roll / post-roll lengths.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -198,6 +198,35 @@ end
 function T.set_roll(which, sec, on)
   if sec then r.SetExtState(T.NS, which, string.format("%.10f", math.max(0, sec)), true) end
   if on ~= nil then r.SetExtState(T.NS, which .. "_on", on and "1" or "0", true) end
+end
+
+------------------------------------------------------------------------------
+-- Play To / From / Through Edit Start / End (Pro Tools)
+--   edge = "start" | "end" of the Edit Selection (no selection: the edit cursor)
+--   how  = "to" (pre-roll before -> edge) | "from" (edge -> post-roll after) |
+--          "through" (pre-roll before -> post-roll after)
+-- The pre-roll / post-roll lengths are used whether the rolls are on or off. Stops at the
+-- end; the playhead (edit cursor) stays where it is while it plays and afterwards follows
+-- the usual rules (Insertion Follows Playback on: stop position + Timeline Selection cleared).
+-- QP: the QuickPunch library (optional) - a running pass is ended first.
+------------------------------------------------------------------------------
+function T.play_around_edit(edge, how, QP)
+  T.reset_half_speed()
+  local es, ee = T.edit_range()
+  local cur = r.GetCursorPosition()
+  local p = edge == "end" and (ee or cur) or (es or cur)
+  local pre, post = T.roll("preroll"), T.roll("postroll")
+  local s = how == "from" and p or math.max(0, p - pre)
+  local e = how == "to" and p or p + post
+  if e - s <= EPS then return end
+  if QP and QP.pass_active() and T.is_running() then
+    QP.stop(T.follows())
+    T.play_range(s, e, true, r.GetCursorPosition())
+    return
+  end
+  local home = T.watch_home() or cur
+  if not T.is_running() then home = cur end
+  T.play_range(s, e, false, home)
 end
 
 return T

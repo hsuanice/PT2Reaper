@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1116.2056
+@version 26.1116.2123pre1
 @author hsuanice
 @metapackage
 @provides
@@ -90,8 +90,14 @@
   [main] hsuanice_Pro Tools Nudge Selection Later By Grid - Selection Start.lua
   [main] hsuanice_Pro Tools Nudge Selection Later By Grid.lua
   [main] hsuanice_Pro Tools Play Edit Selection.lua
+  [main] hsuanice_Pro Tools Play From Edit End.lua
+  [main] hsuanice_Pro Tools Play From Edit Start.lua
   [main] hsuanice_Pro Tools Play Half Speed.lua
+  [main] hsuanice_Pro Tools Play Through Edit End.lua
+  [main] hsuanice_Pro Tools Play Through Edit Start.lua
   [main] hsuanice_Pro Tools Play Timeline Selection.lua
+  [main] hsuanice_Pro Tools Play To Edit End.lua
+  [main] hsuanice_Pro Tools Play To Edit Start.lua
   [main] hsuanice_Pro Tools Play-Stop.lua
   [main] hsuanice_Pro Tools Quantize Clips.lua
   [main] hsuanice_Pro Tools QuickPunch.lua
@@ -149,7 +155,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Tested in REAPER: Counters Panel (with details window and hover info).
+  - Play To / From / Through Edit Start / End: Pro Tools behaviour with the Pre-roll / Post-roll lengths.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -264,8 +270,14 @@
   - Nudge Selection Later By Grid - Selection Start: Opt+Shift+NumPad +
   - Nudge Selection Later By Grid: Shift+NumPad +
   - Play Edit Selection: Control+[, Opt+[
+  - Play From Edit End: Control+9, 9, Cmd+Right
+  - Play From Edit Start: Control+7, 7, Cmd+Left
   - Play Half Speed: Shift+Space
+  - Play Through Edit End: Cmd+Opt+Right
+  - Play Through Edit Start: Cmd+Opt+Left
   - Play Timeline Selection: Control+], Opt+]
+  - Play To Edit End: Control+8, 8
+  - Play To Edit Start: Control+6, 6
   - Play-Stop: NumPad 0, Space
   - Quantize Clips: Cmd+NumPad 0, Cmd+0
   - QuickPunch: NumPad 6, Cmd+Shift+P

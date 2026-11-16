@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1116.2123pre1
+
+- play_around_edit(): Play To / From / Through Edit Start / End with the pre-roll / post-roll lengths.
+
 ## 26.1116.2056
 
 - Pre-roll / Post-roll settings (global, off by default) for the Counters Panel and the Play To / From / Through actions.

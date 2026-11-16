@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1116.2123pre1
+
+- Play To / From / Through Edit Start / End: Pro Tools behaviour with the Pre-roll / Post-roll lengths.
+
 ## 26.1116.2056
 
 - Tested in REAPER: Counters Panel (with details window and hover info).
