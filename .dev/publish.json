@@ -139,7 +139,13 @@
   "hsuanice_Pro Tools Pre Post Roll Playback.lua",
   "hsuanice_Pro Tools Restore Last Selection.lua",
   "hsuanice_Pro Tools Click Timeline Ruler.lua",
-  "hsuanice_Pro Tools Double Click Timeline Ruler.lua"
+  "hsuanice_Pro Tools Double Click Timeline Ruler.lua",
+  "hsuanice_Pro Tools Change Edit to Match Timeline.lua",
+  "hsuanice_Pro Tools Change Edit to Match Timeline - Start.lua",
+  "hsuanice_Pro Tools Change Edit to Match Timeline - End.lua",
+  "hsuanice_Pro Tools Change Timeline to Match Edit.lua",
+  "hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua",
+  "hsuanice_Pro Tools Change Timeline to Match Edit - End.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
@@ -156,7 +162,8 @@
   "hsuanice_PT_TrackEdit.lua",
   "hsuanice_PT_Transient.lua",
   "hsuanice_PT_Transport.lua",
-  "hsuanice_PT_Trim.lua"
+  "hsuanice_PT_Trim.lua",
+  "hsuanice_PT_MatchSelection.lua"
  ],
  "shortcuts": {
   "hsuanice_Pro Tools Apply Next Fade Shape.lua": "Opt+Control+Right",
@@ -284,6 +291,12 @@
   "hsuanice_Pro Tools Play From Edit End.lua": "Control+9, 9, Cmd+Right",
   "hsuanice_Pro Tools Play Through Edit End.lua": "Cmd+Opt+Right",
   "hsuanice_Pro Tools Pre Post Roll Playback.lua": "Cmd+K",
-  "hsuanice_Pro Tools Restore Last Selection.lua": "Cmd+Opt+Z"
+  "hsuanice_Pro Tools Restore Last Selection.lua": "Cmd+Opt+Z",
+  "hsuanice_Pro Tools Change Edit to Match Timeline.lua": "Control+0, 0",
+  "hsuanice_Pro Tools Change Edit to Match Timeline - Start.lua": "Opt+Shift+Control+0",
+  "hsuanice_Pro Tools Change Edit to Match Timeline - End.lua": "Cmd+Shift+Control+0",
+  "hsuanice_Pro Tools Change Timeline to Match Edit.lua": "Control+O, O",
+  "hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua": "Opt+Shift+Control+O",
+  "hsuanice_Pro Tools Change Timeline to Match Edit - End.lua": "Cmd+Shift+Control+O"
  }
 }

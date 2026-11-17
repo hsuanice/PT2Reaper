@@ -18,6 +18,7 @@
 !/PRO TOOLS/hsuanice_PT_Fades.lua
 !/PRO TOOLS/hsuanice_PT_GFXInputField.lua
 !/PRO TOOLS/hsuanice_PT_Grid.lua
+!/PRO TOOLS/hsuanice_PT_MatchSelection.lua
 !/PRO TOOLS/hsuanice_PT_MouseSelect.lua
 !/PRO TOOLS/hsuanice_PT_Nudge.lua
 !/PRO TOOLS/hsuanice_PT_NudgeEdge.lua
@@ -32,6 +33,12 @@
 !/PRO TOOLS/hsuanice_PT_Trim.lua
 !/PRO TOOLS/hsuanice_Pro Tools Apply Next Fade Shape.lua
 !/PRO TOOLS/hsuanice_Pro Tools Apply Previous Fade Shape.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Edit to Match Timeline - End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Edit to Match Timeline - Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Edit to Match Timeline.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Timeline to Match Edit - End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua
+!/PRO TOOLS/hsuanice_Pro Tools Change Timeline to Match Edit.lua
 !/PRO TOOLS/hsuanice_Pro Tools Clear All Soloed Tracks.lua
 !/PRO TOOLS/hsuanice_Pro Tools Clear.lua
 !/PRO TOOLS/hsuanice_Pro Tools Click Timeline Ruler.lua

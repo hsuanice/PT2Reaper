@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.0059
+@version 26.1118.0102pre1
 @author hsuanice
 @metapackage
 @provides
@@ -9,6 +9,12 @@
   [main] hsuanice_PT_Transient Settings.lua
   [main] hsuanice_Pro Tools Apply Next Fade Shape.lua
   [main] hsuanice_Pro Tools Apply Previous Fade Shape.lua
+  [main] hsuanice_Pro Tools Change Edit to Match Timeline - End.lua
+  [main] hsuanice_Pro Tools Change Edit to Match Timeline - Start.lua
+  [main] hsuanice_Pro Tools Change Edit to Match Timeline.lua
+  [main] hsuanice_Pro Tools Change Timeline to Match Edit - End.lua
+  [main] hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua
+  [main] hsuanice_Pro Tools Change Timeline to Match Edit.lua
   [main] hsuanice_Pro Tools Clear All Soloed Tracks.lua
   [main] hsuanice_Pro Tools Clear.lua
   [main] hsuanice_Pro Tools Click Timeline Ruler.lua
@@ -148,6 +154,7 @@
   [nomain] hsuanice_PT_Fades.lua
   [nomain] hsuanice_PT_GFXInputField.lua
   [nomain] hsuanice_PT_Grid.lua
+  [nomain] hsuanice_PT_MatchSelection.lua
   [nomain] hsuanice_PT_MouseSelect.lua
   [nomain] hsuanice_PT_Nudge.lua
   [nomain] hsuanice_PT_NudgeEdge.lua
@@ -160,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Time marker / ruler clicks (Pro Tools Timeline and Marker rulers), Link-off playback keeps the Edit position, Play Edit Selection from the Edit position (tested in REAPER)
+  - Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End): Pro Tools behaviour with loop points, razor areas and the Time marker
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -197,6 +204,12 @@
   ## Suggested shortcuts (Pro Tools keys)
   - Apply Next Fade Shape: Opt+Control+Right
   - Apply Previous Fade Shape: Opt+Control+Left
+  - Change Edit to Match Timeline - End: Cmd+Shift+Control+0
+  - Change Edit to Match Timeline - Start: Opt+Shift+Control+0
+  - Change Edit to Match Timeline: Control+0, 0
+  - Change Timeline to Match Edit - End: Cmd+Shift+Control+O
+  - Change Timeline to Match Edit - Start: Opt+Shift+Control+O
+  - Change Timeline to Match Edit: Control+O, O
   - Clear: Cmd+B
   - Consolidate Selection: Opt+#, Opt+Shift+NumPad 3
   - Copy and Move Clip End To Current TC: Opt+Control+I

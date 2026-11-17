@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0102pre1
+
+- Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End): Pro Tools behaviour with loop points, razor areas and the Time marker
+
 ## 26.1118.0059
 
 - Release: Time marker / ruler clicks (Pro Tools Timeline and Marker rulers), Link-off playback keeps the Edit position, Play Edit Selection from the Edit position (tested in REAPER)
