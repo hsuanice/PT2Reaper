@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1117.1259pre1
+
+- Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+
 ## 26.1115.2128
 
 - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.

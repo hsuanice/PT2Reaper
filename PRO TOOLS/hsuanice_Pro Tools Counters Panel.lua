@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1116.2255
+@version 26.1117.1259pre1
 @author hsuanice
 @noindex
 @changelog
-  - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).
+  - Updates at once when Pre Post Roll Playback (Cmd+K) switches the rolls; its toolbar button shows the saved state after a restart.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -143,7 +143,8 @@ local function scan(now)
   local ls, le = T.timeline_range()
   local key = table.concat({ r.GetProjectStateChangeCount(0), r.CountSelectedMediaItems(0),
     r.CountSelectedTracks(0), cur, es or '-', ee or '-', ls or '-', le or '-', time_mode,
-    r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll') }, '|')
+    r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll'),
+    r.GetExtState(T.NS, 'preroll_on'), r.GetExtState(T.NS, 'postroll_on') }, '|')
   if key == last_key then return end
   last_key = key
   D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
@@ -458,6 +459,7 @@ r.atexit(function()
   r.RefreshToolbar2(sec, cmd)
 end)
 
-T.refresh_follows_button() -- after a restart the N button shows the saved state again
+T.refresh_follows_button() -- after a restart the N / Cmd+K buttons show the saved state again
+T.refresh_rolls_button()
 gfx.init(TITLE, 600, PAD * 2 + 3 * lh(), dock_state, win_x, win_y)
 loop()

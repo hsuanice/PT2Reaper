@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.1259pre1
+
+- Pre Post Roll Playback (Cmd+K): one toggle for both rolls; the rolls now play around the Timeline Selection (Space, Play Timeline Selection).
+
 ## 26.1116.2255
 
 - Release: Play To / From / Through Edit Start / End (tested in REAPER); the N button shows the saved state after a restart.

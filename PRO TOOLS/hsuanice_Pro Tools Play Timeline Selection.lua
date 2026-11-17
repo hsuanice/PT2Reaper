@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1115.2128
+@version 26.1117.1259pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+  - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**
@@ -40,10 +40,10 @@ end
 T.reset_half_speed()
 T.refresh_follows_button()
 
-local s, e = T.timeline_range()
+local s, e, home = T.timeline_bounds() -- with the pre-roll / post-roll when they are on
 if QP.pass_active() and T.is_running() then
   QP.stop(T.follows())
-  if s then T.play_range(s, e, true) else T.play_range(r.GetCursorPosition(), 1e12, true) end
+  if s then T.play_range(s, e, true, home) else T.play_range(r.GetCursorPosition(), 1e12, true) end
 elseif T.is_running() then
   -- retrigger. Insertion Follows Playback on: from where playback is now (the insertion
   -- follows it) and the Timeline Selection is cleared (no stop at its end any more);
@@ -52,12 +52,12 @@ elseif T.is_running() then
     if s then T.watch_clear(); T.clear_timeline(); r.UpdateArrange() end
     r.SetEditCurPos2(0, r.GetPlayPosition(), false, true)
   elseif s then
-    T.play_range(s, e)
+    T.play_range(s, e, false, home)
   else
     T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true)
   end
 elseif s then
-  T.play_range(s, e)
+  T.play_range(s, e, false, home)
 else
   T.play()
 end

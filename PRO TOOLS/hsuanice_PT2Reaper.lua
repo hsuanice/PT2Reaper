@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1116.2255
+@version 26.1117.1259pre1
 @author hsuanice
 @metapackage
 @provides
@@ -99,6 +99,7 @@
   [main] hsuanice_Pro Tools Play To Edit End.lua
   [main] hsuanice_Pro Tools Play To Edit Start.lua
   [main] hsuanice_Pro Tools Play-Stop.lua
+  [main] hsuanice_Pro Tools Pre Post Roll Playback.lua
   [main] hsuanice_Pro Tools Quantize Clips.lua
   [main] hsuanice_Pro Tools QuickPunch.lua
   [main] hsuanice_Pro Tools Quit.lua
@@ -155,7 +156,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Play To / From / Through Edit Start / End (tested in REAPER); the N button shows the saved state after a restart.
+  - Pre Post Roll Playback (Cmd+K): one toggle for both rolls; the rolls now play around the Timeline Selection (Space, Play Timeline Selection).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -279,6 +280,7 @@
   - Play To Edit End: Control+8, 8
   - Play To Edit Start: Control+6, 6
   - Play-Stop: NumPad 0, Space
+  - Pre Post Roll Playback: Cmd+K
   - Quantize Clips: Cmd+NumPad 0, Cmd+0
   - QuickPunch: NumPad 6, Cmd+Shift+P
   - Quit: Cmd+Q

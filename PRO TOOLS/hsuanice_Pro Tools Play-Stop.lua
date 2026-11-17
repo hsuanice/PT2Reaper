@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1115.2128
+@version 26.1117.1259pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+  - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play/Stop**
@@ -52,7 +52,7 @@ if T.is_running() then
 elseif QP.mode_on() then
   if QP.start_pass(false, T.start_position()) == "none" then T.play() end
 else
-  local s, e = T.timeline_range()
-  if s then T.play_range(s, e) else T.play() end
+  local s, e, home = T.timeline_bounds() -- with the pre-roll / post-roll when they are on
+  if s then T.play_range(s, e, false, home) else T.play() end
 end
 r.defer(function() end) -- no "ReaScript: Run" undo point (the pass makes its own)

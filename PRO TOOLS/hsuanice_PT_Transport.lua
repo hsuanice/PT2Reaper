@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1116.2255
+@version 26.1117.1259pre1
 @author hsuanice
 @noindex
 @changelog
-  - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).
+  - Pre-roll / post-roll on: Space and Play Timeline Selection play from the pre-roll before the Timeline Selection to the post-roll after it; plain play starts the pre-roll before the playhead. toggle_rolls() for Pre Post Roll Playback.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -65,9 +65,17 @@ end
 
 function T.is_running() return r.GetPlayState() ~= 0 end
 
+-- Plain play from the start position. Pre-roll on (Pro Tools): starts the pre-roll length
+-- earlier; the playhead (edit cursor) stays at the start position.
 function T.play()
-  r.SetEditCurPos2(0, T.start_position(), true, false)
-  r.Main_OnCommand(CMD_PLAY, 0)
+  local p = T.start_position()
+  local pre, on = T.roll("preroll")
+  if on and pre > 0 and p > 0 then
+    T.start_at(math.max(0, p - pre), p)
+  else
+    r.SetEditCurPos2(0, p, true, false)
+    r.Main_OnCommand(CMD_PLAY, 0)
+  end
 end
 
 -- Insertion Follows Playback on: the edit cursor stays where playback stopped.
@@ -200,7 +208,43 @@ function T.roll(which) -- which = "preroll" | "postroll" -> seconds, on
 end
 function T.set_roll(which, sec, on)
   if sec then r.SetExtState(T.NS, which, string.format("%.10f", math.max(0, sec)), true) end
-  if on ~= nil then r.SetExtState(T.NS, which .. "_on", on and "1" or "0", true) end
+  if on ~= nil then
+    r.SetExtState(T.NS, which .. "_on", on and "1" or "0", true)
+    T.refresh_rolls_button()
+  end
+end
+
+-- Pre Post Roll Playback (Pro Tools Cmd+K): one toggle for both. Either on -> both off;
+-- both off -> both on.
+function T.rolls_on()
+  local _, a = T.roll("preroll")
+  local _, b = T.roll("postroll")
+  return a or b
+end
+function T.toggle_rolls()
+  local on = not T.rolls_on()
+  T.set_roll("preroll", nil, on)
+  T.set_roll("postroll", nil, on)
+end
+local ROLLS_SCRIPT = (debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or '') .. "hsuanice_Pro Tools Pre Post Roll Playback.lua"
+function T.refresh_rolls_button() -- lit while a roll is on; found by path (see refresh_follows_button)
+  local cmd = r.file_exists(ROLLS_SCRIPT) and r.AddRemoveReaScript(true, 0, ROLLS_SCRIPT, false) or 0
+  if cmd and cmd ~= 0 then
+    r.SetToggleCommandState(0, cmd, T.rolls_on() and 1 or 0)
+    r.RefreshToolbar2(0, cmd)
+  end
+end
+
+-- The Timeline Selection as Space / Play Timeline Selection play it (Pro Tools: the rolls
+-- belong to the Timeline Selection, not to the Edit Selection): s, e, home or nil.
+-- Pre-roll on: starts that much earlier; post-roll on: ends that much later; home = the
+-- Timeline Selection start (where the playhead stays).
+function T.timeline_bounds()
+  local ls, le = T.timeline_range()
+  if not ls then return nil end
+  local pre, pon = T.roll("preroll")
+  local post, qon = T.roll("postroll")
+  return math.max(0, ls - (pon and pre or 0)), le + (qon and post or 0), ls
 end
 
 ------------------------------------------------------------------------------

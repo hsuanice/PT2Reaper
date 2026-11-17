@@ -135,7 +135,8 @@
   "hsuanice_Pro Tools Ungroup Clips.lua",
   "hsuanice_Pro Tools Unloop Clips.lua",
   "hsuanice_Pro Tools Zoom Toggle.lua",
-  "hsuanice_PT_Transient Settings.lua"
+  "hsuanice_PT_Transient Settings.lua",
+  "hsuanice_Pro Tools Pre Post Roll Playback.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
@@ -277,6 +278,7 @@
   "hsuanice_Pro Tools Play Through Edit Start.lua": "Cmd+Opt+Left",
   "hsuanice_Pro Tools Play To Edit End.lua": "Control+8, 8",
   "hsuanice_Pro Tools Play From Edit End.lua": "Control+9, 9, Cmd+Right",
-  "hsuanice_Pro Tools Play Through Edit End.lua": "Cmd+Opt+Right"
+  "hsuanice_Pro Tools Play Through Edit End.lua": "Cmd+Opt+Right",
+  "hsuanice_Pro Tools Pre Post Roll Playback.lua": "Cmd+K"
  }
 }
