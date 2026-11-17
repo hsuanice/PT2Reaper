@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2337pre1
+
+- Ruler double click: time selection between the nearest markers; loop points and Time marker kept. Time marker named >
+
 ## 26.1117.2320pre1
 
 - Time marker: no name, marker number 9999 (older V / >< markers are replaced when moved)

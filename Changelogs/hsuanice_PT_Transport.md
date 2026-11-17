@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1117.2337pre1
+
+- Time marker named ">" (number 9999); remembers the ruler click so a double click can put the loop points and the marker back.
+
 ## 26.1117.2320pre1
 
 - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).

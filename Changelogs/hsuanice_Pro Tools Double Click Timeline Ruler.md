@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Double Click Timeline Ruler
 
+## 26.1117.2337pre1
+
+- Time selection between the nearest markers (regions not used); Link off: the loop points and the Time marker stay as they were.
+
 ## 26.1117.2320pre1
 
 - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).

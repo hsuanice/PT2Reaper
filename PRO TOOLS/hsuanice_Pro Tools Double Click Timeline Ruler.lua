@@ -1,19 +1,20 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1117.2320pre1
+@version 26.1117.2337pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
+  - Time selection between the nearest markers (regions not used); Link off: the loop points and the Time marker stay as they were.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).
 
-  Does what REAPER's ruler double click "Set time selection to region" does - inside a
-  region: the time selection becomes the region; else: the range between the markers on
-  either side - but the Time marker (marker 9999, put down by the first click of the double click
-  with Link Timeline and Edit Selection off) is not counted as a marker.
+  The time selection becomes the range between the nearest markers on either side of the
+  double click (regions are not used). The Time marker (marker 9999 ">") is not counted.
   No marker before: from the project start; none after: to the project end.
+  Link Timeline and Edit Selection off: the loop points and the Time marker stay as they were
+  before the double click (the first click of it is undone). Link on: the loop points follow
+  the time selection (REAPER).
 
   Set it in Preferences > Editing Behavior > Mouse Modifiers > Ruler > double click.
   Self-contained: uses hsuanice_PT_Transport.lua (same folder).
@@ -37,22 +38,21 @@ r.Main_OnCommand(40514, 0) -- View: Move edit cursor to mouse cursor (no snappin
 local p = r.GetCursorPosition()
 r.SetEditCurPos2(0, cur, false, false)
 
+if not T.linked() then T.ruler_undo_click() end -- loop points + Time marker as before the first click
+
 local skip = T.time_marker() -- the Time marker's number (not a marker for this)
-local rs, re_, prev, nxt
+local prev, nxt
 local i = 0
 while true do
-  local ret, isrgn, pos, rend, _, idx = r.EnumProjectMarkers3(0, i)
+  local ret, isrgn, pos, _, _, idx = r.EnumProjectMarkers3(0, i)
   if ret == 0 then break end
-  if isrgn then
-    if pos <= p and p < rend and (not rs or pos > rs) then rs, re_ = pos, rend end -- innermost
-  elseif idx ~= skip then
+  if not isrgn and idx ~= skip then
     if pos <= p and (not prev or pos > prev) then prev = pos end
     if pos > p and (not nxt or pos < nxt) then nxt = pos end
   end
   i = i + 1
 end
-local s, e
-if rs then s, e = rs, re_ else s, e = prev or 0, nxt or r.GetProjectLength(0) end
+local s, e = prev or 0, nxt or r.GetProjectLength(0)
 if e > s then
   r.GetSet_LoopTimeRange2(0, true, false, s, e, false) -- the time selection (Link on: loop too)
 end

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Click Timeline Ruler
-@version 26.1117.2320pre1
+@version 26.1117.2337pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
+  - Time marker named ">"; remembers the loop points and the marker for a double click.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: clicking the Timebase ruler
@@ -14,8 +14,9 @@
   clicking the ruler) and the Edit position. REAPER has one edit cursor, so with Link
   Timeline and Edit Selection off this click does not move the edit cursor (it stays the
   Edit position): it clears the Timeline Selection (loop points) and puts the Time marker
-  (marker 9999, blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
+  (marker 9999 ">", blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
   then play from the marker. Playing: playback goes on from there.
+  Part of a double click: Double Click Timeline Ruler puts the loop points and the marker back.
   Link on: like REAPER's own click, the edit cursor moves there (no marker).
 
   Set it in Preferences > Editing Behavior > Mouse Modifiers > Ruler > left click.
@@ -42,6 +43,7 @@ if T.linked() then
   if T.is_running() then T.watch_clear(); r.SetEditCurPos2(0, p, false, true) end
 else
   r.SetEditCurPos2(0, cur, false, false) -- the Edit position stays
+  T.ruler_remember() -- a double click (Double Click Timeline Ruler) puts it back
   r.GetSet_LoopTimeRange2(0, true, true, 0, 0, false) -- a point now: no Timeline Selection
   T.set_time_pos(p)
   if T.is_running() then T.watch_clear(); T.start_at(p, cur) end

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.2320pre1
+@version 26.1117.2337pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
+  - Time marker named ">" (number 9999); remembers the ruler click so a double click can put the loop points and the marker back.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -131,13 +131,14 @@ end
 -- nothing is selected: the Timeline position (blue, set by clicking the ruler) and the Edit
 -- position. REAPER has one edit cursor, so with Link off:
 --   edit cursor = the Edit position (it stays where it is while the Timeline plays)
---   Time marker = the Timeline position: a project marker number 9999, no name (blue), set by
+--   Time marker = the Timeline position: a project marker number 9999 named ">" (blue), set by
 --                 "Pro Tools Click Timeline Ruler" (mouse modifier) and, Insertion Follows
 --                 Playback on, by stopping. A Timeline Selection (loop points) is the
 --                 Timeline position instead: the Counters Panel removes the marker then,
 --                 and with Link on.
 ------------------------------------------------------------------------------
-T.TIME_ID = 9999 -- marker number (shown in the ruler; no name), far from the usual numbers
+T.TIME_ID = 9999 -- marker number, far from the usual numbers
+T.TIME_NAME = ">"
 local OLD_NAMES = { V = true, ["><"] = true } -- 26.1117 pre-releases: still found, replaced when moved
 T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
 
@@ -147,7 +148,7 @@ function T.time_marker()
   while true do
     local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
     if ret == 0 then return nil end
-    if not isrgn and color == T.TIME_COLOR and ((idx == T.TIME_ID and name == "") or OLD_NAMES[name]) then
+    if not isrgn and color == T.TIME_COLOR and ((idx == T.TIME_ID and (name == T.TIME_NAME or name == "")) or OLD_NAMES[name]) then
       return idx, pos
     end
     i = i + 1
@@ -164,11 +165,35 @@ end
 function T.set_time_pos(p)
   local idx = T.time_marker()
   if idx == T.TIME_ID then
-    r.SetProjectMarker3(0, idx, false, p, 0, "", T.TIME_COLOR)
+    r.SetProjectMarker3(0, idx, false, p, 0, T.TIME_NAME, T.TIME_COLOR)
   else
-    if idx then r.DeleteProjectMarker(0, idx, false) end -- an older one (named): replaced
-    r.AddProjectMarker2(0, false, p, 0, "", T.TIME_ID, T.TIME_COLOR)
+    if idx then r.DeleteProjectMarker(0, idx, false) end -- an older one: replaced
+    r.AddProjectMarker2(0, false, p, 0, T.TIME_NAME, T.TIME_ID, T.TIME_COLOR)
   end
+end
+
+-- Ruler double click: REAPER runs the click action first (Click Timeline Ruler: loop points
+-- cleared, Time marker moved). The click remembers what was there; a double click right
+-- after puts it back, so a double click leaves the loop points and the marker alone.
+T.RULER_DBL = 1.0 -- seconds
+function T.ruler_remember()
+  local now = r.time_precise()
+  local t = tonumber(r.GetExtState(T.NS, "ruler_t"))
+  if t and now - t < T.RULER_DBL then return end -- second click of a double click: keep the first
+  local ls, le = r.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
+  local _, mp = T.time_marker()
+  r.SetExtState(T.NS, "ruler_t", string.format("%.3f", now), false)
+  r.SetExtState(T.NS, "ruler_prev", string.format("%.10f,%.10f,%s", ls, le, mp and string.format("%.10f", mp) or ""), false)
+end
+function T.ruler_undo_click()
+  local t = tonumber(r.GetExtState(T.NS, "ruler_t"))
+  r.SetExtState(T.NS, "ruler_t", "", false)
+  if not t or r.time_precise() - t >= T.RULER_DBL then return false end
+  local a, b, m = r.GetExtState(T.NS, "ruler_prev"):match("^([^,]+),([^,]+),(.*)$")
+  if not a then return false end
+  r.GetSet_LoopTimeRange2(0, true, true, tonumber(a), tonumber(b), false)
+  if tonumber(m) then T.set_time_pos(tonumber(m)) else T.clear_time_pos() end
+  return true
 end
 
 function T.clear_time_pos()
