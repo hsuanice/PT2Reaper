@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1117.2317pre1
+
+- Time marker renamed from V to >< (a V marker from 26.1117.2309pre1 is still found and renamed when moved).
+
 ## 26.1117.2309pre1
 
 - Link off: Timeline Selection counters show the Time marker (V) when there are no loop points; the marker is removed when loop points are made or Link is turned on.

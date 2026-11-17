@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.2309pre1
+@version 26.1117.2317pre1
 @author hsuanice
 @noindex
 @changelog
-  - Link off: the Time marker (V) is the Timeline position when there are no loop points; the Timeline plays from it and the edit cursor (Edit position) stays; Insertion Follows Playback moves the marker, not the edit cursor.
+  - Time marker renamed from V to >< (a V marker from 26.1117.2309pre1 is still found and renamed when moved).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -131,13 +131,14 @@ end
 -- nothing is selected: the Timeline position (blue, set by clicking the ruler) and the Edit
 -- position. REAPER has one edit cursor, so with Link off:
 --   edit cursor = the Edit position (it stays where it is while the Timeline plays)
---   Time marker = the Timeline position: a project marker named "V" (blue), set by
+--   Time marker = the Timeline position: a project marker named "><" (blue), set by
 --                 "Pro Tools Click Timeline Ruler" (mouse modifier) and, Insertion Follows
 --                 Playback on, by stopping. A Timeline Selection (loop points) is the
 --                 Timeline position instead: the Counters Panel removes the marker then,
 --                 and with Link on.
 ------------------------------------------------------------------------------
-T.TIME_MARK = "V"
+T.TIME_MARK = "><"
+local OLD_MARK = "V" -- name in 26.1117.2309pre1: still found, renamed when moved
 T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
 
 -- the marker's number and position (whatever the Link state), or nil
@@ -146,7 +147,7 @@ function T.time_marker()
   while true do
     local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
     if ret == 0 then return nil end
-    if not isrgn and name == T.TIME_MARK and color == T.TIME_COLOR then return idx, pos end
+    if not isrgn and (name == T.TIME_MARK or name == OLD_MARK) and color == T.TIME_COLOR then return idx, pos end
     i = i + 1
   end
 end

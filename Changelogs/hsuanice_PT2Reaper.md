@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2317pre1
+
+- Time marker renamed V -> >< (an existing V marker is still found and renamed)
+
 ## 26.1117.2316pre1
 
 - Double Click Timeline Ruler: time selection to region / between markers without counting the Time marker (V)

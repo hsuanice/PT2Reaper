@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2316pre1
+@version 26.1117.2317pre1
 @author hsuanice
 @metapackage
 @provides
@@ -160,7 +160,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Double Click Timeline Ruler: time selection to region / between markers without counting the Time marker (V)
+  - Time marker renamed V -> >< (an existing V marker is still found and renamed)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
