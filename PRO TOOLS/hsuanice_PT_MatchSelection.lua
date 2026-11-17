@@ -1,17 +1,17 @@
 --[[
 @description hsuanice_PT_MatchSelection - Change Edit to Match Timeline / Timeline to Match Edit (PT2Reaper library)
-@version 26.1118.0102pre1
+@version 26.1118.0114
 @author hsuanice
 @noindex
 @changelog
-  - First version: copies the Timeline Selection to the Edit Selection and back (whole, start, end).
+  - Release: Change Edit to Match Timeline / Change Timeline to Match Edit (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the six "Change Edit to Match Timeline" / "Change Timeline to Match Edit"
   scripts. Loaded with dofile().
 
   Selections (as everywhere in PT2Reaper):
-    Timeline Selection = loop points; no loop points: a position - the Time marker (9999 ">",
+    Timeline Selection = loop points; no loop points: a position - the Time marker (marker 9999,
                          Link off), else the edit cursor
     Edit Selection     = razor areas on tracks (else the time selection); no range: a position
                          - the edit cursor

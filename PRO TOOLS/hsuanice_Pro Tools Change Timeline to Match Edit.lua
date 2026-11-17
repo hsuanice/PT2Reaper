@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Change Timeline to Match Edit
-@version 26.1118.0102pre1
+@version 26.1118.0114
 @author hsuanice
 @noindex
 @changelog
-  - First version (was a placeholder): Pro Tools behaviour with loop points, razor areas and the Time marker.
+  - Release: Pro Tools behaviour with loop points, razor areas and the Time marker; Start / End move only that edge (tested in REAPER and Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Change Timeline to Match Edit**

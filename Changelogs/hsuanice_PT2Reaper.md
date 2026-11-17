@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0114
+
+- Release: Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End) (tested in REAPER and Pro Tools)
+
 ## 26.1118.0102pre1
 
 - Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End): Pro Tools behaviour with loop points, razor areas and the Time marker
