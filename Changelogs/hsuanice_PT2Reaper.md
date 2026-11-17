@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2043pre1
+
+- Restore Last Selection (Cmd+Opt+Z): the Counters Panel remembers the previous Edit Selection; one level, swaps current and previous (Pro Tools).
+
 ## 26.1117.2017
 
 - Release: the Grid follows the user when a project opens or a project tab is switched (tested in REAPER).

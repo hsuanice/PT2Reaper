@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1117.2017
+@version 26.1117.2043pre1
 @author hsuanice
 @noindex
 @changelog
-  - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
+  - Remembers the previous Edit Selection for Restore Last Selection (Cmd+Opt+Z); forgotten when another project is opened.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -47,7 +47,8 @@ local function load(name)
   return lib
 end
 local Grid, Nudge, T = load('hsuanice_PT_Grid.lua'), load('hsuanice_PT_Nudge.lua'), load('hsuanice_PT_Transport.lua')
-if not (Grid and Nudge and T) then return end
+local SM = load('hsuanice_PT_SelectionMemory.lua') -- Restore Last Selection (Cmd+Opt+Z)
+if not (Grid and Nudge and T and SM) then return end
 
 local NS = 'hsuanice_PT_CountersPanel'
 local TITLE = 'Pro Tools Counters'
@@ -138,6 +139,7 @@ local function triple(a, b) return { pos(a), pos(b), len(a, b) } end
 local function scan(now)
   if now < next_scan then return end
   next_scan = now + 0.1
+  SM.watch(now) -- remembers the previous Edit Selection for Restore Last Selection
   local cur = r.GetCursorPosition()
   local es, ee = T.edit_range()
   local ls, le = T.timeline_range()
@@ -426,6 +428,7 @@ local function follow_project()
   local key = tostring(proj) .. '|' .. (fn or '')
   if key == last_proj then return end
   last_proj = key
+  SM.reset() -- the remembered Edit Selections belong to the other project
   if Grid.restore_saved() then last_key = nil end
 end
 

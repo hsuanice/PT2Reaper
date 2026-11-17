@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2017
+@version 26.1117.2043pre1
 @author hsuanice
 @metapackage
 @provides
@@ -110,6 +110,7 @@
   [main] hsuanice_Pro Tools Remove Edit Insertion From Top Track.lua
   [main] hsuanice_Pro Tools Rename Clips.lua
   [main] hsuanice_Pro Tools Repeat.lua
+  [main] hsuanice_Pro Tools Restore Last Selection.lua
   [main] hsuanice_Pro Tools Return To Zero.lua
   [main] hsuanice_Pro Tools Save As.lua
   [main] hsuanice_Pro Tools Save.lua
@@ -151,12 +152,13 @@
   [nomain] hsuanice_PT_Play Watcher.lua
   [nomain] hsuanice_PT_QuickPunch Pass Monitor.lua
   [nomain] hsuanice_PT_QuickPunch.lua
+  [nomain] hsuanice_PT_SelectionMemory.lua
   [nomain] hsuanice_PT_TrackEdit.lua
   [nomain] hsuanice_PT_Transient.lua
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: the Grid follows the user when a project opens or a project tab is switched (tested in REAPER).
+  - Restore Last Selection (Cmd+Opt+Z): the Counters Panel remembers the previous Edit Selection; one level, swaps current and previous (Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -291,6 +293,7 @@
   - Remove Edit Insertion From Top Track: Opt+Control+P
   - Rename Clips: Cmd+Opt+Shift+R
   - Repeat: Opt+R
+  - Restore Last Selection: Cmd+Opt+Z
   - Return To Zero: Return
   - Save As: Cmd+Control+S
   - Save: Cmd+S

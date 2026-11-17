@@ -136,7 +136,8 @@
   "hsuanice_Pro Tools Unloop Clips.lua",
   "hsuanice_Pro Tools Zoom Toggle.lua",
   "hsuanice_PT_Transient Settings.lua",
-  "hsuanice_Pro Tools Pre Post Roll Playback.lua"
+  "hsuanice_Pro Tools Pre Post Roll Playback.lua",
+  "hsuanice_Pro Tools Restore Last Selection.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
@@ -149,6 +150,7 @@
   "hsuanice_PT_Play Watcher.lua",
   "hsuanice_PT_QuickPunch Pass Monitor.lua",
   "hsuanice_PT_QuickPunch.lua",
+  "hsuanice_PT_SelectionMemory.lua",
   "hsuanice_PT_TrackEdit.lua",
   "hsuanice_PT_Transient.lua",
   "hsuanice_PT_Transport.lua",
@@ -279,6 +281,7 @@
   "hsuanice_Pro Tools Play To Edit End.lua": "Control+8, 8",
   "hsuanice_Pro Tools Play From Edit End.lua": "Control+9, 9, Cmd+Right",
   "hsuanice_Pro Tools Play Through Edit End.lua": "Cmd+Opt+Right",
-  "hsuanice_Pro Tools Pre Post Roll Playback.lua": "Cmd+K"
+  "hsuanice_Pro Tools Pre Post Roll Playback.lua": "Cmd+K",
+  "hsuanice_Pro Tools Restore Last Selection.lua": "Cmd+Opt+Z"
  }
 }
