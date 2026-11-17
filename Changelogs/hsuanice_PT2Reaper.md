@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2344pre1
+
+- Link Timeline and Edit Selection turned on removes the Time marker
+
 ## 26.1117.2341pre1
 
 - Time marker duplicates cleaned up (one only); ruler double click: gap between the nearest markers or region edges

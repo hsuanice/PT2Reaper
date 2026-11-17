@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Link Timeline and Edit Selection
-@version 26.1115.1407
+@version 26.1117.2344pre1
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - Turned on: removes the Time marker (marker 9999 ">", the Timeline position with Link off).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Link Timeline and Edit Selection**
@@ -16,6 +15,7 @@
   - Mirrors the native toggle state onto this script's own toggle
     so other scripts can read our state via:
       reaper.GetToggleCommandStateEx(0, reaper.NamedCommandLookup("_<this script's RS hash>"))
+  - Turned on: the Time marker (marker 9999 ">", the Timeline position with Link off) is removed.
 
   ## Razor link (disabled)
   - Earlier 0.2.x / 0.3.0 builds added a defer watcher that also
@@ -39,3 +39,12 @@ local native_state = r.GetToggleCommandStateEx(0, 40621)
 local cmd_id = ({r.get_action_context()})[4]
 r.SetToggleCommandState(0, cmd_id, native_state)
 r.RefreshToolbar2(0, cmd_id)
+
+-- Link on: the Timeline and Edit positions are the edit cursor again - the Time marker
+-- (Link off only, see hsuanice_PT_Transport.lua) is removed. The Counters Panel does the
+-- same when Link is turned on elsewhere.
+if native_state == 1 then
+  local DIR = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or ''
+  local ok, T = pcall(dofile, DIR .. 'hsuanice_PT_Transport.lua')
+  if ok and type(T) == 'table' and T.clear_time_pos then T.clear_time_pos(); r.UpdateArrange() end
+end

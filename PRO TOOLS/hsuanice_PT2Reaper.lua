@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2341pre1
+@version 26.1117.2344pre1
 @author hsuanice
 @metapackage
 @provides
@@ -160,7 +160,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Time marker duplicates cleaned up (one only); ruler double click: gap between the nearest markers or region edges
+  - Link Timeline and Edit Selection turned on removes the Time marker
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
