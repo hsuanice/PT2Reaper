@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.1553pre1
+
+- Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).
+
 ## 26.1117.1552
 
 - Release: Pre Post Roll Playback (Cmd+K) - the pre-roll / post-roll play around the Timeline Selection (tested in REAPER).

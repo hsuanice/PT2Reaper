@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1117.1552
+@version 26.1117.1553pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
-  - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
+  - Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**
@@ -49,13 +48,18 @@ elseif T.is_running() then
   -- retrigger. Insertion Follows Playback on: from where playback is now (the insertion
   -- follows it) and the Timeline Selection is cleared (no stop at its end any more);
   -- off: from the Timeline Selection start, else from the edit cursor.
+  -- No Timeline Selection + pre-roll on: every retrigger starts with the pre-roll.
   if T.follows() then
-    if s then T.watch_clear(); T.clear_timeline(); r.UpdateArrange() end
-    r.SetEditCurPos2(0, r.GetPlayPosition(), false, true)
+    if s then
+      T.watch_clear(); T.clear_timeline(); r.UpdateArrange()
+      r.SetEditCurPos2(0, r.GetPlayPosition(), false, true)
+    else
+      T.watch_clear(); T.replay_from(r.GetPlayPosition())
+    end
   elseif s then
     T.play_range(s, e, false, home)
   else
-    T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true)
+    T.watch_clear(); T.replay_from(r.GetCursorPosition())
   end
 elseif s then
   T.play_range(s, e, false, home)

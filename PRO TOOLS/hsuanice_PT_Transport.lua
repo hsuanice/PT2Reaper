@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.1552
+@version 26.1117.1553pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
-  - Pre-roll / post-roll on: Space and Play Timeline Selection play from the pre-roll before the Timeline Selection to the post-roll after it; plain play starts the pre-roll before the playhead. toggle_rolls() for Pre Post Roll Playback.
+  - Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -233,6 +232,18 @@ function T.refresh_rolls_button() -- lit while a roll is on; found by path (see 
   if cmd and cmd ~= 0 then
     r.SetToggleCommandState(0, cmd, T.rolls_on() and 1 or 0)
     r.RefreshToolbar2(0, cmd)
+  end
+end
+
+-- Play again from position p while playing (Play Timeline Selection without a Timeline
+-- Selection). Pre-roll on: from the pre-roll before p, every time (Pro Tools); the playhead
+-- stays at p. Off: from p.
+function T.replay_from(p)
+  local pre, on = T.roll("preroll")
+  if on and pre > 0 then
+    T.start_at(math.max(0, p - pre), p)
+  else
+    r.SetEditCurPos2(0, p, false, true)
   end
 end
 
