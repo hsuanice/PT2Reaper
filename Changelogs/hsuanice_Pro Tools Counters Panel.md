@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.0055pre1
+
+- Link on: razor areas that no longer match dragged loop points are cleared at once (checked every frame, no settle delay).
+
 ## 26.1118.0047pre1
 
 - Link on: loop points made on their own (dragged in the ruler) clear razor areas that no longer match them (Pro Tools: one selection).

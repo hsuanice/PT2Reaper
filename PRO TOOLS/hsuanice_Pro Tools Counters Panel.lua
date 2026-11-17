@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.0047pre1
+@version 26.1118.0055pre1
 @author hsuanice
 @noindex
 @changelog
-  - Link on: loop points made on their own (dragged in the ruler) clear razor areas that no longer match them (Pro Tools: one selection).
+  - Link on: razor areas that no longer match dragged loop points are cleared at once (checked every frame, no settle delay).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -134,18 +134,19 @@ end
 ------------------------------------------------------------
 local D = { edit = {}, tl = {}, items = 0, tracks = 0 }
 local last_key, last_detail_key, next_scan = nil, nil, 0
-local last_loop, last_razor, razor_since = nil, nil, 0
+local last_loop, last_razor = nil, nil
 
 -- Link on (Pro Tools: one selection): a new Timeline range made on its own (loop points
 -- dragged in the ruler, set by a script) replaces the Edit range - razor areas that no longer
--- match it are cleared. Only when the razor areas did not change just before (a razor drag
--- copied to the loop points by another script is not a new Timeline range).
-local function linked_loop_clears_razor(now, ls, le)
+-- match it are cleared. A razor drag copied to the loop points by another script leaves
+-- them equal: kept. Checked every frame (not every 0.1 s) so no stale razor stays visible.
+local function linked_loop_clears_razor()
+  if not T.linked() then last_loop, last_razor = nil, nil; return end
+  local ls, le = T.timeline_range()
   local rs, re = T.razor_range()
   local lk = string.format('%s|%s', ls or '-', le or '-')
   local rk = string.format('%s|%s', rs or '-', re or '-')
-  if rk ~= last_razor then razor_since = now end
-  if last_loop and lk ~= last_loop and rk == last_razor and rs and T.linked() and now - razor_since > 0.3
+  if last_loop and lk ~= last_loop and rk == last_razor and rs
     and not (ls and math.abs(ls - rs) < 1e-6 and math.abs(le - re) < 1e-6) then
     r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
     rk = '-|-'
@@ -162,9 +163,8 @@ local function scan(now)
   next_scan = now + 0.1
   SM.watch(now) -- remembers the previous Edit Selection for Restore Last Selection
   local cur = r.GetCursorPosition()
-  local ls, le = T.timeline_range()
-  linked_loop_clears_razor(now, ls, le)
   local es, ee = T.edit_range()
+  local ls, le = T.timeline_range()
   local key = table.concat({ r.GetProjectStateChangeCount(0), r.CountSelectedMediaItems(0),
     r.CountSelectedTracks(0), cur, es or '-', ee or '-', ls or '-', le or '-', time_mode,
     r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll'),
@@ -463,6 +463,7 @@ local function loop()
   local char = gfx.getchar()
   if char == -1 then return end
   follow_project()
+  linked_loop_clears_razor()
   scan(r.time_precise())
   fit_floating()
   draw()

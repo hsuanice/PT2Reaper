@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0055pre1
+
+- Counters Panel: stale razor areas cleared at once when the loop points are dragged (Link on)
+
 ## 26.1118.0047pre1
 
 - Link on: loop points dragged on their own clear stale razor areas; ruler lane double click (Link off) moves the Edit position to the range start
