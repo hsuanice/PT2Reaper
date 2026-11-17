@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Double Click Timeline Ruler
 
+## 26.1117.2341pre1
+
+- Time selection = the gap between the nearest edges: markers and region starts / ends (marker to marker, marker to region, region to region).
+
 ## 26.1117.2337pre1
 
 - Time selection between the nearest markers (regions not used); Link off: the loop points and the Time marker stay as they were.

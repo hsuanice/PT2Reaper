@@ -1,16 +1,17 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1117.2337pre1
+@version 26.1117.2341pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time selection between the nearest markers (regions not used); Link off: the loop points and the Time marker stay as they were.
+  - Time selection = the gap between the nearest edges: markers and region starts / ends (marker to marker, marker to region, region to region).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).
 
-  The time selection becomes the range between the nearest markers on either side of the
-  double click (regions are not used). The Time marker (marker 9999 ">") is not counted.
+  The time selection becomes the gap between the nearest edges on either side of the double
+  click; an edge is a marker or a region start / end (marker to marker, marker to region,
+  region to region...). The Time marker (marker 9999 ">") is not counted.
   No marker before: from the project start; none after: to the project end.
   Link Timeline and Edit Selection off: the loop points and the Time marker stay as they were
   before the double click (the first click of it is undone). Link on: the loop points follow
@@ -42,14 +43,16 @@ if not T.linked() then T.ruler_undo_click() end -- loop points + Time marker as 
 
 local skip = T.time_marker() -- the Time marker's number (not a marker for this)
 local prev, nxt
+local function edge(x) -- a marker, or a region start / end
+  if x <= p and (not prev or x > prev) then prev = x end
+  if x > p and (not nxt or x < nxt) then nxt = x end
+end
 local i = 0
 while true do
-  local ret, isrgn, pos, _, _, idx = r.EnumProjectMarkers3(0, i)
+  local ret, isrgn, pos, rend, _, idx = r.EnumProjectMarkers3(0, i)
   if ret == 0 then break end
-  if not isrgn and idx ~= skip then
-    if pos <= p and (not prev or pos > prev) then prev = pos end
-    if pos > p and (not nxt or pos < nxt) then nxt = pos end
-  end
+  if isrgn then edge(pos); edge(rend)
+  elseif idx ~= skip then edge(pos) end
   i = i + 1
 end
 local s, e = prev or 0, nxt or r.GetProjectLength(0)

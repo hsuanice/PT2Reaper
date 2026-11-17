@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2341pre1
+
+- Time marker duplicates cleaned up (one only); ruler double click: gap between the nearest markers or region edges
+
 ## 26.1117.2337pre1
 
 - Ruler double click: time selection between the nearest markers; loop points and Time marker kept. Time marker named >

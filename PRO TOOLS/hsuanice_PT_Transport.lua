@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.2337pre1
+@version 26.1117.2341pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker named ">" (number 9999); remembers the ruler click so a double click can put the loop points and the marker back.
+  - Only one Time marker: extra or older ones (V, ><) left in the project are deleted when it is set or cleared.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -142,17 +142,29 @@ T.TIME_NAME = ">"
 local OLD_NAMES = { V = true, ["><"] = true } -- 26.1117 pre-releases: still found, replaced when moved
 T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
 
--- the marker's number and position (whatever the Link state), or nil
-function T.time_marker()
-  local i = 0
+-- every Time marker in the project: { {e = enum index, idx = number, pos, name}, ... }
+-- (normally one; an older one left beside the new one is cleaned up by set / clear)
+local function time_markers()
+  local list, i = {}, 0
   while true do
     local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
-    if ret == 0 then return nil end
+    if ret == 0 then return list end
     if not isrgn and color == T.TIME_COLOR and ((idx == T.TIME_ID and (name == T.TIME_NAME or name == "")) or OLD_NAMES[name]) then
-      return idx, pos
+      list[#list + 1] = { e = i, idx = idx, pos = pos, name = name }
     end
     i = i + 1
   end
+end
+
+-- delete these Time markers (by enum index, last first: the numbers can be the same)
+local function delete_markers(list)
+  for k = #list, 1, -1 do r.DeleteProjectMarkerByIndex(0, list[k].e) end
+end
+
+-- the marker's number and position (whatever the Link state), or nil
+function T.time_marker()
+  local m = time_markers()[1]
+  if m then return m.idx, m.pos end
 end
 
 -- the Timeline position as a point (Link off, no Timeline Selection): the marker, or nil
@@ -163,13 +175,22 @@ function T.time_pos()
 end
 
 function T.set_time_pos(p)
-  local idx = T.time_marker()
-  if idx == T.TIME_ID then
-    r.SetProjectMarker3(0, idx, false, p, 0, T.TIME_NAME, T.TIME_COLOR)
+  local list = time_markers()
+  local keep
+  for k, m in ipairs(list) do if m.idx == T.TIME_ID and m.name == T.TIME_NAME then keep = k; break end end
+  if keep then table.remove(list, keep) end
+  delete_markers(list) -- extra / older ones
+  if keep then
+    r.SetProjectMarker3(0, T.TIME_ID, false, p, 0, T.TIME_NAME, T.TIME_COLOR)
   else
-    if idx then r.DeleteProjectMarker(0, idx, false) end -- an older one: replaced
     r.AddProjectMarker2(0, false, p, 0, T.TIME_NAME, T.TIME_ID, T.TIME_COLOR)
   end
+end
+
+function T.clear_time_pos()
+  local list = time_markers()
+  delete_markers(list)
+  return #list > 0
 end
 
 -- Ruler double click: REAPER runs the click action first (Click Timeline Ruler: loop points
@@ -194,12 +215,6 @@ function T.ruler_undo_click()
   r.GetSet_LoopTimeRange2(0, true, true, tonumber(a), tonumber(b), false)
   if tonumber(m) then T.set_time_pos(tonumber(m)) else T.clear_time_pos() end
   return true
-end
-
-function T.clear_time_pos()
-  local idx = T.time_marker()
-  if idx then r.DeleteProjectMarker(0, idx, false) end
-  return idx ~= nil
 end
 
 -- where the edit cursor stays while the Timeline plays from p:

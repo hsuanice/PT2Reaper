@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1117.2341pre1
+
+- Only one Time marker: extra or older ones (V, ><) left in the project are deleted when it is set or cleared.
+
 ## 26.1117.2337pre1
 
 - Time marker named ">" (number 9999); remembers the ruler click so a double click can put the loop points and the marker back.
