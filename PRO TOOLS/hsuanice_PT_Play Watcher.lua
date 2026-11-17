@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
-@version 26.1115.2128
+@version 26.1117.1532pre1
 @author hsuanice
 @noindex
 @changelog
-  - Keeps the playhead where it was when a range plays with a home position (Play Edit Selection).
+  - Pre-roll / post-roll on: when the Timeline Selection has played to its end, the Time and Edit selections are kept even with Insertion Follows Playback on (as Pro Tools); the playhead goes back to the Timeline Selection start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Background helper of Play/Stop, Play Edit Selection and Play Timeline Selection.
@@ -67,9 +67,9 @@ local function loop()
     if r.GetSetRepeat(-1) == 1 then
       r.SetEditCurPos2(0, s, false, true)
     else
-      local home = T.watch_home()
+      local home, keep = T.watch_home(), T.watch_keep()
       T.watch_clear()
-      T.range_end(s, e, home)
+      T.range_end(s, e, home, keep)
       return finish()
     end
   end

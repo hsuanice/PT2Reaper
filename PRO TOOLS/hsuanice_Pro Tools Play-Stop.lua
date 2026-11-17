@@ -1,9 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1117.1423pre1
+@version 26.1117.1532pre1
 @author hsuanice
 @noindex
 @changelog
+  - Pre-roll / post-roll on: when the Timeline Selection has played to its end, the Time and Edit selections are kept even with Insertion Follows Playback on (as Pro Tools); the playhead goes back to the Timeline Selection start.
   - Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).
   - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
@@ -43,8 +44,8 @@ end
 
 -- Timeline Selection (with the pre-roll / post-roll when they are on), else plain play
 local function play_timeline()
-  local s, e, home = T.timeline_bounds()
-  if s then T.play_range(s, e, false, home) else T.play() end
+  local s, e, home, keep = T.timeline_bounds()
+  if s then T.play_range(s, e, false, home, keep) else T.play() end
 end
 
 T.reset_half_speed()
