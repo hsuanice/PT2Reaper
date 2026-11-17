@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.1556
+@version 26.1117.2017
 @author hsuanice
 @metapackage
 @provides
@@ -156,7 +156,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Play Timeline Selection without a Timeline Selection retriggers with the pre-roll (tested in REAPER).
+  - Release: the Grid follows the user when a project opens or a project tab is switched (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

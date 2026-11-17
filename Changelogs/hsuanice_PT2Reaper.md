@@ -2,6 +2,14 @@
 
 PT2Reaper package
 
+## 26.1117.2017
+
+- Release: the Grid follows the user when a project opens or a project tab is switched (tested in REAPER).
+
+## 26.1117.2015pre1
+
+- The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
+
 ## 26.1117.1556
 
 - Release: Play Timeline Selection without a Timeline Selection retriggers with the pre-roll (tested in REAPER).

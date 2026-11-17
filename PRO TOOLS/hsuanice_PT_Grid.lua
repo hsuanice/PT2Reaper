@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_PT_Grid - Grid Library
-@version 26.1115.1407
+@version 26.1117.2017
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Library for grid mode handling, parallel to hsuanice_PT_Nudge.lua.
@@ -190,6 +189,33 @@ function M.preset_to_div(mode, preset)
   if not bpm or bpm <= 0 then bpm = 120 end
   -- 1 bar at 4/4 = 240/BPM seconds → bar_div = secs * BPM / 240
   return secs * bpm / 240
+end
+
+-- True when REAPER's project grid is the saved preset (the grid is stored in each project,
+-- the preset is global).
+function M.in_sync()
+  local mode, idx = M.get_state()
+  local p = M.get_preset(mode, idx)
+  if not p then return true end
+  local frame_on = r.GetToggleCommandState(40904) == 1
+  if p.native_frame then return frame_on end
+  if frame_on then return false end
+  local _, div = r.GetSetProjectGrid(0, 0)
+  if div ~= div then return false end
+  local expected = M.preset_to_div(mode, p)
+  if mode == 'Measure' then return math.abs(div - expected) < 1e-8 end
+  return math.abs(div - expected) / math.max(math.abs(expected), 1e-9) < 1e-2
+end
+
+-- Pro Tools: the Grid follows the user, not the project. Puts the saved preset back when
+-- the current project has another grid (it was saved with it). Writes only on a difference.
+-- Returns true when it changed the grid.
+function M.restore_saved()
+  if M.in_sync() then return false end
+  local mode, idx = M.get_state()
+  dbg('restore_saved -> %s/%d | %s', mode, idx, snapshot())
+  M.apply(mode, idx)
+  return true
 end
 
 function M.format_value(mode, preset)

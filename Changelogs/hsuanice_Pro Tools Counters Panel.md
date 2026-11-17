@@ -2,6 +2,14 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1117.2017
+
+- The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
+
+## 26.1117.2015pre1
+
+- Updates at once when Pre Post Roll Playback (Cmd+K) switches the rolls; its toolbar button shows the saved state after a restart.
+
 ## 26.1117.1552
 
 - Updates at once when Pre Post Roll Playback (Cmd+K) switches the rolls; its toolbar button shows the saved state after a restart.

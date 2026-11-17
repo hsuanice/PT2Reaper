@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1117.1552
+@version 26.1117.2017
 @author hsuanice
 @noindex
 @changelog
-  - Updates at once when Pre Post Roll Playback (Cmd+K) switches the rolls; its toolbar button shows the saved state after a restart.
+  - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -417,10 +417,23 @@ local function hover_tip()
   end
 end
 
+-- A project was opened / another project tab chosen (or REAPER started): REAPER loads the
+-- grid stored in that project; put the Grid the user chose back (Pro Tools: the Grid
+-- follows the user). Only when it differs.
+local last_proj
+local function follow_project()
+  local proj, fn = r.EnumProjects(-1)
+  local key = tostring(proj) .. '|' .. (fn or '')
+  if key == last_proj then return end
+  last_proj = key
+  if Grid.restore_saved() then last_key = nil end
+end
+
 local prev_cap = 0
 local function loop()
   local char = gfx.getchar()
   if char == -1 then return end
+  follow_project()
   scan(r.time_precise())
   fit_floating()
   draw()
