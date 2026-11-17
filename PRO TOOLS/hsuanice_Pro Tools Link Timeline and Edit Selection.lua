@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Link Timeline and Edit Selection
-@version 26.1118.0059
+@version 26.1118.0115pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: turning Link on removes the Time marker (tested in REAPER).
+  - About: the Time marker is named with its timecode.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Link Timeline and Edit Selection**
@@ -15,7 +15,7 @@
   - Mirrors the native toggle state onto this script's own toggle
     so other scripts can read our state via:
       reaper.GetToggleCommandStateEx(0, reaper.NamedCommandLookup("_<this script's RS hash>"))
-  - Turned on: the Time marker (marker 9999 ">", the Timeline position with Link off) is removed.
+  - Turned on: the Time marker (marker 9999, the Timeline position with Link off) is removed.
 
   ## Razor link (disabled)
   - Earlier 0.2.x / 0.3.0 builds added a defer watcher that also

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1118.0059
+@version 26.1118.0115pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: Link off - the Time marker (9999 ">") is the Timeline position, the edit cursor stays the Edit position (tested in REAPER).
+  - Time marker (9999) named with the timecode of its position (was ">").
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -137,14 +137,15 @@ end
 -- nothing is selected: the Timeline position (blue, set by clicking the ruler) and the Edit
 -- position. REAPER has one edit cursor, so with Link off:
 --   edit cursor = the Edit position (it stays where it is while the Timeline plays)
---   Time marker = the Timeline position: a project marker number 9999 named ">" (blue), set by
+--   Time marker = the Timeline position: a project marker number 9999 named with its timecode (blue), set by
 --                 "Pro Tools Click Timeline Ruler" (mouse modifier) and, Insertion Follows
 --                 Playback on, by stopping. A Timeline Selection (loop points) is the
 --                 Timeline position instead: the Counters Panel removes the marker then,
 --                 and with Link on.
 ------------------------------------------------------------------------------
 T.TIME_ID = 9999 -- marker number, far from the usual numbers
-T.TIME_NAME = ">"
+-- name = the timecode of its position (shown in the ruler)
+function T.time_name(p) return r.format_timestr_pos(p, "", 5) end
 local OLD_NAMES = { V = true, ["><"] = true } -- 26.1117 pre-releases: still found, replaced when moved
 T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
 
@@ -155,7 +156,7 @@ local function time_markers()
   while true do
     local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
     if ret == 0 then return list end
-    if not isrgn and color == T.TIME_COLOR and ((idx == T.TIME_ID and (name == T.TIME_NAME or name == "")) or OLD_NAMES[name]) then
+    if not isrgn and color == T.TIME_COLOR and (idx == T.TIME_ID or OLD_NAMES[name]) then
       list[#list + 1] = { e = i, idx = idx, pos = pos, name = name }
     end
     i = i + 1
@@ -183,13 +184,13 @@ end
 function T.set_time_pos(p)
   local list = time_markers()
   local keep
-  for k, m in ipairs(list) do if m.idx == T.TIME_ID and m.name == T.TIME_NAME then keep = k; break end end
+  for k, m in ipairs(list) do if m.idx == T.TIME_ID then keep = k; break end end
   if keep then table.remove(list, keep) end
   delete_markers(list) -- extra / older ones
   if keep then
-    r.SetProjectMarker3(0, T.TIME_ID, false, p, 0, T.TIME_NAME, T.TIME_COLOR)
+    r.SetProjectMarker3(0, T.TIME_ID, false, p, 0, T.time_name(p), T.TIME_COLOR)
   else
-    r.AddProjectMarker2(0, false, p, 0, T.TIME_NAME, T.TIME_ID, T.TIME_COLOR)
+    r.AddProjectMarker2(0, false, p, 0, T.time_name(p), T.TIME_ID, T.TIME_COLOR)
   end
 end
 

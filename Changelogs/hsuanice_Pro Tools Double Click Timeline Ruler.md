@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Double Click Timeline Ruler
 
+## 26.1118.0115pre1
+
+- About: the Time marker is named with its timecode.
+
 ## 26.1118.0059
 
 - Release: double click on the marker / region lanes selects the gap between the nearest markers or region edges; on the time scale it is a click (tested in REAPER).

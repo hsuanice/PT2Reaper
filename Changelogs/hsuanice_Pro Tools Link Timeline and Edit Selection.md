@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Link Timeline and Edit Selection
 
+## 26.1118.0115pre1
+
+- About: the Time marker is named with its timecode.
+
 ## 26.1118.0059
 
 - Release: turning Link on removes the Time marker (tested in REAPER).

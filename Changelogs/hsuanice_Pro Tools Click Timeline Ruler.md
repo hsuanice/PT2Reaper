@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Click Timeline Ruler
 
+## 26.1118.0115pre1
+
+- About: the Time marker is named with its timecode.
+
 ## 26.1118.0059
 
 - Release: ruler click sets the Timeline position - Time marker (Link off) / clears every range (Link on); marker lanes like a click on track space with Link off (tested in REAPER).

@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0115pre1
+
+- Time marker named with the timecode of its position (instead of >)
+
 ## 26.1118.0114
 
 - Release: Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End) (tested in REAPER and Pro Tools)

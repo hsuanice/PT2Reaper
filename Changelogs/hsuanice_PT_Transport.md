@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1118.0115pre1
+
+- Time marker (9999) named with the timecode of its position (was ">").
+
 ## 26.1118.0059
 
 - Release: Link off - the Time marker (9999 ">") is the Timeline position, the edit cursor stays the Edit position (tested in REAPER).

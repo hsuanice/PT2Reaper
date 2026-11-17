@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1118.0059
+@version 26.1118.0115pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: double click on the marker / region lanes selects the gap between the nearest markers or region edges; on the time scale it is a click (tested in REAPER).
+  - About: the Time marker is named with its timecode.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).
@@ -13,7 +13,7 @@
   Timeline ruler it is a click. In REAPER (needs SWS to tell the parts of the ruler apart):
   - marker / region / tempo lanes (top part of the ruler): the gap between the nearest edges
     on either side - an edge is a marker or a region start / end (marker to marker, marker to
-    region, region to region...); the Time marker (9999 ">") is not counted; no marker
+    region, region to region...); the Time marker (9999) is not counted; no marker
     before: from the project start, none after: to the project end. It becomes the Edit
     range (time selection; no razor areas) and, Link Timeline and Edit Selection on, the
     Timeline range (loop points) too. Link off: the loop points stay and the edit cursor

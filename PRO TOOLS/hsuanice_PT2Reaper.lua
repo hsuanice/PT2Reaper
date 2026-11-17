@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.0114
+@version 26.1118.0115pre1
 @author hsuanice
 @metapackage
 @provides
@@ -167,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Change Edit to Match Timeline / Change Timeline to Match Edit (+ Start / End) (tested in REAPER and Pro Tools)
+  - Time marker named with the timecode of its position (instead of >)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

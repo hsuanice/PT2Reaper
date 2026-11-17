@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Click Timeline Ruler
-@version 26.1118.0059
+@version 26.1118.0115pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: ruler click sets the Timeline position - Time marker (Link off) / clears every range (Link on); marker lanes like a click on track space with Link off (tested in REAPER).
+  - About: the Time marker is named with its timecode.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: clicking the Timebase ruler
@@ -14,7 +14,7 @@
   clicking the ruler) and the Edit position. REAPER has one edit cursor, so with Link
   Timeline and Edit Selection off this click does not move the edit cursor (it stays the
   Edit position): it clears the Timeline Selection (loop points) and puts the Time marker
-  (marker 9999 ">", blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
+  (marker 9999, named with its timecode, blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
   then play from the marker. Playing: playback goes on from there.
   Marker / region lanes (top part of the ruler; needs SWS to tell them apart): Link on, the
   same; Link off, like a click on empty track space - the edit cursor (Edit position) moves
