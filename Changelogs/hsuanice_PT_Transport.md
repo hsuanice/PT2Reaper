@@ -2,7 +2,7 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
-## 26.1117.1532pre1
+## 26.1117.1546pre1
 
 - Pre-roll / post-roll on: Space and Play Timeline Selection play from the pre-roll before the Timeline Selection to the post-roll after it; plain play starts the pre-roll before the playhead. toggle_rolls() for Pre Post Roll Playback.
 

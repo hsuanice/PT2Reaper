@@ -2,7 +2,7 @@
 
 hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
 
-## 26.1117.1532pre1
+## 26.1117.1546pre1
 
 - Keeps the playhead where it was when a range plays with a home position (Play Edit Selection).
 

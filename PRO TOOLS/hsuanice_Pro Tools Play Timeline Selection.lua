@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1117.1532pre1
+@version 26.1117.1546pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pre-roll / post-roll on: when the Timeline Selection has played to its end, the Time and Edit selections are kept even with Insertion Follows Playback on (as Pro Tools); the playhead goes back to the Timeline Selection start.
+  - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
   - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
@@ -41,10 +41,10 @@ end
 T.reset_half_speed()
 T.refresh_follows_button()
 
-local s, e, home, keep = T.timeline_bounds() -- with the pre-roll / post-roll when they are on
+local s, e, home = T.timeline_bounds() -- with the pre-roll / post-roll when they are on
 if QP.pass_active() and T.is_running() then
   QP.stop(T.follows())
-  if s then T.play_range(s, e, true, home, keep) else T.play_range(r.GetCursorPosition(), 1e12, true) end
+  if s then T.play_range(s, e, true, home) else T.play_range(r.GetCursorPosition(), 1e12, true) end
 elseif T.is_running() then
   -- retrigger. Insertion Follows Playback on: from where playback is now (the insertion
   -- follows it) and the Timeline Selection is cleared (no stop at its end any more);
@@ -53,12 +53,12 @@ elseif T.is_running() then
     if s then T.watch_clear(); T.clear_timeline(); r.UpdateArrange() end
     r.SetEditCurPos2(0, r.GetPlayPosition(), false, true)
   elseif s then
-    T.play_range(s, e, false, home, keep)
+    T.play_range(s, e, false, home)
   else
     T.watch_clear(); r.SetEditCurPos2(0, r.GetCursorPosition(), false, true)
   end
 elseif s then
-  T.play_range(s, e, false, home, keep)
+  T.play_range(s, e, false, home)
 else
   T.play()
 end

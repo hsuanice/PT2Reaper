@@ -2,7 +2,7 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
-## 26.1117.1532pre1
+## 26.1117.1546pre1
 
 - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
 

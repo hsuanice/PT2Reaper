@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.1532pre1
+@version 26.1117.1546pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pre-roll / post-roll on: when the Timeline Selection has played to its end, the Time and Edit selections are kept even with Insertion Follows Playback on (as Pro Tools); the playhead goes back to the Timeline Selection start.
+  - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
   - Pre-roll / post-roll on: Space and Play Timeline Selection play from the pre-roll before the Timeline Selection to the post-roll after it; plain play starts the pre-roll before the playhead. toggle_rolls() for Pre Post Roll Playback.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
@@ -145,10 +145,7 @@ function T.watch_get()
   local a, b = r.GetExtState(T.NS, "watch"):match("^([^,]+),([^,]+)$")
   return tonumber(a), tonumber(b)
 end
-function T.watch_clear()
-  r.SetExtState(T.NS, "watch", "", false); r.SetExtState(T.NS, "watch_home", "", false)
-  r.SetExtState(T.NS, "watch_keep", "", false)
-end
+function T.watch_clear() r.SetExtState(T.NS, "watch", "", false); r.SetExtState(T.NS, "watch_home", "", false) end
 
 local function ensure_watcher()
   local hb = tonumber(r.GetExtState(T.NS, "watcher_hb"))
@@ -162,11 +159,8 @@ end
 -- home (optional): where the edit cursor (playhead) stays - playback runs from s, the edit
 -- cursor goes back to home at once and stays there (Play Edit Selection: the playhead /
 -- Timeline position is not lost). Without it, the playhead is s.
--- keep (optional): at the end the selections stay as they are even with Insertion Follows
--- Playback on (Pro Tools: the Timeline Selection played with pre-roll / post-roll).
-function T.play_range(s, e, after_qp, home, keep)
+function T.play_range(s, e, after_qp, home)
   r.SetExtState(T.NS, "watch", string.format("%.10f,%.10f", s, e), false)
-  r.SetExtState(T.NS, "watch_keep", keep and "1" or "", false)
   r.SetExtState(T.NS, "watch_home", home and string.format("%.10f", home) or "", false)
   if after_qp then
     r.SetExtState(T.NS, "wait_qp", "1", false)
@@ -193,12 +187,9 @@ function T.watch_home() return tonumber(r.GetExtState(T.NS, "watch_home")) end
 -- What happens when playback reaches the range end (Pro Tools):
 --   Insertion Follows on : stop at the end, clear the Timeline Selection
 --   off                  : stop, back to the range start (or the playhead it kept), all kept
---   keep (the Timeline Selection played with pre-roll / post-roll): as off, even with N on
-function T.watch_keep() return r.GetExtState(T.NS, "watch_keep") == "1" end
-
-function T.range_end(s, e, home, keep)
+function T.range_end(s, e, home)
   r.Main_OnCommand(CMD_STOP, 0)
-  if T.follows() and not keep then
+  if T.follows() then
     r.SetEditCurPos2(0, e, false, false)
     T.clear_timeline()
   else
@@ -248,14 +239,13 @@ end
 -- The Timeline Selection as Space / Play Timeline Selection play it (Pro Tools: the rolls
 -- belong to the Timeline Selection, not to the Edit Selection): s, e, home or nil.
 -- Pre-roll on: starts that much earlier; post-roll on: ends that much later; home = the
--- Timeline Selection start (where the playhead stays); keep = a roll is on.
+-- Timeline Selection start (where the playhead stays).
 function T.timeline_bounds()
   local ls, le = T.timeline_range()
   if not ls then return nil end
   local pre, pon = T.roll("preroll")
   local post, qon = T.roll("postroll")
-  -- 4th value: a roll is on -> the selections are kept at the end even with N on (Pro Tools)
-  return math.max(0, ls - (pon and pre or 0)), le + (qon and post or 0), ls, (pon or qon)
+  return math.max(0, ls - (pon and pre or 0)), le + (qon and post or 0), ls
 end
 
 ------------------------------------------------------------------------------
