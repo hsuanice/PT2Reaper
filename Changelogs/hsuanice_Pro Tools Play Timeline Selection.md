@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1117.1556
+
+- Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).
+
 ## 26.1117.1553pre1
 
 - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).

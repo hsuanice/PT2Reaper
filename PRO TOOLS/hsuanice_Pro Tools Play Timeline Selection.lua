@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1117.1553pre1
+@version 26.1117.1556
 @author hsuanice
 @noindex
 @changelog
