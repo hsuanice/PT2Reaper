@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Click Timeline Ruler
-@version 26.1117.2337pre1
+@version 26.1118.0008pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker named ">"; remembers the loop points and the marker for a double click.
+  - Link on: clears every range - razor areas, time selection, loop points (Pro Tools); razor areas were kept.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: clicking the Timebase ruler
@@ -17,7 +17,8 @@
   (marker 9999 ">", blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
   then play from the marker. Playing: playback goes on from there.
   Part of a double click: Double Click Timeline Ruler puts the loop points and the marker back.
-  Link on: like REAPER's own click, the edit cursor moves there (no marker).
+  Link on: the edit cursor moves there and every range is cleared - razor areas, time
+  selection, loop points (Pro Tools); no marker.
 
   Set it in Preferences > Editing Behavior > Mouse Modifiers > Ruler > left click.
   Self-contained: uses hsuanice_PT_Transport.lua (same folder).
@@ -40,6 +41,10 @@ r.PreventUIRefresh(1)
 r.Main_OnCommand(40513, 0) -- View: Move edit cursor to mouse cursor (snapping): where was clicked
 local p = r.GetCursorPosition()
 if T.linked() then
+  -- Pro Tools: a point now - every range is cleared (razor areas, time selection, loop points)
+  r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
+  r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
+  r.GetSet_LoopTimeRange2(0, true, true, 0, 0, false)
   if T.is_running() then T.watch_clear(); r.SetEditCurPos2(0, p, false, true) end
 else
   r.SetEditCurPos2(0, cur, false, false) -- the Edit position stays

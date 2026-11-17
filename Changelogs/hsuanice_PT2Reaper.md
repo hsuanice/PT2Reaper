@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0008pre1
+
+- Click Timeline Ruler with Link on clears every range (razor areas, time selection, loop points)
+
 ## 26.1117.2344pre1
 
 - Link Timeline and Edit Selection turned on removes the Time marker

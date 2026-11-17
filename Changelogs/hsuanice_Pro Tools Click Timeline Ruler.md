@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Click Timeline Ruler
 
+## 26.1118.0008pre1
+
+- Link on: clears every range - razor areas, time selection, loop points (Pro Tools); razor areas were kept.
+
 ## 26.1117.2337pre1
 
 - Time marker named ">"; remembers the loop points and the marker for a double click.
