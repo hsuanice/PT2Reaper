@@ -2,6 +2,10 @@
 
 hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
 
+## 26.1118.0059
+
+- Release: Repeat keeps the edit cursor where it was (tested in REAPER).
+
 ## 26.1117.2309pre1
 
 - Repeat on: the edit cursor stays where it was (Link off: the Edit position) when the range loops.

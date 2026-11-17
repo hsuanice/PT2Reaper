@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Timeline Selection
-@version 26.1117.2309pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - Link off: plays from the Time marker (V) when there are no loop points; the edit cursor (Edit position) stays.
+  - Release: Link off, plays from the Time marker with the edit cursor kept (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Timeline Selection**

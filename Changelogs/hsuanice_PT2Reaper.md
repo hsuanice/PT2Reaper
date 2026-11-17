@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0059
+
+- Release: Time marker / ruler clicks (Pro Tools Timeline and Marker rulers), Link-off playback keeps the Edit position, Play Edit Selection from the Edit position (tested in REAPER)
+
 ## 26.1118.0055pre1
 
 - Counters Panel: stale razor areas cleared at once when the loop points are dragged (Link on)

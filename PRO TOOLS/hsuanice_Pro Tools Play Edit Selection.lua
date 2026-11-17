@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1117.2247pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - Pressed again while playing from a position (no Edit range): plays from the Edit position again.
+  - Release: with no Edit range plays (and retriggers) from the Edit position (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**

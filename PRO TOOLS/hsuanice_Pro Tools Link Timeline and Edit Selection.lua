@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Link Timeline and Edit Selection
-@version 26.1117.2344pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - Turned on: removes the Time marker (marker 9999 ">", the Timeline position with Link off).
+  - Release: turning Link on removes the Time marker (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Link Timeline and Edit Selection**

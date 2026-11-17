@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.0055pre1
+@version 26.1118.0059
 @author hsuanice
 @metapackage
 @provides
@@ -160,7 +160,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: stale razor areas cleared at once when the loop points are dragged (Link on)
+  - Release: Time marker / ruler clicks (Pro Tools Timeline and Marker rulers), Link-off playback keeps the Edit position, Play Edit Selection from the Edit position (tested in REAPER)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

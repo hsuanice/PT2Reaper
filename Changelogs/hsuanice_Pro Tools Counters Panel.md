@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.0059
+
+- Release: Time marker shown and kept tidy; Link on, dragged loop points clear stale razor areas (tested in REAPER).
+
 ## 26.1118.0055pre1
 
 - Link on: razor areas that no longer match dragged loop points are cleared at once (checked every frame, no settle delay).

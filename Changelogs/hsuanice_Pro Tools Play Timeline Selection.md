@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1118.0059
+
+- Release: Link off, plays from the Time marker with the edit cursor kept (tested in REAPER).
+
 ## 26.1117.2309pre1
 
 - Link off: plays from the Time marker (V) when there are no loop points; the edit cursor (Edit position) stays.

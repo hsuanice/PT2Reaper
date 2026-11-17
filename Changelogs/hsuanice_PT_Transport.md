@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1118.0059
+
+- Release: Link off - the Time marker (9999 ">") is the Timeline position, the edit cursor stays the Edit position (tested in REAPER).
+
 ## 26.1118.0047pre1
 
 - razor_range(): the union of the track-level razor areas (edit_range uses it).

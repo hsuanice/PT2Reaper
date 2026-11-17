@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.0055pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - Link on: razor areas that no longer match dragged loop points are cleared at once (checked every frame, no settle delay).
+  - Release: Time marker shown and kept tidy; Link on, dragged loop points clear stale razor areas (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the

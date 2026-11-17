@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Click Timeline Ruler
-@version 26.1118.0028pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - Marker / region lanes with Link off (SWS): like a click on empty track space - Edit position moved, Edit range cleared, Timeline kept (Pro Tools Marker ruler).
+  - Release: ruler click sets the Timeline position - Time marker (Link off) / clears every range (Link on); marker lanes like a click on track space with Link off (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: clicking the Timebase ruler

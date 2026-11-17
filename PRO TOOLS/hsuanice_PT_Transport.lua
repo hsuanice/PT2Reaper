@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1118.0047pre1
+@version 26.1118.0059
 @author hsuanice
 @noindex
 @changelog
-  - razor_range(): the union of the track-level razor areas (edit_range uses it).
+  - Release: Link off - the Time marker (9999 ">") is the Timeline position, the edit cursor stays the Edit position (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
