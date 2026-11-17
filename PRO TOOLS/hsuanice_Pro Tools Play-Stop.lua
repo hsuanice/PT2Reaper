@@ -1,9 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1117.1259pre1
+@version 26.1117.1423pre1
 @author hsuanice
 @noindex
 @changelog
+  - Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).
   - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
@@ -40,6 +41,12 @@ if not (ok1 and ok2) then
   return
 end
 
+-- Timeline Selection (with the pre-roll / post-roll when they are on), else plain play
+local function play_timeline()
+  local s, e, home = T.timeline_bounds()
+  if s then T.play_range(s, e, false, home) else T.play() end
+end
+
 T.reset_half_speed()
 T.refresh_follows_button()
 QP.disarm_buffers()
@@ -50,9 +57,9 @@ if T.is_running() then
   if QP.pass_active() then QP.stop(T.follows()) else r.Main_OnCommand(1016, 0) end
   if T.follows() then T.clear_timeline() end -- Pro Tools: N on clears the Timeline Selection
 elseif QP.mode_on() then
-  if QP.start_pass(false, T.start_position()) == "none" then T.play() end
+  -- no armed track: no pass, the same playback as with QuickPunch mode off
+  if QP.start_pass(false, T.start_position()) == "none" then play_timeline() end
 else
-  local s, e, home = T.timeline_bounds() -- with the pre-roll / post-roll when they are on
-  if s then T.play_range(s, e, false, home) else T.play() end
+  play_timeline()
 end
 r.defer(function() end) -- no "ReaScript: Run" undo point (the pass makes its own)

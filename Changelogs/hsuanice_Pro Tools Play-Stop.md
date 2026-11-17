@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1117.1423pre1
+
+- Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
+
 ## 26.1117.1259pre1
 
 - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.

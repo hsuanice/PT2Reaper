@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.1423pre1
+
+- Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).
+
 ## 26.1117.1259pre1
 
 - Pre Post Roll Playback (Cmd+K): one toggle for both rolls; the rolls now play around the Timeline Selection (Space, Play Timeline Selection).
