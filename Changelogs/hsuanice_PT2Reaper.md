@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0047pre1
+
+- Link on: loop points dragged on their own clear stale razor areas; ruler lane double click (Link off) moves the Edit position to the range start
+
 ## 26.1118.0028pre1
 
 - Ruler: time scale vs marker / region lanes (SWS) - Pro Tools Timeline ruler vs Marker ruler

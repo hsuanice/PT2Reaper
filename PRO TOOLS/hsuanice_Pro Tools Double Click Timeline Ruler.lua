@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1118.0028pre1
+@version 26.1118.0047pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pro Tools Marker ruler vs Timeline ruler (SWS): the gap is selected only on the marker / region lanes - Edit range (time selection), Link on also the loop points; on the time scale a double click is a click.
+  - Link off: the edit cursor (Edit position) goes to the start of the selected range.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).
@@ -16,7 +16,8 @@
     region, region to region...); the Time marker (9999 ">") is not counted; no marker
     before: from the project start, none after: to the project end. It becomes the Edit
     range (time selection; no razor areas) and, Link Timeline and Edit Selection on, the
-    Timeline range (loop points) too. Link off: the loop points stay.
+    Timeline range (loop points) too. Link off: the loop points stay and the edit cursor
+    (Edit position) goes to the range start.
   - time scale: nothing more (the first click of the double click set the position).
   Without SWS the whole ruler acts as the lanes, and with Link off the loop points and the
   Time marker are put back as they were before the first click.
@@ -71,7 +72,8 @@ if e > s then
   -- Edit range = time selection (no razor areas: Pro Tools selects on the Marker ruler only);
   -- Link on: the Timeline range (loop points) too
   r.GetSet_LoopTimeRange2(0, true, false, s, e, false)
-  if T.linked() then r.GetSet_LoopTimeRange2(0, true, true, s, e, false) end
+  if T.linked() then r.GetSet_LoopTimeRange2(0, true, true, s, e, false)
+  else r.SetEditCurPos2(0, s, false, false) end -- Link off: the Edit position goes to the range start
 end
 r.PreventUIRefresh(-1)
 r.UpdateArrange()

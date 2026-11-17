@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1118.0028pre1
+@version 26.1118.0047pre1
 @author hsuanice
 @noindex
 @changelog
-  - ruler_segment(): which part of the ruler the mouse is on (SWS) - time scale or marker / region lanes.
+  - razor_range(): the union of the track-level razor areas (edit_range uses it).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -104,7 +104,8 @@ T.WATCHER_SCRIPT = (debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or '') .. 
 
 function T.linked() return r.GetToggleCommandState(CMD_LINK) == 1 end
 
-function T.edit_range()
+-- union of the track-level razor areas, or nil
+function T.razor_range()
   local s, e
   for i = 0, r.CountTracks(0) - 1 do
     local _, str = r.GetSetMediaTrackInfo_String(r.GetTrack(0, i), "P_RAZOREDITS", "", false)
@@ -116,6 +117,11 @@ function T.edit_range()
       end
     end
   end
+  return s, e
+end
+
+function T.edit_range()
+  local s, e = T.razor_range()
   if s then return s, e end
   local ts, te = r.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
   if te > ts + EPS then return ts, te end

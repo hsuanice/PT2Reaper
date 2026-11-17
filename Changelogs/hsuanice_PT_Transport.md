@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1118.0047pre1
+
+- razor_range(): the union of the track-level razor areas (edit_range uses it).
+
 ## 26.1118.0028pre1
 
 - ruler_segment(): which part of the ruler the mouse is on (SWS) - time scale or marker / region lanes.

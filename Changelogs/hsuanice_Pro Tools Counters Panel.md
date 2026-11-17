@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.0047pre1
+
+- Link on: loop points made on their own (dragged in the ruler) clear razor areas that no longer match them (Pro Tools: one selection).
+
 ## 26.1117.2320pre1
 
 - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
