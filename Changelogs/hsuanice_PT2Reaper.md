@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2316pre1
+
+- Double Click Timeline Ruler: time selection to region / between markers without counting the Time marker (V)
+
 ## 26.1117.2309pre1
 
 - Link off: the Time marker (V) is the Timeline position - Click Timeline Ruler (mouse modifier) sets it, the Timeline plays from it and the edit cursor (Edit position) stays

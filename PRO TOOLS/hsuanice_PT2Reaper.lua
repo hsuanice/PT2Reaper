@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2309pre1
+@version 26.1117.2316pre1
 @author hsuanice
 @metapackage
 @provides
@@ -25,6 +25,7 @@
   [main] hsuanice_Pro Tools Decrease Nudge Value.lua
   [main] hsuanice_Pro Tools Delete Fades.lua
   [main] hsuanice_Pro Tools Delete Selection.lua
+  [main] hsuanice_Pro Tools Double Click Timeline Ruler.lua
   [main] hsuanice_Pro Tools Double Edit Selection.lua
   [main] hsuanice_Pro Tools Duplicate.lua
   [main] hsuanice_Pro Tools Edit Lock Clip.lua
@@ -159,7 +160,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Link off: the Time marker (V) is the Timeline position - Click Timeline Ruler (mouse modifier) sets it, the Timeline plays from it and the edit cursor (Edit position) stays
+  - Double Click Timeline Ruler: time selection to region / between markers without counting the Time marker (V)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

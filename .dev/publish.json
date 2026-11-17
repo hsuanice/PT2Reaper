@@ -138,7 +138,8 @@
   "hsuanice_PT_Transient Settings.lua",
   "hsuanice_Pro Tools Pre Post Roll Playback.lua",
   "hsuanice_Pro Tools Restore Last Selection.lua",
-  "hsuanice_Pro Tools Click Timeline Ruler.lua"
+  "hsuanice_Pro Tools Click Timeline Ruler.lua",
+  "hsuanice_Pro Tools Double Click Timeline Ruler.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
