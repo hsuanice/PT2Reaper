@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.0008pre1
+@version 26.1118.0028pre1
 @author hsuanice
 @metapackage
 @provides
@@ -160,7 +160,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Click Timeline Ruler with Link on clears every range (razor areas, time selection, loop points)
+  - Ruler: time scale vs marker / region lanes (SWS) - Pro Tools Timeline ruler vs Marker ruler
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

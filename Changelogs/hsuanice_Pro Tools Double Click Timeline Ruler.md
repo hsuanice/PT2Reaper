@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Double Click Timeline Ruler
 
+## 26.1118.0028pre1
+
+- Pro Tools Marker ruler vs Timeline ruler (SWS): the gap is selected only on the marker / region lanes - Edit range (time selection), Link on also the loop points; on the time scale a double click is a click.
+
 ## 26.1117.2341pre1
 
 - Time selection = the gap between the nearest edges: markers and region starts / ends (marker to marker, marker to region, region to region).

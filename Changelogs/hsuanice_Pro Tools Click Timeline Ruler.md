@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Click Timeline Ruler
 
+## 26.1118.0028pre1
+
+- Marker / region lanes with Link off (SWS): like a click on empty track space - Edit position moved, Edit range cleared, Timeline kept (Pro Tools Marker ruler).
+
 ## 26.1118.0008pre1
 
 - Link on: clears every range - razor areas, time selection, loop points (Pro Tools); razor areas were kept.

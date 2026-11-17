@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0028pre1
+
+- Ruler: time scale vs marker / region lanes (SWS) - Pro Tools Timeline ruler vs Marker ruler
+
 ## 26.1118.0008pre1
 
 - Click Timeline Ruler with Link on clears every range (razor areas, time selection, loop points)

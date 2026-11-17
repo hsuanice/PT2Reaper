@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Click Timeline Ruler
-@version 26.1118.0008pre1
+@version 26.1118.0028pre1
 @author hsuanice
 @noindex
 @changelog
-  - Link on: clears every range - razor areas, time selection, loop points (Pro Tools); razor areas were kept.
+  - Marker / region lanes with Link off (SWS): like a click on empty track space - Edit position moved, Edit range cleared, Timeline kept (Pro Tools Marker ruler).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: clicking the Timebase ruler
@@ -16,6 +16,10 @@
   Edit position): it clears the Timeline Selection (loop points) and puts the Time marker
   (marker 9999 ">", blue) where you clicked (snapped to the grid). Space / Play Timeline Selection
   then play from the marker. Playing: playback goes on from there.
+  Marker / region lanes (top part of the ruler; needs SWS to tell them apart): Link on, the
+  same; Link off, like a click on empty track space - the edit cursor (Edit position) moves
+  there and the Edit range (razor areas, time selection) is cleared; loop points and the
+  Time marker stay (Pro Tools: the Marker ruler does not set the Timeline position then).
   Part of a double click: Double Click Timeline Ruler puts the loop points and the marker back.
   Link on: the edit cursor moves there and every range is cleared - razor areas, time
   selection, loop points (Pro Tools); no marker.
@@ -40,7 +44,13 @@ local cur = r.GetCursorPosition()
 r.PreventUIRefresh(1)
 r.Main_OnCommand(40513, 0) -- View: Move edit cursor to mouse cursor (snapping): where was clicked
 local p = r.GetCursorPosition()
-if T.linked() then
+local lane = T.ruler_segment() == "lane" -- marker / region lanes (SWS), else the time scale
+if lane and not T.linked() then
+  -- Pro Tools Marker ruler, Link off: like a click on empty track space - the Edit position
+  -- moves there and the Edit range is cleared; the Timeline (loop points, Time marker) stays
+  r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
+  r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
+elseif T.linked() then
   -- Pro Tools: a point now - every range is cleared (razor areas, time selection, loop points)
   r.Main_OnCommand(42406, 0) -- Razor edit: Clear all areas
   r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)

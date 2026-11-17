@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.2341pre1
+@version 26.1118.0028pre1
 @author hsuanice
 @noindex
 @changelog
-  - Only one Time marker: extra or older ones (V, ><) left in the project are deleted when it is set or cleared.
+  - ruler_segment(): which part of the ruler the mouse is on (SWS) - time scale or marker / region lanes.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -191,6 +191,17 @@ function T.clear_time_pos()
   local list = time_markers()
   delete_markers(list)
   return #list > 0
+end
+
+-- Which part of the ruler the mouse is on (SWS): "timeline" (the time scale; Pro Tools
+-- Timeline ruler) | "lane" (region / marker / tempo lanes; Pro Tools Marker ruler) | nil
+-- (no SWS, or not over the ruler: the scripts then treat the whole ruler as the timeline)
+function T.ruler_segment()
+  if not r.BR_GetMouseCursorContext then return nil end
+  local win, seg = r.BR_GetMouseCursorContext()
+  if win ~= "ruler" then return nil end
+  if seg == "timeline" then return "timeline" end
+  return "lane"
 end
 
 -- Ruler double click: REAPER runs the click action first (Click Timeline Ruler: loop points
