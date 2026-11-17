@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1117.2242pre1
+@version 26.1117.2247pre1
 @author hsuanice
 @noindex
 @changelog
-  - No Edit range: plays from the Edit position (playhead), not from the loop points; no pre-/post-roll.
+  - Pressed again while playing from a position (no Edit range): plays from the Edit position again.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**
@@ -57,5 +57,9 @@ elseif not T.is_running() then
   -- not from the Timeline Selection, and no rolls (they belong to the Timeline Selection)
   r.SetEditCurPos2(0, r.GetCursorPosition(), true, false)
   r.Main_OnCommand(1007, 0) -- Transport: Play
+else
+  -- pressed again while playing: from the Edit position again (an earlier stop point is dropped)
+  T.watch_clear()
+  r.SetEditCurPos2(0, r.GetCursorPosition(), false, true)
 end
 r.defer(function() end) -- no undo point

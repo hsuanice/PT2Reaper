@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2247pre1
+
+- Play Edit Selection pressed again while playing from a position: plays from the Edit position again
+
 ## 26.1117.2242pre1
 
 - Play Edit Selection with no Edit range plays from the Edit position (playhead), not from the loop points

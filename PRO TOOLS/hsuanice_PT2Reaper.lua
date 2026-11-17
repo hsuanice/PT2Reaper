@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2242pre1
+@version 26.1117.2247pre1
 @author hsuanice
 @metapackage
 @provides
@@ -158,7 +158,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Play Edit Selection with no Edit range plays from the Edit position (playhead), not from the loop points
+  - Play Edit Selection pressed again while playing from a position: plays from the Edit position again
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

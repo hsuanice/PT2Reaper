@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Edit Selection
 
+## 26.1117.2247pre1
+
+- Pressed again while playing from a position (no Edit range): plays from the Edit position again.
+
 ## 26.1117.2242pre1
 
 - No Edit range: plays from the Edit position (playhead), not from the loop points; no pre-/post-roll.
