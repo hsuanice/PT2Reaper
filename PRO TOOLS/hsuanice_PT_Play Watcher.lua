@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
-@version 26.1117.1546pre1
+@version 26.1117.1552
 @author hsuanice
 @noindex
 @changelog

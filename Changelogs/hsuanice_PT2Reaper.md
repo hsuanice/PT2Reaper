@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.1552
+
+- Release: Pre Post Roll Playback (Cmd+K) - the pre-roll / post-roll play around the Timeline Selection (tested in REAPER).
+
 ## 26.1117.1546pre1
 
 - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).

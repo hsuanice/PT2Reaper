@@ -2,6 +2,12 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1117.1552
+
+- Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
+- Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).
+- Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
+
 ## 26.1117.1546pre1
 
 - Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).

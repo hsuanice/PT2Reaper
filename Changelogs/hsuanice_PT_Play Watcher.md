@@ -2,6 +2,10 @@
 
 hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
 
+## 26.1117.1552
+
+- Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
+
 ## 26.1117.1546pre1
 
 - Keeps the playhead where it was when a range plays with a home position (Play Edit Selection).

@@ -1,6 +1,6 @@
 --[[
 @description hsuanice_Pro Tools Pre Post Roll Playback
-@version 26.1117.1259pre1
+@version 26.1117.1552
 @author hsuanice
 @noindex
 @changelog

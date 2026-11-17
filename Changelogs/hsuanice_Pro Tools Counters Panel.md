@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1117.1552
+
+- Updates at once when Pre Post Roll Playback (Cmd+K) switches the rolls; its toolbar button shows the saved state after a restart.
+
 ## 26.1117.1259pre1
 
 - Fix: the Insertion Follows Playback (N) button shows the saved state again after a REAPER restart (it looked off while N was on).

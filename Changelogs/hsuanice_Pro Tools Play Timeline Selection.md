@@ -2,6 +2,11 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1117.1552
+
+- Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
+- Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
+
 ## 26.1117.1546pre1
 
 - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it. The playhead stays at the Timeline Selection start.
