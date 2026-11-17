@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1117.2317pre1
+@version 26.1117.2320pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker renamed from V to >< (a V marker from 26.1117.2309pre1 is still found and renamed when moved).
+  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -16,7 +16,7 @@
     Length         | Items:       n   | Tracks:          n   | Length
 
   - Edit Selection: razor areas, else the time selection (none: the edit cursor).
-  - Timeline Selection: the loop points (none: the Time marker "><" with Link off, else the
+  - Timeline Selection: the loop points (none: the Time marker (9999) with Link off, else the
     edit cursor). The marker is removed when there are loop points or Link is on.
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
   - Items / Tracks: selected item / track counts. Click either to open / close the item details

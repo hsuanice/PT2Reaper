@@ -1,17 +1,17 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1117.2317pre1
+@version 26.1117.2320pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker renamed from V to >< (a V marker from 26.1117.2309pre1 is still found and renamed when moved).
+  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).
 
   Does what REAPER's ruler double click "Set time selection to region" does - inside a
   region: the time selection becomes the region; else: the range between the markers on
-  either side - but the Time marker ("><", put down by the first click of the double click
+  either side - but the Time marker (marker 9999, put down by the first click of the double click
   with Link Timeline and Edit Selection off) is not counted as a marker.
   No marker before: from the project start; none after: to the project end.
 

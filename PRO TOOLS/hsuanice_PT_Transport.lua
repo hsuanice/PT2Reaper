@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.2317pre1
+@version 26.1117.2320pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time marker renamed from V to >< (a V marker from 26.1117.2309pre1 is still found and renamed when moved).
+  - Time marker: no name, marker number 9999 (a V or >< marker from the 26.1117 pre-releases is replaced when moved).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -131,14 +131,14 @@ end
 -- nothing is selected: the Timeline position (blue, set by clicking the ruler) and the Edit
 -- position. REAPER has one edit cursor, so with Link off:
 --   edit cursor = the Edit position (it stays where it is while the Timeline plays)
---   Time marker = the Timeline position: a project marker named "><" (blue), set by
+--   Time marker = the Timeline position: a project marker number 9999, no name (blue), set by
 --                 "Pro Tools Click Timeline Ruler" (mouse modifier) and, Insertion Follows
 --                 Playback on, by stopping. A Timeline Selection (loop points) is the
 --                 Timeline position instead: the Counters Panel removes the marker then,
 --                 and with Link on.
 ------------------------------------------------------------------------------
-T.TIME_MARK = "><"
-local OLD_MARK = "V" -- name in 26.1117.2309pre1: still found, renamed when moved
+T.TIME_ID = 9999 -- marker number (shown in the ruler; no name), far from the usual numbers
+local OLD_NAMES = { V = true, ["><"] = true } -- 26.1117 pre-releases: still found, replaced when moved
 T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
 
 -- the marker's number and position (whatever the Link state), or nil
@@ -147,7 +147,9 @@ function T.time_marker()
   while true do
     local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
     if ret == 0 then return nil end
-    if not isrgn and (name == T.TIME_MARK or name == OLD_MARK) and color == T.TIME_COLOR then return idx, pos end
+    if not isrgn and color == T.TIME_COLOR and ((idx == T.TIME_ID and name == "") or OLD_NAMES[name]) then
+      return idx, pos
+    end
     i = i + 1
   end
 end
@@ -161,10 +163,11 @@ end
 
 function T.set_time_pos(p)
   local idx = T.time_marker()
-  if idx then
-    r.SetProjectMarker3(0, idx, false, p, 0, T.TIME_MARK, T.TIME_COLOR)
+  if idx == T.TIME_ID then
+    r.SetProjectMarker3(0, idx, false, p, 0, "", T.TIME_COLOR)
   else
-    r.AddProjectMarker2(0, false, p, 0, T.TIME_MARK, -1, T.TIME_COLOR)
+    if idx then r.DeleteProjectMarker(0, idx, false) end -- an older one (named): replaced
+    r.AddProjectMarker2(0, false, p, 0, "", T.TIME_ID, T.TIME_COLOR)
   end
 end
 

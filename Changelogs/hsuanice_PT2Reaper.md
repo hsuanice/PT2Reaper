@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2320pre1
+
+- Time marker: no name, marker number 9999 (older V / >< markers are replaced when moved)
+
 ## 26.1117.2317pre1
 
 - Time marker renamed V -> >< (an existing V marker is still found and renamed)
