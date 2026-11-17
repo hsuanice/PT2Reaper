@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Click Timeline Ruler
 
+## 26.1118.0119
+
+- Release: the Time marker is named with its timecode (tested in REAPER).
+
 ## 26.1118.0115pre1
 
 - About: the Time marker is named with its timecode.

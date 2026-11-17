@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Double Click Timeline Ruler
-@version 26.1118.0115pre1
+@version 26.1118.0119
 @author hsuanice
 @noindex
 @changelog
-  - About: the Time marker is named with its timecode.
+  - Release: the Time marker is named with its timecode (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Companion of Pro Tools Click Timeline Ruler (mouse modifier: Ruler - double click).

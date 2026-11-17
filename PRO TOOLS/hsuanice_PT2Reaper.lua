@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.0115pre1
+@version 26.1118.0119
 @author hsuanice
 @metapackage
 @provides
@@ -167,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Time marker named with the timecode of its position (instead of >)
+  - Release: the Time marker is named with the timecode of its position (tested in REAPER)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

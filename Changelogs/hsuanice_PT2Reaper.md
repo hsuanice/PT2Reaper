@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.0119
+
+- Release: the Time marker is named with the timecode of its position (tested in REAPER)
+
 ## 26.1118.0115pre1
 
 - Time marker named with the timecode of its position (instead of >)
