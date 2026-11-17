@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Edit Selection
 
+## 26.1117.2242pre1
+
+- No Edit range: plays from the Edit position (playhead), not from the loop points; no pre-/post-roll.
+
 ## 26.1115.2128
 
 - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.

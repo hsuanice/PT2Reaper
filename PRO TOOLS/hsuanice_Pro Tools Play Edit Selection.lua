@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play Edit Selection
-@version 26.1115.2128
+@version 26.1117.2242pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with Link Timeline and Edit Selection on: the Edit Selection (razor areas, time selection) is cleared together with the loop points; Link off: only the loop points.
+  - No Edit range: plays from the Edit position (playhead), not from the loop points; no pre-/post-roll.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play Edit Selection**
@@ -17,7 +17,8 @@
   cleared - with Link Timeline and Edit Selection on, the Edit Selection too; off: the edit
   cursor is still where it was, selections kept.
   Pressed while playing: plays the selection again from its start.
-  No selection: plays from the edit cursor (like Play).
+  No Edit range: plays from the edit cursor (the Edit position), not from the Timeline
+  Selection (loop points); no pre-/post-roll (they belong to the Timeline Selection).
   During a QuickPunch pass: ends the recording, then plays.
 
   Self-contained: uses hsuanice_PT_Transport.lua, hsuanice_PT_QuickPunch.lua and
@@ -52,6 +53,9 @@ if QP.pass_active() and T.is_running() then
 elseif s then
   T.play_range(s, e, false, home)
 elseif not T.is_running() then
-  T.play()
+  -- no Edit range: the Edit Selection is a position (the playhead), so play from there;
+  -- not from the Timeline Selection, and no rolls (they belong to the Timeline Selection)
+  r.SetEditCurPos2(0, r.GetCursorPosition(), true, false)
+  r.Main_OnCommand(1007, 0) -- Transport: Play
 end
 r.defer(function() end) -- no undo point

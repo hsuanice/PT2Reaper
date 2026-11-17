@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2043pre1
+@version 26.1117.2242pre1
 @author hsuanice
 @metapackage
 @provides
@@ -158,7 +158,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Restore Last Selection (Cmd+Opt+Z): the Counters Panel remembers the previous Edit Selection; one level, swaps current and previous (Pro Tools).
+  - Play Edit Selection with no Edit range plays from the Edit position (playhead), not from the loop points
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
