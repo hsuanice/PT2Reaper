@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1117.2309pre1
+
+- Link off: the Time marker (V) is the Timeline position - Click Timeline Ruler (mouse modifier) sets it, the Timeline plays from it and the edit cursor (Edit position) stays
+
 ## 26.1117.2247pre1
 
 - Play Edit Selection pressed again while playing from a position: plays from the Edit position again

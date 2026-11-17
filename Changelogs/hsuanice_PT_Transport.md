@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1117.2309pre1
+
+- Link off: the Time marker (V) is the Timeline position when there are no loop points; the Timeline plays from it and the edit cursor (Edit position) stays; Insertion Follows Playback moves the marker, not the edit cursor.
+
 ## 26.1117.1556
 
 - Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).

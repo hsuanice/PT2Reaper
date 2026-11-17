@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1117.2043pre1
+@version 26.1117.2309pre1
 @author hsuanice
 @noindex
 @changelog
-  - Remembers the previous Edit Selection for Restore Last Selection (Cmd+Opt+Z); forgotten when another project is opened.
+  - Link off: Timeline Selection counters show the Time marker (V) when there are no loop points; the marker is removed when loop points are made or Link is turned on.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -16,7 +16,8 @@
     Length         | Items:       n   | Tracks:          n   | Length
 
   - Edit Selection: razor areas, else the time selection (none: the edit cursor).
-  - Timeline Selection: the loop points (none: the edit cursor).
+  - Timeline Selection: the loop points (none: the Time marker "V" with Link off, else the
+    edit cursor). The marker is removed when there are loop points or Link is on.
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
   - Items / Tracks: selected item / track counts. Click either to open / close the item details
     in their own floating window (MIDI / Audio / Empty items, channel counts); computed only
@@ -146,12 +147,16 @@ local function scan(now)
   local key = table.concat({ r.GetProjectStateChangeCount(0), r.CountSelectedMediaItems(0),
     r.CountSelectedTracks(0), cur, es or '-', ee or '-', ls or '-', le or '-', time_mode,
     r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll'),
-    r.GetExtState(T.NS, 'preroll_on'), r.GetExtState(T.NS, 'postroll_on') }, '|')
+    r.GetExtState(T.NS, 'preroll_on'), r.GetExtState(T.NS, 'postroll_on'), T.linked() and 1 or 0 }, '|')
   if key == last_key then return end
   last_key = key
+  -- the Time marker (Link off, no Timeline Selection) is the Timeline position; with a
+  -- Timeline Selection or Link on it is not needed: removed
+  local _, tp = T.time_marker()
+  if tp and (ls or T.linked()) then T.clear_time_pos(); tp = nil end
   D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
   D.edit = es and triple(es, ee) or triple(cur, cur)
-  D.tl = ls and triple(ls, le) or triple(cur, cur)
+  D.tl = ls and triple(ls, le) or triple(tp or cur, tp or cur)
 end
 
 ------------------------------------------------------------

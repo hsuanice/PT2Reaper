@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1117.2247pre1
+@version 26.1117.2309pre1
 @author hsuanice
 @metapackage
 @provides
@@ -11,6 +11,7 @@
   [main] hsuanice_Pro Tools Apply Previous Fade Shape.lua
   [main] hsuanice_Pro Tools Clear All Soloed Tracks.lua
   [main] hsuanice_Pro Tools Clear.lua
+  [main] hsuanice_Pro Tools Click Timeline Ruler.lua
   [main] hsuanice_Pro Tools Consolidate Selection.lua
   [main] hsuanice_Pro Tools Copy and Move Clip End To Current TC.lua
   [main] hsuanice_Pro Tools Copy and Move Clip End To Play Position.lua
@@ -158,7 +159,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Play Edit Selection pressed again while playing from a position: plays from the Edit position again
+  - Link off: the Time marker (V) is the Timeline position - Click Timeline Ruler (mouse modifier) sets it, the Timeline plays from it and the edit cursor (Edit position) stays
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

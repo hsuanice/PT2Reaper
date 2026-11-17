@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1117.1556
+@version 26.1117.2309pre1
 @author hsuanice
 @noindex
 @changelog
-  - Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).
+  - Link off: the Time marker (V) is the Timeline position when there are no loop points; the Timeline plays from it and the edit cursor (Edit position) stays; Insertion Follows Playback moves the marker, not the edit cursor.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -60,27 +60,30 @@ end
 -- (razor areas / time selection) does not move the play start.
 function T.start_position()
   local s = T.timeline_range()
-  return s or r.GetCursorPosition()
+  return s or T.time_pos() or r.GetCursorPosition()
 end
 
 function T.is_running() return r.GetPlayState() ~= 0 end
 
--- Plain play from the start position. Pre-roll on (Pro Tools): starts the pre-roll length
--- earlier; the playhead (edit cursor) stays at the start position.
+-- Plain play from the start position (Timeline Selection start, else the Time marker, else
+-- the edit cursor). Pre-roll on (Pro Tools): starts the pre-roll length earlier. The edit
+-- cursor: Link on, at the start position; Link off, where it is (the Edit position).
 function T.play()
   local p = T.start_position()
+  local home = T.home_for(p)
   local pre, on = T.roll("preroll")
   if on and pre > 0 and p > 0 then
-    T.start_at(math.max(0, p - pre), p)
+    T.start_at(math.max(0, p - pre), home)
   else
-    r.SetEditCurPos2(0, p, true, false)
-    r.Main_OnCommand(CMD_PLAY, 0)
+    T.start_at(p, home)
   end
 end
 
--- Insertion Follows Playback on: the edit cursor stays where playback stopped.
+-- Insertion Follows Playback on: the Timeline position goes where playback stopped -
+-- Link on: the edit cursor; Link off: the Time marker (the edit cursor, the Edit position, stays).
 function T.before_stop()
-  if T.follows() then r.Main_OnCommand(CMD_EDIT_TO_PLAY, 0) end
+  if not T.follows() then return end
+  if T.linked() then r.Main_OnCommand(CMD_EDIT_TO_PLAY, 0) else T.set_time_pos(r.GetPlayPosition()) end
 end
 
 function T.stop()
@@ -121,6 +124,60 @@ end
 function T.timeline_range()
   local ls, le = r.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
   if le > ls + EPS then return ls, le end
+end
+
+------------------------------------------------------------------------------
+-- Time marker (Link Timeline and Edit Selection off). Pro Tools shows two positions when
+-- nothing is selected: the Timeline position (blue, set by clicking the ruler) and the Edit
+-- position. REAPER has one edit cursor, so with Link off:
+--   edit cursor = the Edit position (it stays where it is while the Timeline plays)
+--   Time marker = the Timeline position: a project marker named "V" (blue), set by
+--                 "Pro Tools Click Timeline Ruler" (mouse modifier) and, Insertion Follows
+--                 Playback on, by stopping. A Timeline Selection (loop points) is the
+--                 Timeline position instead: the Counters Panel removes the marker then,
+--                 and with Link on.
+------------------------------------------------------------------------------
+T.TIME_MARK = "V"
+T.TIME_COLOR = r.ColorToNative(40, 120, 255) | 0x1000000
+
+-- the marker's number and position (whatever the Link state), or nil
+function T.time_marker()
+  local i = 0
+  while true do
+    local ret, isrgn, pos, _, name, idx, color = r.EnumProjectMarkers3(0, i)
+    if ret == 0 then return nil end
+    if not isrgn and name == T.TIME_MARK and color == T.TIME_COLOR then return idx, pos end
+    i = i + 1
+  end
+end
+
+-- the Timeline position as a point (Link off, no Timeline Selection): the marker, or nil
+function T.time_pos()
+  if T.linked() then return nil end
+  local _, pos = T.time_marker()
+  return pos
+end
+
+function T.set_time_pos(p)
+  local idx = T.time_marker()
+  if idx then
+    r.SetProjectMarker3(0, idx, false, p, 0, T.TIME_MARK, T.TIME_COLOR)
+  else
+    r.AddProjectMarker2(0, false, p, 0, T.TIME_MARK, -1, T.TIME_COLOR)
+  end
+end
+
+function T.clear_time_pos()
+  local idx = T.time_marker()
+  if idx then r.DeleteProjectMarker(0, idx, false) end
+  return idx ~= nil
+end
+
+-- where the edit cursor stays while the Timeline plays from p:
+-- Link on, p (the playhead is the Timeline position); Link off, where it is (the Edit position)
+function T.home_for(p)
+  if T.linked() then return p end
+  return r.GetCursorPosition()
 end
 
 -- Insertion Follows Playback on: stopping clears the Timeline Selection (the loop points).
@@ -189,7 +246,12 @@ function T.watch_home() return tonumber(r.GetExtState(T.NS, "watch_home")) end
 function T.range_end(s, e, home)
   r.Main_OnCommand(CMD_STOP, 0)
   if T.follows() then
-    r.SetEditCurPos2(0, e, false, false)
+    if T.linked() then
+      r.SetEditCurPos2(0, e, false, false)
+    else -- the Timeline position goes to the end; the Edit position stays
+      T.set_time_pos(e)
+      r.SetEditCurPos2(0, home or s, false, false)
+    end
     T.clear_timeline()
   else
     r.SetEditCurPos2(0, home or s, false, false)
@@ -240,23 +302,24 @@ end
 -- stays at p. Off: from p.
 function T.replay_from(p)
   local pre, on = T.roll("preroll")
+  local home = T.home_for(p)
   if on and pre > 0 then
-    T.start_at(math.max(0, p - pre), p)
+    T.start_at(math.max(0, p - pre), home)
   else
-    r.SetEditCurPos2(0, p, false, true)
+    T.start_at(p, home)
   end
 end
 
 -- The Timeline Selection as Space / Play Timeline Selection play it (Pro Tools: the rolls
 -- belong to the Timeline Selection, not to the Edit Selection): s, e, home or nil.
--- Pre-roll on: starts that much earlier; post-roll on: ends that much later; home = the
--- Timeline Selection start (where the playhead stays).
+-- Pre-roll on: starts that much earlier; post-roll on: ends that much later; home = where
+-- the edit cursor stays (Link on: the Timeline Selection start; off: the Edit position).
 function T.timeline_bounds()
   local ls, le = T.timeline_range()
   if not ls then return nil end
   local pre, pon = T.roll("preroll")
   local post, qon = T.roll("postroll")
-  return math.max(0, ls - (pon and pre or 0)), le + (qon and post or 0), ls
+  return math.max(0, ls - (pon and pre or 0)), le + (qon and post or 0), T.home_for(ls)
 end
 
 ------------------------------------------------------------------------------

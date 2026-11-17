@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play Timeline Selection
 
+## 26.1117.2309pre1
+
+- Link off: plays from the Time marker (V) when there are no loop points; the edit cursor (Edit position) stays.
+
 ## 26.1117.1556
 
 - Play Timeline Selection without a Timeline Selection, pre-roll on: every retrigger starts the pre-roll before the Time position (it went on from where it was).

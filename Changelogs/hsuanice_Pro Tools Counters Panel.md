@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1117.2309pre1
+
+- Link off: Timeline Selection counters show the Time marker (V) when there are no loop points; the marker is removed when loop points are made or Link is turned on.
+
 ## 26.1117.2043pre1
 
 - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
