@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1546
+
+- Release: Extend Edit Selection Up / Down Including Folder Siblings (tested in REAPER and Pro Tools)
+
 ## 26.1118.1524pre1
 
 - Extend Edit Selection Up / Down Including Folder Siblings; Extend / Move Edit Insertion skip the tracks of a closed folder

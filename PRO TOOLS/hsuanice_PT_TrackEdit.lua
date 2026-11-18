@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
-@version 26.1118.1524pre1
+@version 26.1118.1546
 @author hsuanice
 @noindex
 @changelog
-  - extend_with_siblings() (Extend Edit Selection Up / Down Including Folder Siblings); the tracks of a closed folder are skipped (Pro Tools).
+  - Release: Extend Edit Selection Up / Down Including Folder Siblings; closed folder tracks skipped (tested in REAPER and Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper "... Tracks with an Edit Selection" actions. Loaded with dofile().
