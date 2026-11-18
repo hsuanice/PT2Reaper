@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Restore Last Selection
-@version 26.1118.1111pre1
+@version 26.1118.1118
 @author hsuanice
 @noindex
 @changelog
-  - Faster: remembered right after the mouse release; a restored range puts the playhead (Edit position) at its start.
+  - Release: Pro Tools Restore Last Selection - one level, Edit range or Edit position with tracks, playhead restored (tested in REAPER, speed like Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Restore Last Selection**

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_SelectionMemory - the last Edit Selection, for Restore Last Selection (PT2Reaper library)
-@version 26.1118.1111pre1
+@version 26.1118.1118
 @author hsuanice
 @noindex
 @changelog
-  - Remembered right after the mouse release (0.15 s with js_ReaScriptAPI, was 0.5 s); a restored range puts the playhead (edit cursor) at its start.
+  - Release: remembers the Edit Selection right after the mouse release; restored ranges put the playhead at their start (tested in REAPER, speed like Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of Restore Last Selection and the Counters Panel. Loaded with dofile().

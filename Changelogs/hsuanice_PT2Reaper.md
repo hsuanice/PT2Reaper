@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1118
+
+- Release: Restore Last Selection (Cmd+Opt+Z), remembered by the Counters Panel (tested in REAPER)
+
 ## 26.1118.1111pre1
 
 - Restore Last Selection: a selection is remembered right after the mouse release; a restored range puts the playhead at its start
