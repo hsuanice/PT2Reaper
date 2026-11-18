@@ -2,6 +2,10 @@
 
 hsuanice_PT_TrackEdit - tracks of the Edit Selection (PT2Reaper library)
 
+## 26.1118.1524pre1
+
+- extend_with_siblings() (Extend Edit Selection Up / Down Including Folder Siblings); the tracks of a closed folder are skipped (Pro Tools).
+
 ## 26.1115.1638
 
 - extend_insertion(): Extend Edit Insertion Up / Down - the selection only grows by one track.

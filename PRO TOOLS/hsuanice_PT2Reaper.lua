@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1428
+@version 26.1118.1524pre1
 @author hsuanice
 @metapackage
 @provides
@@ -38,6 +38,8 @@
   [main] hsuanice_Pro Tools Execute Crossfade using last setting.lua
   [main] hsuanice_Pro Tools Extend Edit Insertion Down.lua
   [main] hsuanice_Pro Tools Extend Edit Insertion Up.lua
+  [main] hsuanice_Pro Tools Extend Edit Selection Down Including Folder Siblings.lua
+  [main] hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua
   [main] hsuanice_Pro Tools Fade In From Start To Cursor.lua
   [main] hsuanice_Pro Tools Fade Out From Cursor To End.lua
   [main] hsuanice_Pro Tools Grid Mode.lua
@@ -169,7 +171,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Zoom To Fit Selection (Option+F) (tested in REAPER and Pro Tools)
+  - Extend Edit Selection Up / Down Including Folder Siblings; Extend / Move Edit Insertion skip the tracks of a closed folder
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -230,6 +232,8 @@
   - Execute Crossfade using last setting: Cmd+Control+F, Control+F, F
   - Extend Edit Insertion Down: :, Control+:
   - Extend Edit Insertion Up: Shift+P, Shift+Control+P
+  - Extend Edit Selection Down Including Folder Siblings: Opt+Shift+Control+;
+  - Extend Edit Selection Up Including Folder Siblings: Opt+Shift+Control+P
   - Fade In From Start To Cursor: D, Control+D
   - Fade Out From Cursor To End: Control+G, G
   - Grid Mode: Opt+4, F4

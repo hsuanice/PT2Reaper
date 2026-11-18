@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1524pre1
+
+- Extend Edit Selection Up / Down Including Folder Siblings; Extend / Move Edit Insertion skip the tracks of a closed folder
+
 ## 26.1118.1428
 
 - Release: Zoom To Fit Selection (Option+F) (tested in REAPER and Pro Tools)
