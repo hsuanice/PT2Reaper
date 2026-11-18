@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Record Punch
-@version 26.1118.1937pre1
+@version 26.1118.2035pre1
 @author hsuanice
 @noindex
 @changelog
-  - Record with the Pro Tools rolls (QuickPunch on or off): pre-roll before the Time position / Timeline Selection, only the Timeline Selection is recorded, stops at its end + post-roll.
+  - Recording that stops by itself with Insertion Follows Playback on: the Time position goes where it stopped (Timeline Selection end + post-roll).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Record Punch**
@@ -16,7 +16,7 @@
     records from the Time position until you stop;
   - Timeline Selection: plays from its start - pre-roll, records only the selection and
     stops at its end + post-roll. Insertion Follows Playback on: the Timeline position goes
-    to the selection end and the selection is cleared; off: everything stays.
+    where it stopped (end + post-roll) and the selection is cleared; off: everything stays.
   REAPER's own pre-roll is not used for this (put back afterwards).
   QuickPunch off: REAPER's own Record; the new items are trimmed to the record range when it
   has stopped. Playing (QuickPunch off): Transport: Record.

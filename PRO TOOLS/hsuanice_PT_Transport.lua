@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1118.1937pre1
+@version 26.1118.2035pre1
 @author hsuanice
 @noindex
 @changelog
-  - Recording uses the Pro Tools rolls (record_plan / record_native / record_end / record_finish); turning a roll on turns REAPER's own pre-roll off.
+  - Recording that stops by itself with Insertion Follows Playback on: the Time position goes where it stopped (Timeline Selection end + post-roll).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -430,8 +430,8 @@ end
 --                           position until stopped
 --   Timeline Selection    : plays from its start - pre-roll, records only the selection,
 --                           stops at its end + post-roll (Play Watcher). Insertion Follows
---                           Playback on: the Timeline position goes to the selection end and
---                           the selection is cleared; off: everything stays.
+--                           Playback on: the Timeline position goes where it stopped (end +
+--                           post-roll) and the selection is cleared; off: everything stays.
 -- QuickPunch mode on: the QuickPunch pass does the recording (it gets plan.pre / range).
 -- Off: REAPER's own Record from the pre-roll start; when it is finished the new items are
 -- trimmed to the record range (the pre-roll / post-roll parts are not kept, as Pro Tools).
@@ -507,7 +507,7 @@ end
 function T.record_end(QP)
   if rget("rec_ended") == "1" then return end
   rset("rec_ended", "1")
-  local e, home = rnum("rec_e"), rnum("rec_home") or rnum("rec_base")
+  local e, home = rnum("rec_stop") or rnum("rec_e"), rnum("rec_home") or rnum("rec_base")
   local follows, linked = T.follows(), T.linked()
   local cur = (follows and linked and e) or home
   if QP and QP.pass_active() then
@@ -518,7 +518,7 @@ function T.record_end(QP)
     r.SetEditCurPos2(0, cur, false, false)
   end
   if follows and e then
-    if not linked then T.set_time_pos(e) end -- the record end, not where it stopped
+    if not linked then T.set_time_pos(e) end -- where it stopped (the post-roll end)
     T.clear_timeline()
   end
   r.UpdateArrange()

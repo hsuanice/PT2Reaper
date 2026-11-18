@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.2035pre1
+
+- Record auto stop, N on: the Time position goes where it stopped (end + post-roll).
+
 ## 26.1118.1937pre1
 
 - Recording uses the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K), QuickPunch on or off.
