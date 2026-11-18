@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Zoom To Fit Selection
-@version 26.1118.1327pre1
+@version 26.1118.1428
 @author hsuanice
 @noindex
 @changelog
-  - First version (was a placeholder): same as Zoom To Fit Horizontal Selection (Pro Tools).
+  - Release: same as Zoom To Fit Horizontal Selection, as in Pro Tools (tested in REAPER and Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Zoom To Fit Selection**
