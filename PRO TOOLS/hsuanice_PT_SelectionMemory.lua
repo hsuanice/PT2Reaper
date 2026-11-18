@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_SelectionMemory - the last Edit Selection, for Restore Last Selection (PT2Reaper library)
-@version 26.1117.2043pre1
+@version 26.1118.1111pre1
 @author hsuanice
 @noindex
 @changelog
-  - First version: remembers the previous Edit Selection (one level, Pro Tools).
+  - Remembered right after the mouse release (0.15 s with js_ReaScriptAPI, was 0.5 s); a restored range puts the playhead (edit cursor) at its start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of Restore Last Selection and the Counters Panel. Loaded with dofile().
@@ -13,8 +13,9 @@
   it (one level; pressing it again goes back). Only the Edit Selection: a range on tracks,
   or a position on tracks. The Timeline Selection (loop points) is not part of it.
   REAPER does not tell scripts when a selection changes, so the Counters Panel (always
-  running) calls watch() every check (0.1 s): a selection counts once it has stayed the
-  same for 0.5 s with the mouse button up.
+  running) calls watch() every check (0.1 s): a selection counts once the mouse button is up
+  and it has stayed the same for 0.15 s (0.5 s without js_ReaScriptAPI). Restoring a range
+  also puts the playhead (edit cursor) at its start.
   A selection is stored as text in ExtState (not saved):
     "R|start|end|GUID,GUID"  range (razor areas, else the time selection) on tracks
     "P|position|GUID,GUID"   position (edit cursor) on the selected tracks
@@ -24,7 +25,10 @@
 local r = reaper
 local S = {}
 S.NS = 'hsuanice_PT_CountersPanel' -- shared with the Counters Panel
-S.SETTLE = 0.5 -- seconds a selection must stay the same to count
+-- seconds a selection must stay the same to count: with js_ReaScriptAPI the mouse button is
+-- known, so a selection counts right after the mouse is released (0.15 s: other scripts that
+-- sync the track selection a frame later are not recorded half-way); without it 0.5 s.
+S.SETTLE = r.JS_Mouse_GetState and 0.15 or 0.5
 local EPS = 1e-9
 local DIR = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or ''
 
@@ -100,6 +104,7 @@ local function apply(text)
     local MS = dofile(DIR .. 'hsuanice_PT_MouseSelect.lua')
     local sel = track_indexes(list)
     MS.apply(tonumber(a), tonumber(b), sel)
+    r.SetEditCurPos(tonumber(a), false, false) -- the playhead (Edit position) goes to the range start
     return true
   end
   local p

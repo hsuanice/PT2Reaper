@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1058pre1
+@version 26.1118.1111pre1
 @author hsuanice
 @metapackage
 @provides
@@ -167,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: the Grid is checked again for 5 s after REAPER starts / a project opens (it could still be loading the project's Frame grid)
+  - Restore Last Selection: a selection is remembered right after the mouse release; a restored range puts the playhead at its start
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

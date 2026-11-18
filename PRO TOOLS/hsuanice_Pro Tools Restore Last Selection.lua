@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Restore Last Selection
-@version 26.1117.2043pre1
+@version 26.1118.1111pre1
 @author hsuanice
 @noindex
 @changelog
-  - Pro Tools behaviour: swaps the Edit Selection with the one before it (remembered by the Counters Panel); no Selection Set any more.
+  - Faster: remembered right after the mouse release; a restored range puts the playhead (Edit position) at its start.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Restore Last Selection**
@@ -15,7 +15,8 @@
   position on tracks (edit cursor + selected tracks). The Timeline Selection (loop points)
   is not part of it.
   The selections are remembered by the Counters Panel (it must be open): a selection counts
-  once it has stayed the same for half a second with the mouse button up.
+  as soon as the mouse button is released (0.15 s; 0.5 s without js_ReaScriptAPI). A range
+  comes back with the playhead (edit cursor) at its start.
 
   Self-contained: uses hsuanice_PT_SelectionMemory.lua and hsuanice_PT_MouseSelect.lua
   (same folder).
