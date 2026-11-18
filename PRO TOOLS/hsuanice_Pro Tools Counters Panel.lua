@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1629pre1
+@version 26.1118.1644pre1
 @author hsuanice
 @noindex
 @changelog
-  - Time: Follow ruler unit (Pro Tools Follow Main Time Scale): every value refreshes as soon as the ruler's unit changes, and Grid / Nudge switch to that unit (nearest preset). The transport's big clock is not followed (REAPER keeps it separately).
+  - Follow ruler unit: Absolute Frames is recognised (it was taken for Samples) - Grid / Nudge use the frame-based Timecode presets; right-click menu has Time: Frames.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -33,7 +33,8 @@
   - Right-click: time format, font size, dock / undock, close. "Follow ruler unit" (Pro Tools
     Follow Main Time Scale) shows every value in the arrange ruler's unit - not the transport's
     big clock, which REAPER keeps separately - and switches Grid / Nudge to the same unit
-    (nearest preset) whenever the ruler's unit changes. Dock state, position, font size
+    (nearest preset) whenever the ruler's unit changes (Absolute Frames: the frame-based Timecode
+    presets; Seconds: Min:Secs). Dock state, position, font size
     and time format are remembered.
 
   Combines hsuanice's "Grid Nudge Panel" and "Count Items and Tracks - Selection HUD"
@@ -67,7 +68,7 @@ local TITLE = 'Pro Tools Counters'
 ------------------------------------------------------------
 local function num(k, d) return tonumber(r.GetExtState(NS, k)) or d end
 local font_size    = num('font_size', 14)
-local time_mode    = num('time_mode', -1) -- format_timestr: -1 ruler, 5 TC, 0 m:s, 2 bars, 3 sec, 4 smp
+local time_mode    = num('time_mode', -1) -- format_timestr: -1 ruler, 5 TC, 0 m:s, 2 bars, 3 sec, 4 smp, 8 frames
 local dock_state   = num('dock', 0)
 local win_x, win_y = num('x', 200), num('y', 200)
 
@@ -177,7 +178,11 @@ local function ruler_unit()
   local _, colons = s:gsub(':', '')
   if colons >= 3 then return 'Timecode' end
   if colons >= 1 then return 'Min:Secs' end
-  if s:match('^%-?%d+$') then return 'Samples' end
+  if s:match('^%-?%d+$') then -- samples or absolute frames: 1 second = the sample rate / the frame rate
+    local one = tonumber(r.format_timestr_pos(1, '', -1)) or 0
+    if one < 1000 then return 'Timecode' end -- absolute frames: the frame-based Grid / Nudge
+    return 'Samples'
+  end
   return 'Min:Secs' -- seconds: the nearest Grid / Nudge unit
 end
 
@@ -458,20 +463,20 @@ local function context_menu()
   local items = {
     m(-1, time_mode) .. 'Time: Follow ruler unit (all values + Grid / Nudge; not the transport clock)', m(5, time_mode) .. 'Time: Timecode',
     m(0, time_mode) .. 'Time: Min:Secs', m(2, time_mode) .. 'Time: Measures.Beats',
-    m(3, time_mode) .. 'Time: Seconds', m(4, time_mode) .. 'Time: Samples', '',
+    m(3, time_mode) .. 'Time: Seconds', m(4, time_mode) .. 'Time: Samples', m(8, time_mode) .. 'Time: Frames', '',
     m(12, font_size) .. 'Font: Small', m(14, font_size) .. 'Font: Medium',
     m(16, font_size) .. 'Font: Large', m(20, font_size) .. 'Font: XL', '',
     docked and 'Undock' or 'Dock', 'Close',
   }
   local ret = menu_at(items)
-  local modes = { -1, 5, 0, 2, 3, 4 }
+  local modes = { -1, 5, 0, 2, 3, 4, 8 }
   local fonts = { 12, 14, 16, 20 }
-  if ret >= 1 and ret <= 6 then time_mode = modes[ret]; last_key = nil; cur_w = 0
-  elseif ret >= 7 and ret <= 10 then font_size = fonts[ret - 6]; cur_w = 0
-  elseif ret == 11 then
+  if ret >= 1 and ret <= 7 then time_mode = modes[ret]; last_key = nil; cur_w = 0
+  elseif ret >= 8 and ret <= 11 then font_size = fonts[ret - 7]; cur_w = 0
+  elseif ret == 12 then
     if docked then gfx.dock(0) else gfx.dock(1) end
     cur_w = 0
-  elseif ret == 12 then return true end
+  elseif ret == 13 then return true end
 end
 
 -- Hover info (native tooltip, shown outside the window - not cut by a short docker)

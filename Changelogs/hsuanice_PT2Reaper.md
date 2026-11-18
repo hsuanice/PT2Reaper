@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1644pre1
+
+- Counters Panel: Absolute Frames ruler recognised (Grid / Nudge in frames), Time: Frames in the menu
+
 ## 26.1118.1629pre1
 
 - Counters Panel: Follow ruler unit (Pro Tools Follow Main Time Scale) - values refresh at once and Grid / Nudge switch to the ruler's unit
