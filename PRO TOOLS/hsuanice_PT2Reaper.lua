@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1150pre1
+@version 26.1118.1156
 @author hsuanice
 @metapackage
 @provides
@@ -167,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: Edit values in white (razor), Timeline values in cyan (loop points), blue on the Time marker
+  - Release: Counters Panel colors - Edit white, Timeline one steady cyan (tested in REAPER)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

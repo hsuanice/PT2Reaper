@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1156
+
+- Release: Counters Panel colors - Edit white, Timeline one steady cyan (tested in REAPER)
+
 ## 26.1118.1150pre1
 
 - Counters Panel: Edit values in white (razor), Timeline values in cyan (loop points), blue on the Time marker
