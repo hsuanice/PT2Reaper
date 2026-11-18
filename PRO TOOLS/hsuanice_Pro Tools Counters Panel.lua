@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1705pre1
+@version 26.1118.1726
 @author hsuanice
 @noindex
 @changelog
-  - Right-click menu: Grid debug log (ReaScript console), to find out why the Grid sometimes stays on Frame. Also in this pre-release: Follow ruler unit (values + Grid / Nudge), Absolute Frames, Time: Frames.
+  - Release: Follow ruler unit (values + Grid / Nudge, incl. Absolute Frames), Time: Frames, Grid debug log in the right-click menu (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the

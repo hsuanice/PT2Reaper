@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Grid - Grid Library
-@version 26.1118.1714pre1
+@version 26.1118.1726
 @author hsuanice
 @noindex
 @changelog
-  - Frame grid read from the project setting projgridframe and turned off by writing it (SWS): on REAPER 7.86+dev command 40904 only turns it on and its toggle state stays on, so the Grid stayed on Frame after leaving 1 frame. Debug log shows projgridframe.
+  - Release: Frame grid read and switched through projgridframe - the Grid no longer stays on Frame on REAPER 7.86 (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Library for grid mode handling, parallel to hsuanice_PT_Nudge.lua.

@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1714pre1
+@version 26.1118.1726
 @author hsuanice
 @metapackage
 @provides
@@ -171,7 +171,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Grid: Frame grid turned off through the project setting (REAPER 7.86: 40904 only sets it) - fixes the Grid stuck on Frame
+  - Release: Grid no longer stuck on Frame (REAPER 7.86); Counters Panel follows the ruler unit (tested in REAPER)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
