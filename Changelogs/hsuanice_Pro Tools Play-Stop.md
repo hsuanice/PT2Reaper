@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1118.2039
+
+- Release: QuickPunch on, Space plays from the pre-roll and stops at the Timeline Selection end + post-roll (tested in REAPER).
+
 ## 26.1118.1937pre1
 
 - QuickPunch on: Space plays from the pre-roll and stops at the Timeline Selection end + post-roll.

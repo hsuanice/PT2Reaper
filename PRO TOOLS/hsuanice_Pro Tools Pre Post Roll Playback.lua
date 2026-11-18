@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Pre Post Roll Playback
-@version 26.1118.1937pre1
+@version 26.1118.2039
 @author hsuanice
 @noindex
 @changelog
-  - The rolls are used for recording too; turning them on turns REAPER's own pre-roll off.
+  - Release: the rolls are used for recording too; turning them on turns REAPER's own pre-roll off (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Pre Post Roll Playback**

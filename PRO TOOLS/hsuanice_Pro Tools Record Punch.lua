@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Record Punch
-@version 26.1118.2035pre1
+@version 26.1118.2039
 @author hsuanice
 @noindex
 @changelog
-  - Recording that stops by itself with Insertion Follows Playback on: the Time position goes where it stopped (Timeline Selection end + post-roll).
+  - Release: Record with the Pro Tools rolls, QuickPunch on or off - pre-roll, only the Timeline Selection recorded, stop at its end + post-roll; N on: Time position where it stopped (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Record Punch**

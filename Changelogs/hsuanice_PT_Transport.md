@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1118.2039
+
+- Release: recording uses the Pro Tools rolls; turning a roll on turns REAPER's own pre-roll off (tested in REAPER).
+
 ## 26.1118.2035pre1
 
 - Recording that stops by itself with Insertion Follows Playback on: the Time position goes where it stopped (Timeline Selection end + post-roll).

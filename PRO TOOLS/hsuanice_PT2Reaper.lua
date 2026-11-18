@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.2035pre1
+@version 26.1118.2039
 @author hsuanice
 @metapackage
 @provides
@@ -171,7 +171,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Record auto stop, N on: the Time position goes where it stopped (end + post-roll).
+  - Release: recording uses the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K), QuickPunch on or off (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

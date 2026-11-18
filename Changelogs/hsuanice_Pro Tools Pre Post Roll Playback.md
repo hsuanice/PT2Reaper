@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Pre Post Roll Playback
 
+## 26.1118.2039
+
+- Release: the rolls are used for recording too; turning them on turns REAPER's own pre-roll off (tested in REAPER).
+
 ## 26.1118.1937pre1
 
 - The rolls are used for recording too; turning them on turns REAPER's own pre-roll off.

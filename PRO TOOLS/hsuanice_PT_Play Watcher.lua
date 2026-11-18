@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
-@version 26.1118.1937pre1
+@version 26.1118.2039
 @author hsuanice
 @noindex
 @changelog
-  - Recording: stops at the Timeline Selection end + post-roll; REAPER's own Record is trimmed to the record range when it has stopped.
+  - Release: recording stops at the Timeline Selection end + post-roll; REAPER's own Record is trimmed to the record range (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Background helper of Play/Stop, Play Edit Selection and Play Timeline Selection.

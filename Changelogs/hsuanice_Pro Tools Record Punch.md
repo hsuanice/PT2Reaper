@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Record Punch
 
+## 26.1118.2039
+
+- Release: Record with the Pro Tools rolls, QuickPunch on or off - pre-roll, only the Timeline Selection recorded, stop at its end + post-roll; N on: Time position where it stopped (tested in REAPER).
+
 ## 26.1118.2035pre1
 
 - Recording that stops by itself with Insertion Follows Playback on: the Time position goes where it stopped (Timeline Selection end + post-roll).

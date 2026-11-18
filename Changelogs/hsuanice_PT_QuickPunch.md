@@ -2,6 +2,10 @@
 
 hsuanice_PT_QuickPunch - QuickPunch Library (PT2Reaper)
 
+## 26.1118.2039
+
+- Release: the pass uses the Pro Tools rolls and the Timeline Selection as the record range (tested in REAPER).
+
 ## 26.1118.1937pre1
 
 - start_pass takes the Pro Tools rolls (pre-roll, Timeline Selection as the record range) instead of REAPER's pre-roll.
