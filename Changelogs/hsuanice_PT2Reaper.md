@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1629pre1
+
+- Counters Panel: Follow ruler unit (Pro Tools Follow Main Time Scale) - values refresh at once and Grid / Nudge switch to the ruler's unit
+
 ## 26.1118.1546
 
 - Release: Extend Edit Selection Up / Down Including Folder Siblings (tested in REAPER and Pro Tools)

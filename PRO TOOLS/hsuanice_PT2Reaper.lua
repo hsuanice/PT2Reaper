@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1546
+@version 26.1118.1629pre1
 @author hsuanice
 @metapackage
 @provides
@@ -171,7 +171,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Extend Edit Selection Up / Down Including Folder Siblings (tested in REAPER and Pro Tools)
+  - Counters Panel: Follow ruler unit (Pro Tools Follow Main Time Scale) - values refresh at once and Grid / Nudge switch to the ruler's unit
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

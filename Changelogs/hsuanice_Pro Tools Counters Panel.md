@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1629pre1
+
+- Time: Follow ruler unit (Pro Tools Follow Main Time Scale): every value refreshes as soon as the ruler's unit changes, and Grid / Nudge switch to that unit (nearest preset). The transport's big clock is not followed (REAPER keeps it separately).
+
 ## 26.1118.1203
 
 - Release: Timeline values white with Link Timeline and Edit Selection on, cyan when off (tested in REAPER).

@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1203
+@version 26.1118.1629pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: Timeline values white with Link Timeline and Edit Selection on, cyan when off (tested in REAPER).
+  - Time: Follow ruler unit (Pro Tools Follow Main Time Scale): every value refreshes as soon as the ruler's unit changes, and Grid / Nudge switch to that unit (nearest preset). The transport's big clock is not followed (REAPER keeps it separately).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -30,7 +30,10 @@
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
     type a new length. Hover for a reminder. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
-  - Right-click: time format, font size, dock / undock, close. Dock state, position, font size
+  - Right-click: time format, font size, dock / undock, close. "Follow ruler unit" (Pro Tools
+    Follow Main Time Scale) shows every value in the arrange ruler's unit - not the transport's
+    big clock, which REAPER keeps separately - and switches Grid / Nudge to the same unit
+    (nearest preset) whenever the ruler's unit changes. Dock state, position, font size
     and time format are remembered.
 
   Combines hsuanice's "Grid Nudge Panel" and "Count Items and Tracks - Selection HUD"
@@ -164,9 +167,66 @@ local function pos(t) return r.format_timestr_pos(t, '', time_mode) end
 local function len(a, b) return r.format_timestr_len(b - a, '', a, time_mode) end
 local function triple(a, b) return { pos(a), pos(b), len(a, b) } end
 
+-- Time: Follow ruler (Pro Tools "Follow Main Time Scale"): the ruler's unit - the arrange
+-- ruler, not the transport's big clock (REAPER can show several units at once) - is used for
+-- every value, and Grid / Nudge switch to the same unit (nearest preset) when it changes.
+local function ruler_unit()
+  local s = r.format_timestr_pos(3723.5, '', -1)
+  if s:find('+', 1, true) then return 'Feet+Frames' end
+  if s:match('^%-?%d+%.%d+%.%d+') then return 'Measure' end -- measures.beats (+ time)
+  local _, colons = s:gsub(':', '')
+  if colons >= 3 then return 'Timecode' end
+  if colons >= 1 then return 'Min:Secs' end
+  if s:match('^%-?%d+$') then return 'Samples' end
+  return 'Min:Secs' -- seconds: the nearest Grid / Nudge unit
+end
+
+-- the preset of `list` nearest (ratio) to `sec` seconds
+local function nearest(list, to_sec, sec)
+  local best, bd = 1, math.huge
+  for i, p in ipairs(list) do
+    local v = to_sec(p)
+    local d = (v > 0 and sec > 0) and math.abs(math.log(v / sec)) or math.abs(v - sec)
+    if d < bd then best, bd = i, d end
+  end
+  return best
+end
+
+local function grid_sec(mode, p)
+  if not p then return 0 end
+  if mode == 'Measure' then
+    local bpm = r.GetProjectTimeSignature2(0)
+    if not bpm or bpm <= 0 then bpm = 120 end
+    return (p.div or 1) * 240 / bpm
+  end
+  return Grid.preset_to_seconds(p)
+end
+
+local last_unit
+local function follow_ruler()
+  if time_mode ~= -1 then last_unit = nil; return end
+  local u = ruler_unit()
+  if u == last_unit then return end
+  last_unit = u
+  local gm, gi = Grid.get_state()
+  local gp = Grid.PRESETS[u]
+  if gm ~= u and gp then
+    local sec = grid_sec(gm, Grid.get_preset(gm, gi))
+    Grid.apply(u, nearest(gp, function(p) return grid_sec(u, p) end, sec))
+  end
+  local nm, ni = Nudge.get_state()
+  local np = Nudge.PRESETS[u]
+  if nm ~= u and np then
+    local sec = math.abs(Nudge.calc_delta_sec(Nudge.get_preset(nm, ni)))
+    Nudge.set_state(u, nearest(np, function(p) return math.abs(Nudge.calc_delta_sec(p)) end, sec))
+  end
+  last_key = nil
+end
+
 local function scan(now)
   if now < next_scan then return end
   next_scan = now + 0.1
+  follow_ruler()
   SM.watch(now) -- remembers the previous Edit Selection for Restore Last Selection
   local cur = r.GetCursorPosition()
   local es, ee = T.edit_range()
@@ -174,7 +234,8 @@ local function scan(now)
   local key = table.concat({ r.GetProjectStateChangeCount(0), r.CountSelectedMediaItems(0),
     r.CountSelectedTracks(0), cur, es or '-', ee or '-', ls or '-', le or '-', time_mode,
     r.GetExtState(T.NS, 'preroll'), r.GetExtState(T.NS, 'postroll'),
-    r.GetExtState(T.NS, 'preroll_on'), r.GetExtState(T.NS, 'postroll_on'), T.linked() and 1 or 0 }, '|')
+    r.GetExtState(T.NS, 'preroll_on'), r.GetExtState(T.NS, 'postroll_on'), T.linked() and 1 or 0,
+    time_mode == -1 and r.format_timestr_pos(3723.5, '', -1) or '' }, '|') -- the ruler's unit changed
   if key == last_key then return end
   last_key = key
   -- the Time marker (Link off, no Timeline Selection) is the Timeline position; with a
@@ -395,7 +456,7 @@ local function context_menu()
   local function m(v, cur) return v == cur and '!' or '' end
   local docked = gfx.dock(-1) ~= 0
   local items = {
-    m(-1, time_mode) .. 'Time: Follow ruler', m(5, time_mode) .. 'Time: Timecode',
+    m(-1, time_mode) .. 'Time: Follow ruler unit (all values + Grid / Nudge; not the transport clock)', m(5, time_mode) .. 'Time: Timecode',
     m(0, time_mode) .. 'Time: Min:Secs', m(2, time_mode) .. 'Time: Measures.Beats',
     m(3, time_mode) .. 'Time: Seconds', m(4, time_mode) .. 'Time: Samples', '',
     m(12, font_size) .. 'Font: Small', m(14, font_size) .. 'Font: Medium',
