@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1058pre1
+
+- Counters Panel: the Grid is checked again for 5 s after REAPER starts / a project opens (it could still be loading the project's Frame grid)
+
 ## 26.1118.0119
 
 - Release: the Time marker is named with the timecode of its position (tested in REAPER)

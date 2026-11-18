@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1058pre1
+
+- The Grid is checked again every 0.5 s for 5 s after REAPER starts / a project opens: the project's own grid (e.g. Frame) could still be loading at the first check.
+
 ## 26.1118.0059
 
 - Release: Time marker shown and kept tidy; Link on, dragged loop points clear stale razor areas (tested in REAPER).

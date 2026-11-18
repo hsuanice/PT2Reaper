@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.0059
+@version 26.1118.1058pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: Time marker shown and kept tidy; Link on, dragged loop points clear stale razor areas (tested in REAPER).
+  - The Grid is checked again every 0.5 s for 5 s after REAPER starts / a project opens: the project's own grid (e.g. Frame) could still be loading at the first check.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -448,23 +448,34 @@ end
 -- A project was opened / another project tab chosen (or REAPER started): REAPER loads the
 -- grid stored in that project; put the Grid the user chose back (Pro Tools: the Grid
 -- follows the user). Only when it differs.
+-- REAPER may still be loading the project (its grid) when the Panel looks - at startup the
+-- Panel can run before the project is applied - so the grid is checked again every 0.5 s for
+-- 5 s after a project change (only while it differs; a later change of the grid is left alone).
 local last_proj
-local function follow_project()
+local GRID_WATCH, GRID_EVERY = 5, 0.5
+local grid_until, grid_next = 0, 0
+local function follow_project(now)
   local proj, fn = r.EnumProjects(-1)
   local key = tostring(proj) .. '|' .. (fn or '')
-  if key == last_proj then return end
-  last_proj = key
-  SM.reset() -- the remembered Edit Selections belong to the other project
-  if Grid.restore_saved() then last_key = nil end
+  if key ~= last_proj then
+    last_proj = key
+    SM.reset() -- the remembered Edit Selections belong to the other project
+    grid_until, grid_next = now + GRID_WATCH, now
+  end
+  if now < grid_until and now >= grid_next then
+    grid_next = now + GRID_EVERY
+    if Grid.restore_saved() then last_key = nil end
+  end
 end
 
 local prev_cap = 0
 local function loop()
   local char = gfx.getchar()
   if char == -1 then return end
-  follow_project()
+  local now = r.time_precise()
+  follow_project(now)
   linked_loop_clears_razor()
-  scan(r.time_precise())
+  scan(now)
   fit_floating()
   draw()
 
