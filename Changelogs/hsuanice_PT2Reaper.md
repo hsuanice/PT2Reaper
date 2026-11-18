@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1203
+
+- Release: Counters Panel - Timeline values white with Link on (tested in REAPER)
+
 ## 26.1118.1201pre1
 
 - Counters Panel: Timeline values white with Link on (one selection)

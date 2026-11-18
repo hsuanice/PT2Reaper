@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1201pre1
+@version 26.1118.1203
 @author hsuanice
 @noindex
 @changelog
-  - Link Timeline and Edit Selection on: the Timeline values are white like the Edit values (one selection); off: cyan.
+  - Release: Timeline values white with Link Timeline and Edit Selection on, cyan when off (tested in REAPER).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the

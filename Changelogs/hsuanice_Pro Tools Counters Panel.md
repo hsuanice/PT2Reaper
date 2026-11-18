@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1203
+
+- Release: Timeline values white with Link Timeline and Edit Selection on, cyan when off (tested in REAPER).
+
 ## 26.1118.1201pre1
 
 - Link Timeline and Edit Selection on: the Timeline values are white like the Edit values (one selection); off: cyan.
