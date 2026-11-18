@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1705pre1
+
+- Right-click menu: Grid debug log (ReaScript console), to find out why the Grid sometimes stays on Frame. Also in this pre-release: Follow ruler unit (values + Grid / Nudge), Absolute Frames, Time: Frames.
+
 ## 26.1118.1644pre1
 
 - Follow ruler unit: Absolute Frames is recognised (it was taken for Samples) - Grid / Nudge use the frame-based Timecode presets; right-click menu has Time: Frames.

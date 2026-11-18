@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1644pre1
+@version 26.1118.1705pre1
 @author hsuanice
 @metapackage
 @provides
@@ -171,7 +171,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Counters Panel: Absolute Frames ruler recognised (Grid / Nudge in frames), Time: Frames in the menu
+  - Counters Panel: Grid debug log in the right-click menu
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

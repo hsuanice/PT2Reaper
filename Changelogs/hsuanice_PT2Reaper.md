@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1705pre1
+
+- Counters Panel: Grid debug log in the right-click menu
+
 ## 26.1118.1644pre1
 
 - Counters Panel: Absolute Frames ruler recognised (Grid / Nudge in frames), Time: Frames in the menu

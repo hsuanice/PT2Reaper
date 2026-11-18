@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1644pre1
+@version 26.1118.1705pre1
 @author hsuanice
 @noindex
 @changelog
-  - Follow ruler unit: Absolute Frames is recognised (it was taken for Samples) - Grid / Nudge use the frame-based Timecode presets; right-click menu has Time: Frames.
+  - Right-click menu: Grid debug log (ReaScript console), to find out why the Grid sometimes stays on Frame. Also in this pre-release: Follow ruler unit (values + Grid / Nudge), Absolute Frames, Time: Frames.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -30,7 +30,8 @@
   - Pre-roll / Post-roll: click the name to turn it on / off (green = on), click the value to
     type a new length. Hover for a reminder. Global setting, used by Play To / From / Through Edit Start / End.
   - Too narrow for one row: the sections wrap onto more rows.
-  - Right-click: time format, font size, dock / undock, close. "Follow ruler unit" (Pro Tools
+  - Right-click: time format, font size, Grid debug log (what the Grid does, in the ReaScript
+    console - for bug reports), dock / undock, close. "Follow ruler unit" (Pro Tools
     Follow Main Time Scale) shows every value in the arrange ruler's unit - not the transport's
     big clock, which REAPER keeps separately - and switches Grid / Nudge to the same unit
     (nearest preset) whenever the ruler's unit changes (Absolute Frames: the frame-based Timecode
@@ -466,6 +467,7 @@ local function context_menu()
     m(3, time_mode) .. 'Time: Seconds', m(4, time_mode) .. 'Time: Samples', m(8, time_mode) .. 'Time: Frames', '',
     m(12, font_size) .. 'Font: Small', m(14, font_size) .. 'Font: Medium',
     m(16, font_size) .. 'Font: Large', m(20, font_size) .. 'Font: XL', '',
+    ((Grid.is_debug and Grid.is_debug()) and '!' or '') .. 'Grid debug log (ReaScript console)', '',
     docked and 'Undock' or 'Dock', 'Close',
   }
   local ret = menu_at(items)
@@ -474,9 +476,11 @@ local function context_menu()
   if ret >= 1 and ret <= 7 then time_mode = modes[ret]; last_key = nil; cur_w = 0
   elseif ret >= 8 and ret <= 11 then font_size = fonts[ret - 7]; cur_w = 0
   elseif ret == 12 then
+    if Grid.set_debug then Grid.set_debug(not Grid.is_debug()) end
+  elseif ret == 13 then
     if docked then gfx.dock(0) else gfx.dock(1) end
     cur_w = 0
-  elseif ret == 13 then return true end
+  elseif ret == 14 then return true end
 end
 
 -- Hover info (native tooltip, shown outside the window - not cut by a short docker)
