@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1259pre1
+
+- Zoom To Fit Horizontal Selection: fits the Edit range (4 % margins), else centers the Edit position
+
 ## 26.1118.1203
 
 - Release: Counters Panel - Timeline values white with Link on (tested in REAPER)

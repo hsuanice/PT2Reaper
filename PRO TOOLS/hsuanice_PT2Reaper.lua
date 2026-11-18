@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1203
+@version 26.1118.1259pre1
 @author hsuanice
 @metapackage
 @provides
@@ -149,6 +149,7 @@
   [main] hsuanice_Pro Tools Undo.lua
   [main] hsuanice_Pro Tools Ungroup Clips.lua
   [main] hsuanice_Pro Tools Unloop Clips.lua
+  [main] hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua
   [main] hsuanice_Pro Tools Zoom Toggle.lua
   [nomain] hsuanice_PT_Counters Details.lua
   [nomain] hsuanice_PT_Fades.lua
@@ -167,7 +168,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Counters Panel - Timeline values white with Link on (tested in REAPER)
+  - Zoom To Fit Horizontal Selection: fits the Edit range (4 % margins), else centers the Edit position
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -333,6 +334,7 @@
   - Trim Clips Start To File Start: Cmd+Control+R
   - Undo: Z, Control+Z, Cmd+Z
   - Ungroup Clips: Cmd+Opt+U
+  - Zoom To Fit Horizontal Selection: Cmd+F5, Cmd+Control+], Opt+Control+F
   - Zoom Toggle: Control+E, E
 
   Shortcuts are suggestions only (the Pro Tools keys) - nothing is assigned automatically. macOS names; on Windows Cmd = Ctrl, Option = Alt, Control = Win.
