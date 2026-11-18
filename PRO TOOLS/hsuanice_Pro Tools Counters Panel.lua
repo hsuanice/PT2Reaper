@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1156
+@version 26.1118.1201pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: Edit Selection values in white (like razor areas), Timeline Selection values in one steady cyan (like the loop points); the Grid is checked again for 5 s after a project opens (tested in REAPER).
+  - Link Timeline and Edit Selection on: the Timeline values are white like the Edit values (one selection); off: cyan.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -19,7 +19,8 @@
     white, like razor areas.
   - Timeline Selection: the loop points (none: the Time marker (9999) with Link off, else the
     edit cursor). The marker is removed when there are loop points or Link is on. Values in
-    cyan like the loop points (also when they show the Time marker).
+    cyan like the loop points (also when they show the Time marker); white with Link Timeline
+    and Edit Selection on (one selection).
   - Link on: loop points made on their own (dragged in the ruler) replace the Edit range - razor
     areas that no longer match them are cleared (Pro Tools: one selection).
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
@@ -181,6 +182,7 @@ local function scan(now)
   local _, tp = T.time_marker()
   if tp and (ls or T.linked()) then T.clear_time_pos(); tp = nil end
   D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
+  D.linked = T.linked()
   D.edit = es and triple(es, ee) or triple(cur, cur)
   D.tl = ls and triple(ls, le) or triple(tp or cur, tp or cur)
 end
@@ -270,7 +272,8 @@ end
 
 local function sections()
   local S = {}
-  local ec, tc = C.edit, C.timeline -- [7] = value color
+  -- [7] = value color; Link on: one selection, so the Timeline is white like the Edit Selection
+  local ec, tc = C.edit, D.linked and C.edit or C.timeline
   S[#S + 1] = { { 'Start', D.edit[1], nil, nil, nil, nil, ec }, { 'End', D.edit[2], nil, nil, nil, nil, ec }, { 'Length', D.edit[3], nil, nil, nil, nil, ec } }
   local mode, idx = Nudge.get_state()
   S[#S + 1] = {

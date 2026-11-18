@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1201pre1
+
+- Link Timeline and Edit Selection on: the Timeline values are white like the Edit values (one selection); off: cyan.
+
 ## 26.1118.1156
 
 - Release: Edit Selection values in white (like razor areas), Timeline Selection values in one steady cyan (like the loop points); the Grid is checked again for 5 s after a project opens (tested in REAPER).
