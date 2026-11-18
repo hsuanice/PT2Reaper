@@ -1,11 +1,10 @@
 --[[
 @description hsuanice_PT_QuickPunch - QuickPunch Library (PT2Reaper)
-@version 26.1115.1407
+@version 26.1118.1937pre1
 @author hsuanice
 @noindex
 @changelog
-  - First release of the PT2Reaper package (all Pro Tools actions in one package).
-  - File names have no brackets any more: "Name [X]" is now "Name - X", "Clip[s]" is "Clips".
+  - start_pass takes the Pro Tools rolls (pre-roll, Timeline Selection as the record range) instead of REAPER's pre-roll.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper QuickPunch actions (Record Punch, QuickPunch,
@@ -486,7 +485,10 @@ end
 
 -- Returns "started", "none" (no armed track: the caller plays normally) or nil (cancelled / busy).
 -- `start` (optional): project time to start at (else the edit cursor).
-function C.start_pass(punch_now, start)
+-- `opts` (optional, the Pro Tools rolls): { pre = seconds of pre-roll (0 = none),
+--   range = { s, e } the Timeline Selection or nil } - Record punches exactly that range
+--   (Space: manual punches only); REAPER's pre-roll and time selection auto-punch are not used.
+function C.start_pass(punch_now, start, opts)
   C.log("start_pass punch_now", punch_now, "playstate", r.GetPlayState(), "pass_active", C.pass_active(), "mode", C.get("mode"))
   if r.GetPlayState() ~= 0 then return end
   -- the previous pass stopped but is not finished yet (the monitor waits a cycle): finish it now
@@ -513,7 +515,16 @@ function C.start_pass(punch_now, start)
   local cursor = r.GetCursorPosition()
   local base = start or cursor
   local pre
-  if #auto > 0 then
+  if opts then
+    if opts.range then
+      auto = punch_now and { { opts.range[1], opts.range[2] } } or {}
+    elseif mode == REC_AUTO_TIMESEL then
+      auto = {} -- Pro Tools: only the Timeline Selection punches
+    end
+    if #auto > 0 then base = auto[1][1] end
+    if opts.range then base = opts.range[1] end
+    pre = math.min(opts.pre or 0, base)
+  elseif #auto > 0 then
     base = auto[1][1]
     pre = C.preroll_seconds(base)
     if pre == 0 and cursor < base then pre = base - cursor end

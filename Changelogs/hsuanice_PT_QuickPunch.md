@@ -2,6 +2,10 @@
 
 hsuanice_PT_QuickPunch - QuickPunch Library (PT2Reaper)
 
+## 26.1118.1937pre1
+
+- start_pass takes the Pro Tools rolls (pre-roll, Timeline Selection as the record range) instead of REAPER's pre-roll.
+
 ## 26.1115.1407
 
 - First release of the PT2Reaper package (all Pro Tools actions in one package).

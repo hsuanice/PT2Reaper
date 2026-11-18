@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
-@version 26.1118.0059
+@version 26.1118.1937pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: Repeat keeps the edit cursor where it was (tested in REAPER).
+  - Recording: stops at the Timeline Selection end + post-roll; REAPER's own Record is trimmed to the record range when it has stopped.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Background helper of Play/Stop, Play Edit Selection and Play Timeline Selection.
@@ -16,6 +16,9 @@
   end and the Timeline Selection is cleared; off: back to the range start.
   With Repeat on, playback goes back to the range start instead.
   When asked to start after a QuickPunch pass, waits until the pass is finished.
+  Recording (Record / QuickPunch with a Timeline Selection): stops at its end + post-roll.
+  REAPER's own Record (QuickPunch mode off): when the recording has stopped, puts REAPER's
+  record settings back and trims the new items to the record range.
   Built with AI: written with Claude Code (Anthropic); designed and tested by hsuanice.
 --]]
 
@@ -35,8 +38,41 @@ local function finish()
   r.SetExtState(T.NS, "watcher_hb", "", false)
 end
 
+-- a recording with the Pro Tools rolls (Record / QuickPunch): stop at the Timeline Selection
+-- end + post-roll; native recording: REAPER's settings back + trim once it has stopped
+local rec_started, rec_stopped, rec_t0 = false, 0, nil
+local function rec_step()
+  rec_t0 = rec_t0 or r.time_precise()
+  local kind = T.rec_kind()
+  local st = r.GetPlayState()
+  if not rec_started then
+    if st & 4 == 4 then rec_started = true
+    elseif r.time_precise() - rec_t0 > 3 then -- never started
+      if kind == "native" then T.record_finish() end
+      T.rec_clear(); return false
+    end
+    return true
+  end
+  if st & 4 == 0 then
+    rec_stopped = rec_stopped + 1
+    if rec_stopped >= 2 then -- give REAPER a cycle to add the recorded items
+      if kind == "native" then T.record_finish() end
+      T.rec_clear(); return false
+    end
+    return true
+  end
+  rec_stopped = 0
+  local stop_at = tonumber(r.GetExtState(T.NS, "rec_stop"))
+  if stop_at and r.GetPlayPosition() >= stop_at - EPS then T.record_end(QP) end
+  return true
+end
+
 local function loop()
   r.SetExtState(T.NS, "watcher_hb", string.format("%.3f", r.time_precise()), false)
+  if T.rec_kind() then
+    if rec_step() then return r.defer(loop) end
+    rec_started, rec_stopped, rec_t0 = false, 0, nil
+  end
   local w = r.GetExtState(T.NS, "watch")
   if w ~= last_watch then last_watch, seen_running, since = w, false, r.time_precise() end
   local s, e = T.watch_get()

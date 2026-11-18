@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Play/Stop
 
+## 26.1118.1937pre1
+
+- QuickPunch on: Space plays from the pre-roll and stops at the Timeline Selection end + post-roll.
+
 ## 26.1117.1552
 
 - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).

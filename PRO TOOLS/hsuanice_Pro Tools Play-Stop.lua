@@ -1,12 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Play/Stop
-@version 26.1117.1552
+@version 26.1118.1937pre1
 @author hsuanice
 @noindex
 @changelog
-  - Insertion Follows Playback on with pre-roll / post-roll: stops at the post-roll end and clears the Timeline Selection, as without the rolls (26.1117.1532pre1 kept the selections - reverted).
-  - Fix: with QuickPunch mode on and no armed track, Space now plays the Timeline Selection and stops at its end (it played on).
-  - Pre-roll / post-roll on (Counters Panel, Cmd+K): plays from the pre-roll before the Timeline Selection to the post-roll after it; without one, starts the pre-roll before the playhead. The playhead stays where it is.
+  - QuickPunch on: Space plays from the pre-roll and stops at the Timeline Selection end + post-roll.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Play/Stop**
@@ -59,7 +57,10 @@ if T.is_running() then
   if T.follows() then T.clear_timeline() end -- Pro Tools: N on clears the Timeline Selection
 elseif QP.mode_on() then
   -- no armed track: no pass, the same playback as with QuickPunch mode off
-  if QP.start_pass(false, T.start_position()) == "none" then play_timeline() end
+  -- the Pro Tools rolls: pre-roll before the start; a Timeline Selection stops at its end + post-roll
+  local plan = T.record_plan()
+  local res = QP.start_pass(false, plan.base, { pre = plan.pre, range = plan.s and { plan.s, plan.e } or nil })
+  if res == "started" then T.watch_record("qp", plan) elseif res == "none" then play_timeline() end
 else
   play_timeline()
 end

@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Record Punch
 
+## 26.1118.1937pre1
+
+- Record with the Pro Tools rolls (QuickPunch on or off): pre-roll before the Time position / Timeline Selection, only the Timeline Selection is recorded, stops at its end + post-roll.
+
 ## 26.1115.1407
 
 - First release of the PT2Reaper package (all Pro Tools actions in one package).

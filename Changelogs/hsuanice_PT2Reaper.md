@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1937pre1
+
+- Recording uses the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K), QuickPunch on or off.
+
 ## 26.1118.1726
 
 - Release: Grid no longer stuck on Frame (REAPER 7.86); Counters Panel follows the ruler unit (tested in REAPER)

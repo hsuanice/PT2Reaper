@@ -2,6 +2,10 @@
 
 hsuanice_PT_Transport - Transport Library (PT2Reaper)
 
+## 26.1118.1937pre1
+
+- Recording uses the Pro Tools rolls (record_plan / record_native / record_end / record_finish); turning a roll on turns REAPER's own pre-roll off.
+
 ## 26.1118.0119
 
 - Release: the Time marker (9999) is named with the timecode of its position (tested in REAPER).

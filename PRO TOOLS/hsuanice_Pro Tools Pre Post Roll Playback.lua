@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Pre Post Roll Playback
-@version 26.1117.1552
+@version 26.1118.1937pre1
 @author hsuanice
 @noindex
 @changelog
-  - First working version (was a placeholder): one toggle for the pre-roll and the post-roll.
+  - The rolls are used for recording too; turning them on turns REAPER's own pre-roll off.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Pre Post Roll Playback**
@@ -16,8 +16,12 @@
   Selection (the loop points) and stop the post-roll length after it; without a Timeline
   Selection, playback starts the pre-roll length before the playhead. The playhead stays
   where it is. The Edit Selection is not affected (Play Edit Selection plays it as it is).
-  The toolbar button is lit while a roll is on. Recording (QuickPunch) still uses REAPER's
-  own pre-roll setting.
+  Recording (Record Punch, QuickPunch on or off) uses the same rolls: from the pre-roll
+  before the Timeline Selection / Time position; a Timeline Selection is recorded alone and
+  playback stops the post-roll length after it.
+  Turning a roll on turns REAPER's own pre-roll (Metronome and pre-roll settings) off, so
+  the two do not add up; the metronome is not touched.
+  The toolbar button is lit while a roll is on.
 
   Self-contained: uses hsuanice_PT_Transport.lua (same folder).
   - Tags : Options menu, Transport

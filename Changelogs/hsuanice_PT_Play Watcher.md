@@ -2,6 +2,10 @@
 
 hsuanice_PT_Play Watcher - stops playback at the end of a played selection (PT2Reaper)
 
+## 26.1118.1937pre1
+
+- Recording: stops at the Timeline Selection end + post-roll; REAPER's own Record is trimmed to the record range when it has stopped.
+
 ## 26.1118.0059
 
 - Release: Repeat keeps the edit cursor where it was (tested in REAPER).

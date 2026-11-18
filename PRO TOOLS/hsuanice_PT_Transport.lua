@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Transport - Transport Library (PT2Reaper)
-@version 26.1118.0119
+@version 26.1118.1937pre1
 @author hsuanice
 @noindex
 @changelog
-  - Release: the Time marker (9999) is named with the timecode of its position (tested in REAPER).
+  - Recording uses the Pro Tools rolls (record_plan / record_native / record_end / record_finish); turning a roll on turns REAPER's own pre-roll off.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Shared code of the PT2Reaper transport scripts (Play-Stop, Play Half Speed,
@@ -334,7 +334,17 @@ function T.set_roll(which, sec, on)
   if sec then r.SetExtState(T.NS, which, string.format("%.10f", math.max(0, sec)), true) end
   if on ~= nil then
     r.SetExtState(T.NS, which .. "_on", on and "1" or "0", true)
+    if on then T.builtin_rolls_off() end
     T.refresh_rolls_button()
+  end
+end
+
+-- REAPER's own pre-roll (Metronome and pre-roll settings) would add to ours: turned off when
+-- a Pro Tools roll is turned on (the metronome itself is not touched)
+local CMD_PREROLL_PLAY, CMD_PREROLL_REC = 41818, 41819
+function T.builtin_rolls_off()
+  for _, c in ipairs({ CMD_PREROLL_PLAY, CMD_PREROLL_REC }) do
+    if r.GetToggleCommandState(c) == 1 then r.Main_OnCommand(c, 0) end
   end
 end
 
@@ -412,6 +422,157 @@ function T.play_around_edit(edge, how, QP)
   local home = T.watch_home() or cur
   if not T.is_running() then home = cur end
   T.play_range(s, e, false, home)
+end
+
+------------------------------------------------------------------------------
+-- Record with the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K)
+--   No Timeline Selection : plays from the Time position - pre-roll, records from the Time
+--                           position until stopped
+--   Timeline Selection    : plays from its start - pre-roll, records only the selection,
+--                           stops at its end + post-roll (Play Watcher). Insertion Follows
+--                           Playback on: the Timeline position goes to the selection end and
+--                           the selection is cleared; off: everything stays.
+-- QuickPunch mode on: the QuickPunch pass does the recording (it gets plan.pre / range).
+-- Off: REAPER's own Record from the pre-roll start; when it is finished the new items are
+-- trimmed to the record range (the pre-roll / post-roll parts are not kept, as Pro Tools).
+-- REAPER's own pre-roll and "edit cursor to end of recording" are off
+-- during the recording and put back after it.
+------------------------------------------------------------------------------
+local CMD_RECORD, CMD_STOP_SAVE_ALL = 1013, 40667
+local CMD_ENDCUR_REC = 40300 -- Options: Move edit cursor to end of recording
+
+function T.record_plan()
+  local ls, le = T.timeline_range()
+  local base = ls or T.time_pos() or r.GetCursorPosition()
+  local pre, pon = T.roll("preroll")
+  local post, qon = T.roll("postroll")
+  local from = math.max(0, base - (pon and pre or 0))
+  return {
+    base = base, from = from, pre = base - from, s = ls, e = le,
+    stop_at = le and (le + (qon and post or 0)) or nil,
+    home = T.home_for(base),
+  }
+end
+
+local REC_KEYS = { "rec_kind", "rec_base", "rec_from", "rec_s", "rec_e", "rec_stop", "rec_home",
+                   "rec_preroll", "rec_endcur", "rec_items", "rec_ended" }
+local function rset(k, v) r.SetExtState(T.NS, k, v == nil and "" or tostring(v), false) end
+local function rget(k) return r.GetExtState(T.NS, k) end
+local function rnum(k) return tonumber(rget(k)) end
+local function fmt(x) return x and string.format("%.10f", x) or "" end
+function T.rec_clear() for _, k in ipairs(REC_KEYS) do rset(k, "") end end
+function T.rec_kind() local k = rget("rec_kind"); return k ~= "" and k or nil end
+
+-- after a recording has started: the Play Watcher stops it and finishes it
+function T.watch_record(kind, plan)
+  rset("rec_kind", kind)
+  rset("rec_base", fmt(plan.base)); rset("rec_from", fmt(plan.from))
+  rset("rec_s", fmt(plan.s)); rset("rec_e", fmt(plan.e))
+  rset("rec_stop", fmt(plan.stop_at)); rset("rec_home", fmt(plan.home))
+  rset("rec_ended", "")
+  T.watch_clear()
+  ensure_watcher()
+end
+
+local function item_guid(it) local _, g = r.GetSetMediaItemInfo_String(it, "GUID", "", false); return g end
+local function armed_tracks()
+  local t = {}
+  for i = 0, r.CountTracks(0) - 1 do
+    local tr = r.GetTrack(0, i)
+    if r.GetMediaTrackInfo_Value(tr, "I_RECARM") == 1 then t[#t + 1] = tr end
+  end
+  return t
+end
+
+-- QuickPunch mode off: REAPER's own Record with the Pro Tools rolls
+function T.record_native()
+  -- (REAPER's auto-punch record modes count as QuickPunch on: here the mode is normal)
+  local plan = T.record_plan()
+  local pr = r.GetToggleCommandState(CMD_PREROLL_REC) == 1
+  rset("rec_preroll", pr and "1" or ""); if pr then r.Main_OnCommand(CMD_PREROLL_REC, 0) end
+  local ec = r.GetToggleCommandState(CMD_ENDCUR_REC) == 1
+  rset("rec_endcur", ec and "1" or ""); if ec then r.Main_OnCommand(CMD_ENDCUR_REC, 0) end
+  local old = {}
+  for _, tr in ipairs(armed_tracks()) do
+    for j = 0, r.CountTrackMediaItems(tr) - 1 do old[#old + 1] = item_guid(r.GetTrackMediaItem(tr, j)) end
+  end
+  rset("rec_items", table.concat(old, " "))
+  r.SetEditCurPos2(0, plan.from, false, false)
+  r.Main_OnCommand(CMD_RECORD, 0)
+  r.SetEditCurPos2(0, plan.home, false, false) -- the playhead stays home (no seek)
+  T.watch_record("native", plan)
+end
+
+-- Play Watcher: playback reached the stop point (Timeline Selection end + post-roll)
+function T.record_end(QP)
+  if rget("rec_ended") == "1" then return end
+  rset("rec_ended", "1")
+  local e, home = rnum("rec_e"), rnum("rec_home") or rnum("rec_base")
+  local follows, linked = T.follows(), T.linked()
+  local cur = (follows and linked and e) or home
+  if QP and QP.pass_active() then
+    QP.set("stop_cursor", fmt(cur))
+    QP.stop()
+  else
+    r.Main_OnCommand(CMD_STOP_SAVE_ALL, 0)
+    r.SetEditCurPos2(0, cur, false, false)
+  end
+  if follows and e then
+    if not linked then T.set_time_pos(e) end -- the record end, not where it stopped
+    T.clear_timeline()
+  end
+  r.UpdateArrange()
+end
+
+-- Play Watcher: a native recording has stopped (by itself or by the user) - REAPER's
+-- settings back, the new items trimmed to the record range
+function T.record_finish()
+  if rget("rec_preroll") == "1" and r.GetToggleCommandState(CMD_PREROLL_REC) ~= 1 then r.Main_OnCommand(CMD_PREROLL_REC, 0) end
+  if rget("rec_endcur") == "1" and r.GetToggleCommandState(CMD_ENDCUR_REC) ~= 1 then r.Main_OnCommand(CMD_ENDCUR_REC, 0) end
+  local base, from, e = rnum("rec_base"), rnum("rec_from"), rnum("rec_e")
+  local old = {}
+  for g in rget("rec_items"):gmatch("%S+") do old[g] = true end
+  local new = {}
+  for _, tr in ipairs(armed_tracks()) do
+    for j = 0, r.CountTrackMediaItems(tr) - 1 do
+      local it = r.GetTrackMediaItem(tr, j)
+      if not old[item_guid(it)] then new[#new + 1] = it end
+    end
+  end
+  local cut = false
+  for _, it in ipairs(new) do
+    local a = r.GetMediaItemInfo_Value(it, "D_POSITION")
+    local b = a + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+    if (base and a < base - EPS) or (e and b > e + EPS) then cut = true end
+  end
+  if cut then
+    r.Undo_BeginBlock()
+    for _, it in ipairs(new) do
+      local a = r.GetMediaItemInfo_Value(it, "D_POSITION")
+      local b = a + r.GetMediaItemInfo_Value(it, "D_LENGTH")
+      local ns, ne = math.max(a, base or a), math.min(b, e or b)
+      if ne <= ns + EPS then
+        r.DeleteTrackMediaItem(r.GetMediaItem_Track(it), it)
+      elseif ns > a + EPS or ne < b - EPS then
+        for k = 0, r.CountTakes(it) - 1 do
+          local tk = r.GetTake(it, k)
+          if tk then
+            local rate = r.GetMediaItemTakeInfo_Value(tk, "D_PLAYRATE")
+            r.SetMediaItemTakeInfo_Value(tk, "D_STARTOFFS",
+              r.GetMediaItemTakeInfo_Value(tk, "D_STARTOFFS") + (ns - a) * rate)
+          end
+        end
+        r.SetMediaItemInfo_Value(it, "D_POSITION", ns)
+        r.SetMediaItemInfo_Value(it, "D_LENGTH", ne - ns)
+      end
+    end
+    r.Undo_EndBlock("Pro Tools: Record - trim to the record range", -1)
+  end
+  -- the edit cursor was moved to the pre-roll start for Record: back home
+  if from and math.abs(r.GetCursorPosition() - from) < 1e-6 then
+    r.SetEditCurPos2(0, rnum("rec_home") or base, false, false)
+  end
+  r.UpdateArrange()
 end
 
 return T
