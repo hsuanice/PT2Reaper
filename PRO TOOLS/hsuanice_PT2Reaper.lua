@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1259pre1
+@version 26.1118.1303
 @author hsuanice
 @metapackage
 @provides
@@ -168,7 +168,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Zoom To Fit Horizontal Selection: fits the Edit range (4 % margins), else centers the Edit position
+  - Release: Zoom To Fit Horizontal Selection (tested in REAPER and Pro Tools)
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

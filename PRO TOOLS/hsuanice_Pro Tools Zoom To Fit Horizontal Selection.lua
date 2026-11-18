@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Zoom To Fit Horizontal Selection
-@version 26.1118.1259pre1
+@version 26.1118.1303
 @author hsuanice
 @noindex
 @changelog
-  - First version (was a placeholder): Pro Tools behaviour - fits the Edit range, else centers the Edit position.
+  - Release: fits the Edit range with 4 % margins, else centers the Edit position; horizontal only, no toggle (tested in REAPER and Pro Tools).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Replicates Pro Tools: **Zoom To Fit Horizontal Selection**

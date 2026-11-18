@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1303
+
+- Release: Zoom To Fit Horizontal Selection (tested in REAPER and Pro Tools)
+
 ## 26.1118.1259pre1
 
 - Zoom To Fit Horizontal Selection: fits the Edit range (4 % margins), else centers the Edit position
