@@ -2,6 +2,10 @@
 
 hsuanice_PT_Grid - Grid Library
 
+## 26.1118.1714pre1
+
+- Frame grid read from the project setting projgridframe and turned off by writing it (SWS): on REAPER 7.86+dev command 40904 only turns it on and its toggle state stays on, so the Grid stayed on Frame after leaving 1 frame. Debug log shows projgridframe.
+
 ## 26.1117.2017
 
 - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.

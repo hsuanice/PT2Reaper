@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_PT_Grid - Grid Library
-@version 26.1117.2017
+@version 26.1118.1714pre1
 @author hsuanice
 @noindex
 @changelog
-  - The Grid follows the user (Pro Tools): when a project opens or another project tab is chosen with a different grid saved in it (e.g. Frame), the chosen Grid is put back.
+  - Frame grid read from the project setting projgridframe and turned off by writing it (SWS): on REAPER 7.86+dev command 40904 only turns it on and its toggle state stays on, so the Grid stayed on Frame after leaving 1 frame. Debug log shows projgridframe.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Library for grid mode handling, parallel to hsuanice_PT_Nudge.lua.
@@ -95,6 +95,31 @@ local DEFAULT_IDX = {
 }
 
 local M = {}
+
+-- REAPER's Frame grid. Read from the project setting "projgridframe" (bit 1): on REAPER
+-- 7.86+dev command 40904 is "Grid: Set framerate grid" - it only turns it ON, and its toggle
+-- state stays ON (hsuanice's debug log 261118). Turned off by writing the setting (SWS
+-- SNM_SetIntConfigVar); without SWS, command 40904 as before.
+local function frame_cfg()
+  if not r.get_config_var_string then return nil end
+  local ok, v = r.get_config_var_string('projgridframe')
+  if ok then return tonumber(v) end
+end
+function M.frame_on()
+  local v = frame_cfg()
+  if v then return v & 1 == 1 end
+  return r.GetToggleCommandState(40904) == 1
+end
+function M.set_frame(on)
+  if M.frame_on() == on then return end
+  local v = frame_cfg()
+  if v and r.SNM_SetIntConfigVar then
+    r.SNM_SetIntConfigVar('projgridframe', on and (v | 1) or (v & ~1))
+    r.UpdateTimeline()
+    if M.frame_on() == on then return end
+  end
+  r.Main_OnCommand(40904, 0) -- set / toggle (older REAPER)
+end
 M.MODES       = GRID_MODES
 M.PRESETS     = GRID_PRESETS
 M.DEFAULT_IDX = DEFAULT_IDX
@@ -125,11 +150,12 @@ function M.is_debug()
 end
 
 local function snapshot()
-  local frame_on = r.GetToggleCommandState(40904) == 1
+  local frame_on = M.frame_on()
   local _, gd, sw = r.GetSetProjectGrid(0, 0)
   local bpm = r.GetProjectTimeSignature2(0) or 0
-  return string.format('40904=%s grid_div=%.6f swing=%d bpm=%.2f',
-    frame_on and 'ON' or 'OFF', gd or 0, sw or 0, bpm)
+  return string.format('frame=%s (projgridframe=%s 40904=%s) grid_div=%.6f swing=%d bpm=%.2f',
+    frame_on and 'ON' or 'OFF', tostring(frame_cfg()), r.GetToggleCommandState(40904) == 1 and 'ON' or 'OFF',
+    gd or 0, sw or 0, bpm)
 end
 
 local function dbg(fmt, ...)
@@ -197,7 +223,7 @@ function M.in_sync()
   local mode, idx = M.get_state()
   local p = M.get_preset(mode, idx)
   if not p then return true end
-  local frame_on = r.GetToggleCommandState(40904) == 1
+  local frame_on = M.frame_on()
   if p.native_frame then return frame_on end
   if frame_on then return false end
   local _, div = r.GetSetProjectGrid(0, 0)
@@ -310,12 +336,12 @@ end
 -- stays OFF, or after `remaining` iterations.
 local function ensure_frame_off_chain(remaining)
   if remaining <= 0 then return end
-  if r.GetToggleCommandState(40904) ~= 1 then return end  -- already off
-  r.Main_OnCommand(40904, 0)
+  if not M.frame_on() then return end  -- already off
+  M.set_frame(false)
   if M.is_debug() then
     r.ShowConsoleMsg(string.format(
-      '[Grid]   (defer) retoggle 40904 off (retries left: %d) | 40904=%s\n',
-      remaining - 1, r.GetToggleCommandState(40904) == 1 and 'ON' or 'OFF'))
+      '[Grid]   (defer) Frame grid off again (retries left: %d) | %s\n',
+      remaining - 1, snapshot()))
   end
   r.defer(function() ensure_frame_off_chain(remaining - 1) end)
 end
@@ -328,9 +354,9 @@ function M.apply(mode, idx)
     mode, idx, preset.label, tostring(preset.native_frame == true), snapshot())
 
   if preset.native_frame then
-    if r.GetToggleCommandState(40904) ~= 1 then
-      r.Main_OnCommand(40904, 0)
-      dbg('  toggled 40904 ON | %s', snapshot())
+    if not M.frame_on() then
+      M.set_frame(true)
+      dbg('  Frame grid ON | %s', snapshot())
     end
     M.set_state(mode, idx)
     dbg('apply END (native_frame) | %s', snapshot())
@@ -352,9 +378,9 @@ function M.apply(mode, idx)
   dbg('  step1 (pre-toggle write) | %s', snapshot())
 
   -- 2) Toggle Frame grid off if currently on
-  if r.GetToggleCommandState(40904) == 1 then
-    r.Main_OnCommand(40904, 0)
-    dbg('  step2 (toggle 40904 OFF) | %s', snapshot())
+  if M.frame_on() then
+    M.set_frame(false)
+    dbg('  step2 (Frame grid OFF) | %s', snapshot())
   end
 
   -- 3) Post-toggle write (clobber any side-effect reset from the toggle)
@@ -402,7 +428,7 @@ end
 -- native_frame preset — signals user enabled Frame grid externally and we
 -- shouldn't override their intent from a keyboard shortcut.
 local function frame_grid_external(mode, idx)
-  if r.GetToggleCommandState(40904) ~= 1 then return false end
+  if not M.frame_on() then return false end
   local preset = M.get_preset(mode, idx)
   return not (preset and preset.native_frame)
 end
@@ -440,7 +466,7 @@ local _last_dbg_sig
 local function get_text_inner()
   local mode, idx = M.get_state()
   local preset = M.get_preset(mode, idx)
-  local frame_on = r.GetToggleCommandState(40904) == 1
+  local frame_on = M.frame_on()
 
   -- Saved preset is native_frame: TC display when Frame grid is on
   if preset and preset.native_frame and frame_on then

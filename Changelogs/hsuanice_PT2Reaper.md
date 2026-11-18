@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1714pre1
+
+- Grid: Frame grid turned off through the project setting (REAPER 7.86: 40904 only sets it) - fixes the Grid stuck on Frame
+
 ## 26.1118.1705pre1
 
 - Counters Panel: Grid debug log in the right-click menu
