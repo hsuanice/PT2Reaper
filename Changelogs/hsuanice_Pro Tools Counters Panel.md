@@ -2,6 +2,10 @@
 
 hsuanice_Pro Tools Counters Panel
 
+## 26.1118.1150pre1
+
+- Edit Selection values in white (like razor areas), Timeline Selection values in cyan (like the loop points), blue when they show the Time marker. Also still: the Grid is checked again for 5 s after a project opens.
+
 ## 26.1118.1058pre1
 
 - The Grid is checked again every 0.5 s for 5 s after REAPER starts / a project opens: the project's own grid (e.g. Frame) could still be loading at the first check.

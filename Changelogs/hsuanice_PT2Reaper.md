@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1150pre1
+
+- Counters Panel: Edit values in white (razor), Timeline values in cyan (loop points), blue on the Time marker
+
 ## 26.1118.1118
 
 - Release: Restore Last Selection (Cmd+Opt+Z), remembered by the Counters Panel (tested in REAPER)

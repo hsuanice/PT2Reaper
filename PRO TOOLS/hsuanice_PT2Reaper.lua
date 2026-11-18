@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.1118
+@version 26.1118.1150pre1
 @author hsuanice
 @metapackage
 @provides
@@ -167,7 +167,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: Restore Last Selection (Cmd+Opt+Z), remembered by the Counters Panel (tested in REAPER)
+  - Counters Panel: Edit values in white (razor), Timeline values in cyan (loop points), blue on the Time marker
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper

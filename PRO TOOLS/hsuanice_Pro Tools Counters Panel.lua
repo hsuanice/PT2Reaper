@@ -1,10 +1,10 @@
 --[[
 @description hsuanice_Pro Tools Counters Panel
-@version 26.1118.1058pre1
+@version 26.1118.1150pre1
 @author hsuanice
 @noindex
 @changelog
-  - The Grid is checked again every 0.5 s for 5 s after REAPER starts / a project opens: the project's own grid (e.g. Frame) could still be loading at the first check.
+  - Edit Selection values in white (like razor areas), Timeline Selection values in cyan (like the loop points), blue when they show the Time marker. Also still: the Grid is checked again for 5 s after a project opens.
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   Pro Tools style counters in one dockable window (native gfx), laid out like the
@@ -15,9 +15,11 @@
     End            | Nudge  (click)   | Post-roll (click)    | End
     Length         | Items:       n   | Tracks:          n   | Length
 
-  - Edit Selection: razor areas, else the time selection (none: the edit cursor).
+  - Edit Selection: razor areas, else the time selection (none: the edit cursor). Values in
+    white, like razor areas.
   - Timeline Selection: the loop points (none: the Time marker (9999) with Link off, else the
-    edit cursor). The marker is removed when there are loop points or Link is on.
+    edit cursor). The marker is removed when there are loop points or Link is on. Values in
+    cyan like the loop points; blue (the marker's color) when they show the Time marker.
   - Link on: loop points made on their own (dragged in the ruler) replace the Edit range - razor
     areas that no longer match them are cleared (Pro Tools: one selection).
   - Grid / Nudge: click to choose (same settings as the Grid Nudge Panel and the Nudge actions).
@@ -80,6 +82,9 @@ local C = {
   bg = { 0.10, 0.10, 0.10 }, sep = { 0.25, 0.25, 0.25 },
   label = { 0.55, 0.55, 0.55 }, value = { 0.00, 0.87, 0.00 }, text = { 0.87, 0.87, 0.87 },
   accent = { 0.60, 0.80, 1.00 }, on_bg = { 0.20, 0.55, 0.15 }, off_txt = { 0.40, 0.40, 0.40 },
+  -- the two selections in their arrange colors: Edit = razor areas (white), Timeline = loop
+  -- points (cyan); a Timeline position on the Time marker = the marker's blue
+  edit = { 0.95, 0.95, 0.95 }, timeline = { 0.25, 0.85, 0.95 }, marker = { 0.40, 0.62, 1.00 },
 }
 local PAD, GAP, COLGAP = 8, 10, 14
 local function col(c) gfx.set(c[1], c[2], c[3], 1) end
@@ -178,6 +183,7 @@ local function scan(now)
   D.items, D.tracks = r.CountSelectedMediaItems(0), r.CountSelectedTracks(0)
   D.edit = es and triple(es, ee) or triple(cur, cur)
   D.tl = ls and triple(ls, le) or triple(tp or cur, tp or cur)
+  D.tl_col = (not ls and tp) and C.marker or C.timeline
 end
 
 ------------------------------------------------------------
@@ -265,7 +271,8 @@ end
 
 local function sections()
   local S = {}
-  S[#S + 1] = { { 'Start', D.edit[1] }, { 'End', D.edit[2] }, { 'Length', D.edit[3] } }
+  local ec, tc = C.edit, D.tl_col or C.timeline -- [7] = value color
+  S[#S + 1] = { { 'Start', D.edit[1], nil, nil, nil, nil, ec }, { 'End', D.edit[2], nil, nil, nil, nil, ec }, { 'Length', D.edit[3], nil, nil, nil, nil, ec } }
   local mode, idx = Nudge.get_state()
   S[#S + 1] = {
     { 'Grid', Grid.get_text(), nil, grid_menu, grid_menu, 'grid' },
@@ -279,7 +286,7 @@ local function sections()
     { 'Post-roll', post, post_on and 'on' or 'off', function() toggle_roll('postroll') end, function() edit_roll('postroll') end, 'postroll' },
     { 'Tracks:', tostring(D.tracks), 'count', toggle_details, toggle_details },
   }
-  S[#S + 1] = { { 'Start', D.tl[1] }, { 'End', D.tl[2] }, { 'Length', D.tl[3] } }
+  S[#S + 1] = { { 'Start', D.tl[1], nil, nil, nil, nil, tc }, { 'End', D.tl[2], nil, nil, nil, nil, tc }, { 'Length', D.tl[3], nil, nil, nil, nil, tc } }
   return S
 end
 
@@ -353,7 +360,7 @@ local function draw()
           elseif kind == 'off' then col(C.off_txt)
           else col(C.label) end
           gfx.x, gfx.y = b.x, y; gfx.drawstr(label)
-          col(kind == 'detail' and C.text or kind == 'off' and C.off_txt or C.value)
+          col(row[7] or kind == 'detail' and C.text or kind == 'off' and C.off_txt or C.value)
           gfx.x = b.x + b.w - gfx.measurestr(value); gfx.drawstr(value)
         end
         local f_label, f_value = row[4], row[5]
