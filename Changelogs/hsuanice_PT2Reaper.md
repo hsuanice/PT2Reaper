@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1118.1327pre1
+
+- Zoom To Fit Selection (Option+F): the same as Zoom To Fit Horizontal Selection, as in Pro Tools
+
 ## 26.1118.1303
 
 - Release: Zoom To Fit Horizontal Selection (tested in REAPER and Pro Tools)

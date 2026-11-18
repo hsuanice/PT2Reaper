@@ -146,7 +146,8 @@
   "hsuanice_Pro Tools Change Timeline to Match Edit.lua",
   "hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua",
   "hsuanice_Pro Tools Change Timeline to Match Edit - End.lua",
-  "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua"
+  "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua",
+  "hsuanice_Pro Tools Zoom To Fit Selection.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
@@ -299,6 +300,7 @@
   "hsuanice_Pro Tools Change Timeline to Match Edit.lua": "Control+O, O",
   "hsuanice_Pro Tools Change Timeline to Match Edit - Start.lua": "Opt+Shift+Control+O",
   "hsuanice_Pro Tools Change Timeline to Match Edit - End.lua": "Cmd+Shift+Control+O",
-  "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua": "Cmd+F5, Cmd+Control+], Opt+Control+F"
+  "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua": "Cmd+F5, Cmd+Control+], Opt+Control+F",
+  "hsuanice_Pro Tools Zoom To Fit Selection.lua": "Opt+F"
  }
 }
