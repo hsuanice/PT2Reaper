@@ -149,7 +149,11 @@
   "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua",
   "hsuanice_Pro Tools Zoom To Fit Selection.lua",
   "hsuanice_Pro Tools Extend Edit Selection Down Including Folder Siblings.lua",
-  "hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua"
+  "hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua",
+  "hsuanice_Pro Tools Zoom To Show All.lua",
+  "hsuanice_Pro Tools Horizontal Zoom to Show All.lua",
+  "hsuanice_Pro Tools Fit Track Size To Window.lua",
+  "hsuanice_Pro Tools Toggle Auto Input Monitor Mode.lua"
  ],
  "libs": [
   "hsuanice_PT_Counters Details.lua",
@@ -305,6 +309,10 @@
   "hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua": "Cmd+F5, Cmd+Control+], Opt+Control+F",
   "hsuanice_Pro Tools Zoom To Fit Selection.lua": "Opt+F",
   "hsuanice_Pro Tools Extend Edit Selection Down Including Folder Siblings.lua": "Opt+Shift+Control+;",
-  "hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua": "Opt+Shift+Control+P"
+  "hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua": "Opt+Shift+Control+P",
+  "hsuanice_Pro Tools Zoom To Show All.lua": "Opt+A",
+  "hsuanice_Pro Tools Horizontal Zoom to Show All.lua": "Cmd+Control+[, Opt+Control+A",
+  "hsuanice_Pro Tools Fit Track Size To Window.lua": "Cmd+Control+Up Arrow, Cmd+Control+Down Arrow",
+  "hsuanice_Pro Tools Toggle Auto Input Monitor Mode.lua": "Opt+K"
  }
 }

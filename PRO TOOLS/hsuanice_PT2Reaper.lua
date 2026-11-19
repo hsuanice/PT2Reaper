@@ -1,6 +1,6 @@
 --[[
 @description PT2Reaper - Pro Tools style editing, nudge, fades and QuickPunch for REAPER
-@version 26.1118.2039
+@version 26.1119.1341pre1
 @author hsuanice
 @metapackage
 @provides
@@ -42,10 +42,12 @@
   [main] hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua
   [main] hsuanice_Pro Tools Fade In From Start To Cursor.lua
   [main] hsuanice_Pro Tools Fade Out From Cursor To End.lua
+  [main] hsuanice_Pro Tools Fit Track Size To Window.lua
   [main] hsuanice_Pro Tools Grid Mode.lua
   [main] hsuanice_Pro Tools Group Clips.lua
   [main] hsuanice_Pro Tools Halve Edit Selection.lua
   [main] hsuanice_Pro Tools Heal Separation.lua
+  [main] hsuanice_Pro Tools Horizontal Zoom to Show All.lua
   [main] hsuanice_Pro Tools Identify Sync Point.lua
   [main] hsuanice_Pro Tools Increase Grid Value.lua
   [main] hsuanice_Pro Tools Increase Nudge Value.lua
@@ -139,6 +141,7 @@
   [main] hsuanice_Pro Tools Spot Mode.lua
   [main] hsuanice_Pro Tools Tab to Transient.lua
   [main] hsuanice_Pro Tools Time Lock Clip.lua
+  [main] hsuanice_Pro Tools Toggle Auto Input Monitor Mode.lua
   [main] hsuanice_Pro Tools Trim Clip End To Cursor.lua
   [main] hsuanice_Pro Tools Trim Clip End to Fill Selection.lua
   [main] hsuanice_Pro Tools Trim Clip Start To Cursor.lua
@@ -153,6 +156,7 @@
   [main] hsuanice_Pro Tools Unloop Clips.lua
   [main] hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua
   [main] hsuanice_Pro Tools Zoom To Fit Selection.lua
+  [main] hsuanice_Pro Tools Zoom To Show All.lua
   [main] hsuanice_Pro Tools Zoom Toggle.lua
   [nomain] hsuanice_PT_Counters Details.lua
   [nomain] hsuanice_PT_Fades.lua
@@ -171,7 +175,7 @@
   [nomain] hsuanice_PT_Transport.lua
   [nomain] hsuanice_PT_Trim.lua
 @changelog
-  - Release: recording uses the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K), QuickPunch on or off (tested in REAPER).
+  - Zoom To Show All / Horizontal Zoom to Show All, Fit Track Size To Window, Toggle Auto Input Monitor Mode (first release).
   - Full history: Changelogs/ in the repository (https://github.com/hsuanice/PT2Reaper/tree/master/Changelogs)
 @about
   # PT2Reaper
@@ -236,10 +240,12 @@
   - Extend Edit Selection Up Including Folder Siblings: Opt+Shift+Control+P
   - Fade In From Start To Cursor: D, Control+D
   - Fade Out From Cursor To End: Control+G, G
+  - Fit Track Size To Window: Cmd+Control+Up Arrow, Cmd+Control+Down Arrow
   - Grid Mode: Opt+4, F4
   - Group Clips: Cmd+Opt+G
   - Halve Edit Selection: Cmd+Opt+Shift+Control+L
   - Heal Separation: Cmd+H
+  - Horizontal Zoom to Show All: Cmd+Control+[, Opt+Control+A
   - Identify Sync Point: Cmd+,
   - Increase Grid Value: +, Opt+Control+NumPad +
   - Increase Nudge Value: Opt++, Cmd+Opt+NumPad +, Cmd+Opt+=
@@ -331,6 +337,7 @@
   - Spot Mode: F3, Opt+3
   - Tab to Transient: Cmd+Opt+Tab
   - Time Lock Clip: Opt+Control+L
+  - Toggle Auto Input Monitor Mode: Opt+K
   - Trim Clip End To Cursor: Opt+*, Opt+Shift+NumPad 8, S, Control+S
   - Trim Clip Start To Cursor: Opt+&, A, Control+A, Opt+Shift+NumPad 7
   - Trim Clip To File Boundaries: Cmd+Control+T
@@ -341,6 +348,7 @@
   - Ungroup Clips: Cmd+Opt+U
   - Zoom To Fit Horizontal Selection: Cmd+F5, Cmd+Control+], Opt+Control+F
   - Zoom To Fit Selection: Opt+F
+  - Zoom To Show All: Opt+A
   - Zoom Toggle: Control+E, E
 
   Shortcuts are suggestions only (the Pro Tools keys) - nothing is assigned automatically. macOS names; on Windows Cmd = Ctrl, Option = Alt, Control = Win.

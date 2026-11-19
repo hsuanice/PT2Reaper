@@ -2,6 +2,10 @@
 
 PT2Reaper package
 
+## 26.1119.1341pre1
+
+- Zoom To Show All / Horizontal Zoom to Show All, Fit Track Size To Window, Toggle Auto Input Monitor Mode (first release).
+
 ## 26.1118.2039
 
 - Release: recording uses the Pro Tools rolls (Counters Panel pre-roll / post-roll, Cmd+K), QuickPunch on or off (tested in REAPER).

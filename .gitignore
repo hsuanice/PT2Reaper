@@ -66,10 +66,12 @@
 !/PRO TOOLS/hsuanice_Pro Tools Extend Edit Selection Up Including Folder Siblings.lua
 !/PRO TOOLS/hsuanice_Pro Tools Fade In From Start To Cursor.lua
 !/PRO TOOLS/hsuanice_Pro Tools Fade Out From Cursor To End.lua
+!/PRO TOOLS/hsuanice_Pro Tools Fit Track Size To Window.lua
 !/PRO TOOLS/hsuanice_Pro Tools Grid Mode.lua
 !/PRO TOOLS/hsuanice_Pro Tools Group Clips.lua
 !/PRO TOOLS/hsuanice_Pro Tools Halve Edit Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Heal Separation.lua
+!/PRO TOOLS/hsuanice_Pro Tools Horizontal Zoom to Show All.lua
 !/PRO TOOLS/hsuanice_Pro Tools Identify Sync Point.lua
 !/PRO TOOLS/hsuanice_Pro Tools Increase Grid Value.lua
 !/PRO TOOLS/hsuanice_Pro Tools Increase Nudge Value.lua
@@ -163,6 +165,7 @@
 !/PRO TOOLS/hsuanice_Pro Tools Spot Mode.lua
 !/PRO TOOLS/hsuanice_Pro Tools Tab to Transient.lua
 !/PRO TOOLS/hsuanice_Pro Tools Time Lock Clip.lua
+!/PRO TOOLS/hsuanice_Pro Tools Toggle Auto Input Monitor Mode.lua
 !/PRO TOOLS/hsuanice_Pro Tools Trim Clip End To Cursor.lua
 !/PRO TOOLS/hsuanice_Pro Tools Trim Clip End to Fill Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Trim Clip Start To Cursor.lua
@@ -177,6 +180,7 @@
 !/PRO TOOLS/hsuanice_Pro Tools Unloop Clips.lua
 !/PRO TOOLS/hsuanice_Pro Tools Zoom To Fit Horizontal Selection.lua
 !/PRO TOOLS/hsuanice_Pro Tools Zoom To Fit Selection.lua
+!/PRO TOOLS/hsuanice_Pro Tools Zoom To Show All.lua
 !/PRO TOOLS/hsuanice_Pro Tools Zoom Toggle.lua
 
 .DS_Store
